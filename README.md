@@ -6,6 +6,6 @@ CookieCaster 3.0 is a freely available web application that allows users to draw
 
 ## GitHub Pages
 
-Initial setup of [GutHub Pages](https://docs.github.com/de/pages) is done. The React app caon by accessed with https://fhnw-makerverse.github.io/cookiecaster/
+The initial setup of GitHub Pages is complete, and the React app is now accessible at https://fhnw-makerverse.github.io/cookiecaster/.
 
 
