@@ -1,0 +1,285 @@
+/* === GLOBAL LAYOUT === */
+.start-root {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--hintergrundfarbe);
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding-top: 80px; /* make room for navbar */
+}
+
+.start-layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: center; /* center both canvas + sidebar horizontally */
+    align-items: flex-start; /* align tops evenly */
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    gap: 2rem;
+    padding: 0 2rem;
+}
+
+/* === CANVAS AREA === */
+.canvas-wrap {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* align top with sidebar */
+    margin-top: 0;
+}
+
+#drawingarea {
+    background-color: var(--akzentfarbe3, #bfb8a3);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    width: 20cm;
+    height: 20cm;
+}
+
+#raster line {
+    stroke: #a39b86;
+    stroke-width: 1px;
+}
+
+/* === SIDENAV (right panel) === */
+.sidenav {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--akzentfarbe1);
+    color: white;
+    width: 320px;
+    min-width: 300px;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 2rem;
+    height: fit-content;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.sidenav h5 {
+    font-size: 20px;
+    color: var(--akzentfarbe2);
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+/* === SIDENAV ITEMS === */
+.sidenav li {
+    list-style: none;
+    font-size: 18px;
+    margin: 0.4rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+}
+
+.sidenav button,
+.sidenav a {
+    background-color: var(--akzentfarbe1);
+    color: white;
+    font-size: 18px;
+    border: none;
+    text-align: left;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: var(--hausschrift);
+}
+
+.sidenav button:hover,
+.sidenav a:hover {
+    color: var(--akzentfarbe2);
+}
+
+.sidenav hr {
+    border-top: 1px solid var(--akzentfarbe2);
+    margin: 1rem 0;
+}
+
+/* === TOGGLE SWITCH === */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--hintergrundfarbe);
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--akzentfarbe2);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* === TOOLTIP === */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: var(--akzentfarbe2);
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* === CANVAS ELEMENTS === */
+circle {
+    stroke: black;
+    fill: lightgreen;
+}
+
+.circleSelected {
+    fill: lightblue;
+}
+
+.pathSelected {
+    stroke: lightblue;
+}
+
+.qCircle {
+    fill: yellow;
+}
+
+.eCircle {
+    stroke: var(--akzentfarbe4);
+    stroke-width: 2px;
+    fill: none;
+}
+
+.eSeg {
+    stroke: var(--akzentfarbe4);
+    stroke-width: 5px;
+    stroke-linecap: round;
+}
+
+.qEdge {
+    stroke: yellow;
+    stroke-width: 1px;
+}
+
+#selectionRect {
+    fill: #add8e6;
+    stroke: #add8e6;
+    fill-opacity: 0.3;
+    stroke-opacity: 0.7;
+    stroke-width: 1px;
+    stroke-dasharray: 5, 5;
+}
+
+text {
+    fill: var(--akzentfarbe2);
+    font-size: 8px;
+    z-index: 99;
+}
+
+/* === SVG EDGE AND PATH FIX === */
+#edges path,
+#edges line,
+path {
+    stroke: #202020;
+    stroke-width: 4px;
+    fill: none;
+}
+
+/* Move-edge (temporary line while drawing) */
+#moveEdge {
+    stroke: #20202060;
+    stroke-width: 4px;
+}
+
+/* Highlighted or selected paths */
+.pathSelected {
+    stroke: lightblue;
+}
+
+/* Edge control lines (Bezier helpers) */
+.qEdge {
+    stroke: yellow;
+    stroke-width: 1px;
+}
+
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+    .start-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sidenav {
+        width: 90%;
+        margin-top: 1rem;
+    }
+
+    #drawingarea {
+        width: 90vw;
+        height: 90vw;
+    }
+}
+
+@media all and (orientation: portrait) {
+    #drawingarea,
+    .sidenav {
+        display: none;
+    }
+
+    h7 {
+        font-size: 28px;
+        color: var(--akzentfarbe2);
+    }
+
+    .btn-primary {
+        display: none;
+    }
+}

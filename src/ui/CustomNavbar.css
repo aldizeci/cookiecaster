@@ -1,0 +1,113 @@
+.navbar-nav, .navbar-default {
+    background-color: var(--akzentfarbe1) !important;
+    font-family: var(--hausschrift);
+    font-size: 20px;
+}
+
+.navbar-default {
+    width: 100%;
+    z-index: 2;
+    position: fixed;
+}
+
+/*.navbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+}*/
+
+#startNavBar{
+    left: 0;
+    right: 0;
+}
+
+.navbar-nav > li > a{
+    text-shadow: none;
+}
+
+a.navbar-brand{
+    font-size: 30pt;
+}
+
+.navbar-default .navbar-brand:hover{
+    color: var(--akzentfarbe2) !important;
+}
+
+.navbar-default {
+    background-image: none;
+    border: none;
+    border-radius: 0;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: white;
+}
+
+.navbar-default .navbar-nav > li > a:hover{
+    color: var(--akzentfarbe2) !important;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+    font-family: var(--hausschrift);
+    text-shadow: none;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: white;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: white;
+}
+
+-navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover{
+    background-color: transparent;
+}
+
+.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover{
+    color: white;
+    background-color: transparent;
+}
+
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover{
+    color: white;
+    background-color: transparent;
+}
+
+#basic-nav-dropdown{
+    color: white;
+}
+
+#basic-nav-dropdown:hover{
+    color: var(--akzentfarbe2);
+    text-decoration: none;
+}
+
+#basic-nav-dropdown:focus {
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.dropdown-menu{
+    background-color: var(--akzentfarbe1);
+}
+
+.dropdown-menu > li > a{
+    color: white;
+    font-size: 20px;
+}
+
+.dropdown-menu > li > a:hover{
+    color: var(--akzentfarbe2);
+    background: none;
+}
+
+a:focus, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+    color: var(--akzentfarbe2);
+
+}
+
+a:focus, .navbar-default .navbar-nav .open .dropdown-menu > li > a{
+    color:white;
+}
