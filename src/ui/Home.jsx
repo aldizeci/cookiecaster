@@ -1,13 +1,29 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
 import "./Home.css";
 
-const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+//const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 export default function Home() {
-    if (isTouchDevice) {
+    // Track window width
+    const [width, setWidth] = useState(window.innerWidth);
+
+    // Update on resize
+    useEffect(() => {
+        function handleWindowSizeChange() {
+            setWidth(window.innerWidth);
+        }
+
+        window.addEventListener("resize", handleWindowSizeChange);
+        return () => window.removeEventListener("resize", handleWindowSizeChange);
+    }, []);
+
+    // Device detection (mobile vs tablet/desktop)
+    const isMobile = width <= 768;
+
+    if (isMobile) {
         return (
             <Container className="mt-5">
                 <div className="p-5 mb-4 bg-light rounded-3">

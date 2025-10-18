@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
 import config from "../client_config.json";
+import * as bootstrap from "bootstrap";
 
 import Graph from "../api/graph/Graph";
 import Controller from "../api/Controller";
@@ -85,6 +86,12 @@ export default function Start() {
         upload: {id: "alert.upload"},
     }), []);
 
+    useEffect(() => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map((el) => new bootstrap.Tooltip(el));
+        return () => tooltipList.forEach((t) => t.dispose());
+    }, []);
+
     // ---- local state ----
     const [showGrid, setShowGrid] = useState(true);
     const [pictureUrl, setPictureUrl] = useState(null);
@@ -107,6 +114,15 @@ export default function Start() {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
     } : undefined;
+
+    useEffect(() => {
+        // Enable all tooltips on page load
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+
+        // Optional: clean up on unmount
+        return () => tooltipList.forEach((t) => t.dispose());
+    }, []);
 
     // ---- handlers ----
     const changeGrid = useCallback((checked) => {
@@ -320,165 +336,170 @@ export default function Start() {
 
     // ---- render ----
     return (<div className="start-root">
-            <div className="start-layout">
-                <div className="canvas-wrap">
-                    <svg
-                        ref={svgRef}
-                        viewBox={viewBox}
-                        style={backgroundStyle}
-                        preserveAspectRatio="xMidYMid meet"
-                        id="drawingarea"
-                        className="mouse"
-                    >
-                        <g id="raster">
-                            {rasterLines.linesY}
-                            {rasterLines.linesX}
-                        </g>
+        <div className="start-layout">
+            <div className="canvas-wrap">
+                <svg
+                    ref={svgRef}
+                    viewBox={viewBox}
+                    style={backgroundStyle}
+                    preserveAspectRatio="xMidYMid meet"
+                    id="drawingarea"
+                    className="mouse"
+                >
+                    <g id="raster">
+                        {rasterLines.linesY}
+                        {rasterLines.linesX}
+                    </g>
 
-                        <g id="layer" transform={translate}>
-                            <text textAnchor="middle">{formatMessage(msgs.drawingarea)}</text>
-                        </g>
+                    <g id="layer" transform={translate}>
+                        <text textAnchor="middle">{formatMessage(msgs.drawingarea)}</text>
+                    </g>
 
-                        <line id="moveEdge" visibility="hidden"/>
-                        <path id="selectionRect" visibility="hidden"/>
-                        <g id="edges"/>
-                        <line id="qEdge1" className="qEdge" visibility="hidden"/>
-                        <line id="qEdge2" className="qEdge" visibility="hidden"/>
-                        <g id="nodes"/>
-                        <g id="warnings"/>
-                        <g>
-                            <text id="message1"/>
-                            <text id="message2"/>
-                        </g>
-                    </svg>
+                    <line id="moveEdge" visibility="hidden"/>
+                    <path id="selectionRect" visibility="hidden"/>
+                    <g id="edges"/>
+                    <line id="qEdge1" className="qEdge" visibility="hidden"/>
+                    <line id="qEdge2" className="qEdge" visibility="hidden"/>
+                    <g id="nodes"/>
+                    <g id="warnings"/>
+                    <g>
+                        <text id="message1"/>
+                        <text id="message2"/>
+                    </g>
+                </svg>
+            </div>
+
+            <aside className="sidenav">
+                <h5>
+                    <FormattedMessage id="start.title"/>
+                </h5>
+
+                <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center gap-2 standard-font">
+                        <i className="fas fa-table-cells-large"></i>
+                        <FormattedMessage id="start.helplines"/>
+                    </div>
+
+                    <div>
+                        <label className="switch m-0">
+                            <input
+                                type="checkbox"
+                                checked={showGrid}
+                                onChange={(e) => changeGrid(e.target.checked)}
+                            />
+                            <span className="slider round"></span>
+                        </label>
+                    </div>
                 </div>
 
-                <aside className="sidenav">
-                    <h5>
-                        <FormattedMessage id="start.title"/>
-                    </h5>
-
-                    <li className="list-group-item">
-                        <i className="fas fa-th-large"/>
-                        <FormattedMessage id="start.helplines"/>
-                        <div className="material-switch pull-right">
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={showGrid}
-                                    onChange={(e) => changeGrid(e.target.checked)}
-                                />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </li>
-
-                    <li className="list-group-item">
-                        <i className="far fa-image"/>
+                <div className="list-group-item d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center gap-2">
+                        <i className="far fa-image"></i>
                         <FormattedMessage id="start.backgroundImage"/>
-                        <div className="material-switch pull-right">
-                            <label className="switch">
-                                <input
-                                    type="checkbox"
-                                    checked={!!pictureUrl}
-                                    onChange={(e) => toggleBackground(e.target.checked)}
-                                />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </li>
+                    </div>
 
-                    <li className="list-group-item">
-                        <i className="fa fa-search"/>
+                    <div className="material-switch m-0 flex-shrink-0">
+                        <label className="switch m-0">
+                            <input
+                                type="checkbox"
+                                checked={!!pictureUrl}
+                                onChange={(e) => toggleBackground(e.target.checked)}
+                            />
+                            <span className="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+
+                <div className="list-group-item d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center gap-2">
+                        <i className="fa fa-search"></i>
                         <FormattedMessage id="start.zoom"/>
-                        <div className="pull-right selector">
-                            <select
-                                aria-label="Zoom"
-                                value={zoomIndex}
-                                onChange={(e) => changeZoom(e.target.value)}
-                            >
-                                {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
-                                        {z}
-                                    </option>))}
-                            </select>
-                        </div>
-                    </li>
+                    </div>
 
-                    <button id="reset" className="tooltip">
+                    <div className="selector m-0 flex-shrink-0">
+                        <select
+                            className="form-select form-select-sm"
+                            aria-label="Zoom"
+                            value={zoomIndex}
+                            onChange={(e) => changeZoom(e.target.value)}
+                        >
+                            {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
+                                    {z}
+                                </option>))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="d-flex justify-content-start">
+                    <button id="reset" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                            data-bs-title={intl.formatMessage({id: "start.deleteEverything"})}>
                         <i className="far fa-file"></i> <FormattedMessage id="start.new"/>
-                        <span className="tooltiptext tooltip-right">
-              <FormattedMessage id="start.deleteEverything"/>
-            </span>
                     </button>
+                </div>
 
-                    <button id="draw">
-                        <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
-                    </button>
+                <button id="draw">
+                    <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
+                </button>
 
-                    <button id="select">
-                        <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
-                    </button>
+                <button id="select">
+                    <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
+                </button>
 
-                    <button id="move">
-                        <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
-                    </button>
+                <button id="move">
+                    <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
+                </button>
 
-                    <button id="rotate">
-                        <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
-                    </button>
+                <button id="rotate">
+                    <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
+                </button>
 
-                    <button id="mirror">
-                        <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
-                    </button>
+                <button id="mirror">
+                    <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
+                </button>
 
-                    <button id="copy">
-                        <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
-                    </button>
+                <button id="copy">
+                    <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
+                </button>
 
-                    <button id="upload" className="tooltip" onClick={onUploadClick}>
-                        <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
-                        <span className="tooltiptext tooltip-right">
-              <FormattedMessage id="start.uploadTooltip"/>
-            </span>
-                    </button>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={onFilePicked}
-                    />
+                <button id="upload" type="button" onClick={onUploadClick} data-bs-toggle="tooltip"
+                        data-bs-placement="top" data-bs-title={intl.formatMessage({id: "start.uploadTooltip"})}>
+                    <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
+                </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onFilePicked}
+                />
 
-                    <button id="erase" className="tooltip">
-                        <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
-                        <span className="tooltiptext tooltip-right">
-              <FormattedMessage id="start.deleteTooltip"/>
-            </span>
-                    </button>
+                <button id="erase" data-toggle="tooltip" data-placement="top"
+                        data-bs-title={intl.formatMessage({id: "start.deleteTooltip"})}>
+                    <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
+                </button>
 
-                    <hr/>
+                <hr/>
 
-                    <button id="analyze" className="tooltip">
-                        <i className="fab fa-searchengin"></i>{" "}
-                        <FormattedMessage id="start.analyze"/>
-                        <span className="tooltiptext tooltip-right">
-              <FormattedMessage id="start.analyzeText"/>
-            </span>
-                    </button>
+                <button id="analyze" data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-title={intl.formatMessage({id: "start.analyzeText"})}>
+                    <i className="fab fa-searchengin"></i>{" "}
+                    <FormattedMessage id="start.analyze"/>
+                </button>
 
-                    <button id="save" className="tooltip">
-                        <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-                    </button>
+                <button id="save">
+                    <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
+                </button>
 
-                    <Link id="load" className="tooltip nav-link" to="/gallery">
-                        <i className="fas fa-upload"></i>{" "}
-                        <FormattedMessage id="start.loadFromGallery"/>
-                    </Link>
+                <Link id="load" className="nav-link" to="/gallery">
+                    <i className="fas fa-upload"></i>{" "}
+                    <FormattedMessage id="start.loadFromGallery"/>
+                </Link>
 
-                    <Link id="goToExport" className="tooltip nav-link" to="/export">
-                        <i className="fas fa-download"></i> Export 3D
-                    </Link>
-                </aside>
-            </div>
-        </div>);
+                <Link id="goToExport" className="nav-link" to="/export">
+                    <i className="fas fa-download"></i> Export 3D
+                </Link>
+            </aside>
+        </div>
+    </div>);
 }

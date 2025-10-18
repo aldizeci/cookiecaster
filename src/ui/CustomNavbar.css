@@ -1,113 +1,93 @@
-.navbar-nav, .navbar-default {
+/* ============================================================
+   CookieCaster 3.0 – CustomNavbar (Bootstrap 5 compatible)
+   Preserves original colors and font from CookieCaster 2.0
+   ============================================================ */
+
+.custom-navbar {
     background-color: var(--akzentfarbe1) !important;
     font-family: var(--hausschrift);
     font-size: 20px;
-}
-
-.navbar-default {
     width: 100%;
     z-index: 2;
-    position: fixed;
-}
-
-/*.navbar {
-    position: fixed;
-    left: 0;
-    right: 0;
-}*/
-
-#startNavBar{
-    left: 0;
-    right: 0;
-}
-
-.navbar-nav > li > a{
-    text-shadow: none;
-}
-
-a.navbar-brand{
-    font-size: 30pt;
-}
-
-.navbar-default .navbar-brand:hover{
-    color: var(--akzentfarbe2) !important;
-}
-
-.navbar-default {
-    background-image: none;
+    position: sticky;
+    top: 0;
     border: none;
     border-radius: 0;
 }
 
-.navbar-default .navbar-nav > li > a {
-    color: white;
-}
-
-.navbar-default .navbar-nav > li > a:hover{
-    color: var(--akzentfarbe2) !important;
-}
-
-.navbar-default .navbar-brand {
-    color: white;
+/* Brand text */
+.navbar-brand {
+    color: white !important;
+    font-size: 30pt;
     font-family: var(--hausschrift);
     text-shadow: none;
+    transition: color 0.2s ease;
 }
 
-.navbar-default .navbar-toggle {
+.navbar-brand:hover,
+.navbar-brand:focus {
+    color: var(--akzentfarbe2) !important;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+/* Navbar links */
+.navbar-nav .nav-link {
+    color: white !important;
+    text-shadow: none;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    color: var(--akzentfarbe2) !important;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+/* Dropdown styling */
+.navbar-nav .dropdown-menu {
+    background-color: var(--akzentfarbe1);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.navbar-nav .dropdown-item {
+    color: white;
+    font-size: 20px;
+    font-family: var(--hausschrift);
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .dropdown-item:hover,
+.navbar-nav .dropdown-item:focus {
+    color: var(--akzentfarbe2);
+    background-color: transparent;
+}
+
+/* Language dropdown toggle icon */
+#basic-nav-dropdown {
+    color: white;
+}
+
+#basic-nav-dropdown:hover,
+#basic-nav-dropdown:focus {
+    color: var(--akzentfarbe2);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+/* Mobile toggle button */
+.navbar-toggler {
     border-color: white;
 }
 
-.navbar-default .navbar-toggle .icon-bar {
-    background-color: white;
+.navbar-toggler-icon {
+    filter: invert(100%);
 }
 
--navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover{
-    background-color: transparent;
-}
-
-.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover{
-    color: white;
-    background-color: transparent;
-}
-
-.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover{
-    color: white;
-    background-color: transparent;
-}
-
-#basic-nav-dropdown{
-    color: white;
-}
-
-#basic-nav-dropdown:hover{
-    color: var(--akzentfarbe2);
-    text-decoration: none;
-}
-
-#basic-nav-dropdown:focus {
-    background-color: transparent;
-    text-decoration: none;
-}
-
-.dropdown-menu{
-    background-color: var(--akzentfarbe1);
-}
-
-.dropdown-menu > li > a{
-    color: white;
-    font-size: 20px;
-}
-
-.dropdown-menu > li > a:hover{
-    color: var(--akzentfarbe2);
-    background: none;
-}
-
-a:focus, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
-    color: var(--akzentfarbe2);
-
-}
-
-a:focus, .navbar-default .navbar-nav .open .dropdown-menu > li > a{
-    color:white;
+/* Utility */
+a:focus {
+    outline: none;
 }
