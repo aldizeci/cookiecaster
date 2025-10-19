@@ -1,7 +1,7 @@
 /**
- * @author Claudio
- * @date 22.06.2018
- * @version 1.0
+ * @author Sadik Hrnjica
+ * @date 19.10.2025
+ * @version 2.0 (refactored)
  */
 
 import AbstractMode from "./AbstractMode";
@@ -10,89 +10,101 @@ import SvgHandler from "../SvgHandler";
 import Controller from "../Controller";
 import SelectionHandler from "../SelectionHandler";
 
-let round5 = x => Math.round(2 * x) * 0.5;
+const round5 = x => Math.round(2 * x) * 0.5;
 
 export default class ModeRotate extends AbstractMode {
     enable() {
         d3.select("#rotate").classed("activeMode", true);
-        this.data = {pivot: undefined, vec: undefined, nodePos: {}, qPos: {}};
+        this.data = { pivot: null, vec: null, nodePos: {}, qPos: {} };
+        console.log("ModeRotate enabled");
     }
 
     onMouseDown(point) {
         const selh = SelectionHandler.instance;
-        const selNodes = selh.selectedNodes;
-        if (selNodes.length > 0) {
-            let cx = 0, cy = 0;
-            selNodes.forEach(node => {
-                cx += node.pos.x;
-                cy += node.pos.y;
-                this.data.nodePos[node.id] = node.pos
-            });
-            selh.selectedEdges.forEach(edge => this.data.qPos[edge.id] = edge.q);
-            selh.affectedEdges.forEach(affected => {
-                const edge = affected.edge;
-                this.data.qPos[edge.id] = edge.q
-            });
-            const dn = 1 / selNodes.length;
-            this.data.pivot = {x: cx * dn, y: cy * dn};
-            this.data.vec = {x: point.x - this.data.pivot.x, y: point.y - this.data.pivot.y};
+        const nodes = Array.from(selh.selectedNodes);
+        const edges = Array.from(selh.selectedEdges);
+
+        if (!nodes.length && !edges.length) {
+            console.log("No nodes or edges selected");
+            return;
         }
+
+        // --- compute pivot (average of all selected node positions) ---
+        const pivot = nodes.reduce(
+            (acc, n) => {
+                this.data.nodePos[n.id] = n.pos;
+                return { x: acc.x + n.pos.x, y: acc.y + n.pos.y };
+            },
+            { x: 0, y: 0 }
+        );
+
+        pivot.x /= nodes.length;
+        pivot.y /= nodes.length;
+        this.data.pivot = pivot;
+        this.data.vec = { x: point.x - pivot.x, y: point.y - pivot.y };
+
+        // --- store edge control points ---
+        [...selh.selectedEdges, ...selh.affectedEdges].forEach(item => {
+            const edge = item.edge || item; // handle affectedEdges which wrap {edge, mod}
+            this.data.qPos[edge.id] = edge.q;
+        });
+
+        console.log("Pivot:", pivot, "Vec:", this.data.vec);
     }
 
     onMouseMove(point) {
-        if (this.data.vec !== undefined) {
-            const svgh = SvgHandler.instance;
-            const selh = SelectionHandler.instance;
-            const vx = this.data.vec.x;
-            const vy = this.data.vec.y;
-            const dx = point.x - this.data.pivot.x;
-            const dy = point.y - this.data.pivot.y;
+        const { pivot, vec } = this.data;
+        if (!vec) return;
 
-            const s = Math.sign(vx * dy - vy * dx);
-            const cosPhi = (vx * dx + vy * dy) / (Math.sqrt(vx * vx + vy * vy) * Math.sqrt(dx * dx + dy * dy));
-            const sinPhi = s * Math.sqrt(1 - cosPhi * cosPhi);
+        const svgh = SvgHandler.instance;
+        const selh = SelectionHandler.instance;
 
-            //todo check simplify
-            const cosPhi2 = Math.cos(0.5 * Math.acos(cosPhi));
-            const sinPhi2 = s * Math.sqrt(1 - cosPhi2 * cosPhi2);
+        const vx = vec.x, vy = vec.y;
+        const dx = point.x - pivot.x, dy = point.y - pivot.y;
 
-            selh.selectedNodes.forEach(node => {
-                const np = this.data.nodePos[node.id];
-                const dx = np.x - this.data.pivot.x;
-                const dy = np.y - this.data.pivot.y;
-                node.pos = {
-                    x: round5(dx * cosPhi - dy * sinPhi + this.data.pivot.x),
-                    y: round5(dx * sinPhi + dy * cosPhi + this.data.pivot.y),
-                };
-                svgh.updateNode(node);
-            });
-            selh.selectedEdges.forEach(edge => {
-                const q = this.data.qPos[edge.id];
-                const dx = q.x - this.data.pivot.x;
-                const dy = q.y - this.data.pivot.y;
-                edge.q = {
-                    x: round5(dx * cosPhi - dy * sinPhi + this.data.pivot.x),
-                    y: round5(dx * sinPhi + dy * cosPhi + this.data.pivot.y),
-                };
-                svgh.updateEdge(edge);
-            });
-            selh.affectedEdges.forEach(affected => {
-                const edge = affected.edge;
-                const q = this.data.qPos[edge.id];
-                const dx = q.x - this.data.pivot.x;
-                const dy = q.y - this.data.pivot.y;
-                edge.q = {
-                    x: round5(dx * cosPhi2 - dy * sinPhi2 + this.data.pivot.x),
-                    y: round5(dx * sinPhi2 + dy * cosPhi2 + this.data.pivot.y),
-                };
-                svgh.updateEdge(edge);
-            });
-            svgh.updateMessage();
+        // --- angle computation ---
+        const cross = vx * dy - vy * dx;
+        const s = Math.sign(cross);
+        const dot = vx * dx + vy * dy;
+        const cosPhi = dot / (Math.hypot(vx, vy) * Math.hypot(dx, dy));
+        const sinPhi = s * Math.sqrt(1 - cosPhi * cosPhi);
+
+        // simplified half-angle
+        const cosHalf = Math.cos(0.5 * Math.acos(cosPhi));
+        const sinHalf = s * Math.sqrt(1 - cosHalf * cosHalf);
+
+        // --- rotation helper ---
+        const rotatePoint = (x, y, c = cosPhi, s = sinPhi) => ({
+            x: round5((x - pivot.x) * c - (y - pivot.y) * s + pivot.x),
+            y: round5((x - pivot.x) * s + (y - pivot.y) * c + pivot.y)
+        });
+
+        // --- update nodes ---
+        for (const node of selh.selectedNodes) {
+            const old = this.data.nodePos[node.id];
+            node.pos = rotatePoint(old.x, old.y);
+            svgh.updateNode(node);
         }
+
+        // --- update selected edges ---
+        for (const edge of selh.selectedEdges) {
+            const old = this.data.qPos[edge.id];
+            edge.q = rotatePoint(old.x, old.y);
+            svgh.updateEdge(edge);
+        }
+
+        // --- update affected edges ---
+        for (const { edge } of selh.affectedEdges) {
+            const old = this.data.qPos[edge.id];
+            edge.q = rotatePoint(old.x, old.y, cosHalf, sinHalf);
+            svgh.updateEdge(edge);
+        }
+
+        svgh.updateMessage();
     }
 
     onMouseUp() {
-        this.data.vec = undefined;
+        this.data.vec = null;
     }
 
     onEscape() {
@@ -101,5 +113,6 @@ export default class ModeRotate extends AbstractMode {
 
     disable() {
         d3.select("#rotate").classed("activeMode", false);
+        console.log("ModeRotate disabled");
     }
 }

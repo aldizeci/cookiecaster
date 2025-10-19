@@ -1,5 +1,4 @@
 import './Start.css'
-// Start.jsx (React 19+ functional, no backend, D3 latest)
 import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {Link} from "react-router-dom";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
