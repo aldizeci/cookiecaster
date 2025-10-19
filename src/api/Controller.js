@@ -13,7 +13,7 @@ let _singleton = Symbol();
 export default class Controller {
     constructor(singletonToken) {
         if (_singleton !== singletonToken)
-            throw new Error("Cannot instantiate directly.");
+            throw new Error("Use Controller.instance instead of direct instantiation.");
 
         this.modi = {
             MODE_DRAW: new ModeDraw(),
@@ -21,231 +21,201 @@ export default class Controller {
             MODE_MOVE: new ModeMove(),
             MODE_ROTATE: new ModeRotate(),
         };
+
         this._mode = this.modi.MODE_DRAW;
         this._grid = true;
     }
 
-    /**
-     * Static accessor
-     *
-     * @returns {Controller}
-     */
+    /** Singleton accessor */
     static get instance() {
-        if (!this[_singleton]) this[_singleton] = new Controller(_singleton);
-
+        if (!this[_singleton])
+            this[_singleton] = new Controller(_singleton);
         return this[_singleton];
     }
 
-    /**
-     *
-     * @returns {boolean}
-     */
-    get grid() {
-        return this._grid;
-    }
+    // --- Grid toggle ---
+    get grid() { return this._grid; }
+    set grid(active) { this._grid = Boolean(active); }
 
-    set grid(isGridActived) {
-        this._grid = isGridActived;
-    }
-
-    /**
-     *
-     * @returns {AbstractMode}
-     */
-    get mode() {
-        return this._mode;
-    }
-
-    set mode(value) {
+    // --- Mode handling ---
+    get mode() { return this._mode; }
+    set mode(newMode) {
+        if (newMode === this._mode) return;
         this._mode.disable();
-        this._mode = value;
+        this._mode = newMode;
         this._mode.enable();
     }
 
-    fixIfAtBoundary(pos) {
-        const space = SvgHandler.instance.getRasterSpace();
-        const size = SvgHandler.instance.getDrawingAreaSize();
-        if (pos.x < space) {
-            pos.x = space;
+    // UTILITY METHODS
+    /** Snaps point to grid and clamps to drawing area boundaries */
+    fixAndSnapPoint(point) {
+        const svgh = SvgHandler.instance;
+        const space = svgh.getRasterSpace();
+        const size = svgh.getDrawingAreaSize();
+
+        if (this._grid) {
+            const snap = Math.floor(space / 2);
+            point.x = Math.floor(point.x / space) * space + (point.x % space > snap ? space : 0);
+            point.y = Math.floor(point.y / space) * space + (point.y % space > snap ? space : 0);
         }
-        if (pos.y < space) {
-            pos.y = space;
-        }
-        if (pos.x > size - space) {
-            pos.x = size - space;
-        }
-        if (pos.y > size - space) {
-            pos.y = size - space;
-        }
+
+        // Clamp inside boundaries
+        point.x = Math.min(Math.max(point.x, space), size - space);
+        point.y = Math.min(Math.max(point.y, space), size - space);
     }
 
-    updatePoint(point) {
-        const space = SvgHandler.instance.getRasterSpace();
-        const moduloX = point.x % space;
-        const moduloY = point.y % space;
-        const snap = Math.floor(space / 2);
-        let x = Math.floor(point.x / space) * space;
-        let y = Math.floor(point.y / space) * space;
-        if (moduloX > snap) {
-            x = Math.floor(point.x / space) * space + space;
-        }
-        if (moduloY > snap) {
-            y = Math.floor(point.y / space) * space + space;
-        }
-        point.x = x;
-        point.y = y;
-    }
+    // MOUSE INTERACTIONS
 
     mouseDown(point) {
-        if (!SelectionHandler.instance.isRectActive()) {
-            if (this._grid) {
-                this.updatePoint(point);
-            }
-            this.fixIfAtBoundary(point);
-        }
-        const m = this.mode.onMouseDown(point);
-        if (m !== undefined) {
-            this.mode = m;
-        }
+        if (!SelectionHandler.instance.isRectActive()) this.fixAndSnapPoint(point);
+        this._transition(this._mode.onMouseDown(point));
     }
 
     mouseMove(point) {
         const selh = SelectionHandler.instance;
-        if (!selh.isRectActive()) {
-            if (this._grid) {
-                this.updatePoint(point);
-            }
-            this.fixIfAtBoundary(point);
-        }
-        const m = this.mode.onMouseMove(point);
-        if (m !== undefined) {
-            this.mode = m;
-        }
+        if (!selh.isRectActive()) this.fixAndSnapPoint(point);
+        this._transition(this._mode.onMouseMove(point));
     }
 
     mouseUp() {
-        const m = this.mode.onMouseUp();
-        if (m !== undefined) {
-            this.mode = m;
-        }
+        this._transition(this._mode.onMouseUp());
     }
 
+    /** Helper to safely change mode if a function returns a new one */
+    _transition(nextMode) {
+        if (nextMode !== undefined) this.mode = nextMode;
+    }
+
+    // COMMANDS
+
+    /** Clears graph and resets to draw mode */
     reset() {
         Graph.instance.clear();
         SvgHandler.instance.clear();
         this.mode = this.modi.MODE_DRAW;
     }
 
+    /** Deletes selected elements */
     erase() {
         const selh = SelectionHandler.instance;
         const svgh = SvgHandler.instance;
         const graph = Graph.instance;
-        selh.selectedEdges.forEach((edge) => graph.removeEdge(edge));
+
+        for (const edge of selh.selectedEdges) graph.removeEdge(edge);
+
         if (!selh.singleEdge) {
-            selh.affectedEdges.forEach((affected) =>
-                graph.removeEdge(affected.edge)
-            );
-            selh.selectedNodes.forEach((node) => graph.removeNode(node));
+            for (const { edge } of selh.affectedEdges) graph.removeEdge(edge);
+            for (const node of selh.selectedNodes) graph.removeNode(node);
         }
+
         selh.clear();
         svgh.updateMessage("");
-        this.mode =
-            graph.nodeSize > 0 ? this.modi.MODE_SELECT : this.modi.MODE_DRAW;
+        this.mode = graph.nodeSize > 0 ? this.modi.MODE_SELECT : this.modi.MODE_DRAW;
     }
 
+    /** Duplicates selected elements, offsetting them by 5 raster spaces */
     copy() {
         const graph = Graph.instance;
         const selh = SelectionHandler.instance;
         const svgh = SvgHandler.instance;
-        const dx = svgh.getRasterSpace()*5,
-            dy = svgh.getRasterSpace()*5;
-        const cNodes = {};
-        const selNodes = selh.selectedNodes;
-        const selEdges = selh.selectedEdges;
-        selh.clear();
+        const dx = svgh.getRasterSpace() * 5;
+        const dy = svgh.getRasterSpace() * 5;
 
-        selNodes.forEach((sn) => {
-            const nid = svgh.nodeID++;
-            const node = new Node(nid, { x: sn.pos.x + dx, y: sn.pos.y + dy });
+        const selNodes = Array.from(selh.selectedNodes);
+        const selEdges = Array.from(selh.selectedEdges);
+        if (!selNodes.length && !selEdges.length) {
+            console.log("Copy: nothing selected");
+            return;
+        }
+
+        selh.clear();
+        const cNodes = {};
+
+        // Copy nodes
+        for (const sn of selNodes) {
+            const node = new Node(svgh.nodeID++, { x: sn.pos.x + dx, y: sn.pos.y + dy });
             graph.addNode(node);
-            selh._nodes.put(node.id, node);
+            selh._nodes.set(node.id, node);
             svgh.selectNode(node, true);
             cNodes[sn.id] = node;
-        });
-        selEdges.forEach((se) => {
-            const eid = svgh.edgeID++;
+        }
+
+        // Copy edges
+        for (const se of selEdges) {
             const from = cNodes[se.from.id];
             const to = cNodes[se.to.id];
-            const edge = new Edge(eid, from, to, {
-                x: se.q.x + dx,
-                y: se.q.y + dy,
-            });
+            if (!from || !to) continue;
+
+            const edge = new Edge(svgh.edgeID++, from, to, { x: se.q.x + dx, y: se.q.y + dy });
             graph.addEdge(edge);
-            selh._edges.put(edge.id, edge);
+            selh._edges.set(edge.id, edge);
             svgh.selectEdge(edge, true);
-        });
+        }
+
         svgh.updateMessage();
         this.mode = this.modi.MODE_MOVE;
     }
 
+    /** Mirrors selected elements along the line between two “tail” nodes */
     mirror() {
         const graph = Graph.instance;
         const selh = SelectionHandler.instance;
         const svgh = SvgHandler.instance;
-        const cNodes = {};
+
         const tails = [];
+        for (const sn of selh.selectedNodes) {
+            if (sn.adjacent.length === 1) tails.push(sn);
+            if (sn.adjacent.length === 0) return;
+        }
+        if (tails.length !== 2) return;
 
-        const check = selh.selectedNodes.forEach((sn) => {
-            if (sn.adjacent.length === 0) return -1;
-            else if (sn.adjacent.length === 1) {
-                tails.push(sn);
-            }
-        });
-        if (check < 0 || tails.length !== 2) return;
+        const [p1, p2] = tails.map(t => t.pos);
+        const vec = { x: p2.x - p1.x, y: p2.y - p1.y };
+        const invLen2 = 1 / (vec.x * vec.x + vec.y * vec.y);
+        const cNodes = {};
 
-        const p = tails[0].pos;
-        const vec = { x: tails[1].pos.x - p.x, y: tails[1].pos.y - p.y };
-        const dvec2 = 1 / (vec.x * vec.x + vec.y * vec.y);
-
-        selh.selectedNodes.forEach((sn) => {
-            if (sn === tails[0] || sn === tails[1]) {
+        // Mirror nodes
+        for (const sn of selh.selectedNodes) {
+            if (tails.includes(sn)) {
                 cNodes[sn.id] = sn;
-            } else {
-                const pn = sn.pos;
-                const lambda =
-                    (vec.x * (pn.x - p.x) + vec.y * (pn.y - p.y)) * dvec2;
-                const fpx = p.x + lambda * vec.x;
-                const fpy = p.y + lambda * vec.y;
-                const nid = svgh.nodeID++;
-                const node = new Node(nid, {
-                    x: pn.x + 2 * (fpx - pn.x),
-                    y: pn.y + 2 * (fpy - pn.y),
-                });
-                graph.addNode(node);
-                cNodes[sn.id] = node;
+                continue;
             }
-        });
-        selh.selectedEdges.forEach((se) => {
-            const q = se.q;
-            const lambda = (vec.x * (q.x - p.x) + vec.y * (q.y - p.y)) * dvec2;
-            const fpx = p.x + lambda * vec.x;
-            const fpy = p.y + lambda * vec.y;
-            const eid = svgh.edgeID++;
-            const edge = new Edge(eid, cNodes[se.from.id], cNodes[se.to.id], {
-                x: q.x + 2 * (fpx - q.x),
-                y: q.y + 2 * (fpy - q.y),
+
+            const { x, y } = sn.pos;
+            const lambda = (vec.x * (x - p1.x) + vec.y * (y - p1.y)) * invLen2;
+            const fx = p1.x + lambda * vec.x;
+            const fy = p1.y + lambda * vec.y;
+            const node = new Node(svgh.nodeID++, {
+                x: x + 2 * (fx - x),
+                y: y + 2 * (fy - y),
             });
+
+            graph.addNode(node);
+            cNodes[sn.id] = node;
+        }
+
+        // Mirror edges
+        for (const se of selh.selectedEdges) {
+            const { x, y } = se.q;
+            const lambda = (vec.x * (x - p1.x) + vec.y * (y - p1.y)) * invLen2;
+            const fx = p1.x + lambda * vec.x;
+            const fy = p1.y + lambda * vec.y;
+            const edge = new Edge(
+                svgh.edgeID++,
+                cNodes[se.from.id],
+                cNodes[se.to.id],
+                { x: x + 2 * (fx - x), y: y + 2 * (fy - y) }
+            );
             graph.addEdge(edge);
-        });
+        }
+
         selh.clear();
         svgh.updateMessage();
         this.mode = this.modi.MODE_SELECT;
     }
 
+    /** Escape key handler */
     escape() {
-        const m = this.mode.onEscape();
-        if (m !== undefined) {
-            this.mode = m;
-        }
+        this._transition(this._mode.onEscape());
     }
 }
