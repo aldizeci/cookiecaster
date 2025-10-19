@@ -173,8 +173,19 @@ export default class SvgHandler {
             .append("path")
             .attr("id", `e${edge.id}`)
             .attr("d", edge.asSvgPath())
-            .on(this._e.enter, () => { this.focus = { obj: edge, type: "edge" }; })
-            .on(this._e.leave, () => { this.focus.obj = undefined; });
+            .on(this._e.enter, () => {
+                this.focus = { obj: edge, type: "edge" };
+                // Preview des gelben Punktes beim Hovern über die Kante anzeigen
+                d3.select(`#q${edge.id}`).attr("visibility", "visible");
+            })
+            .on(this._e.leave, () => {
+                this.focus.obj = undefined;
+                // Preview des gelben Punktes ausblenden, wenn nicht selektiert
+                const isSelected = d3.select(`#e${edge.id}`).classed("pathSelected");
+                if (!isSelected) {
+                    d3.select(`#q${edge.id}`).attr("visibility", "hidden");
+                }
+            });
 
         d3.select("#edges")
             .append("circle")
@@ -183,7 +194,10 @@ export default class SvgHandler {
             .attr("cx", edge.q.x)
             .attr("cy", edge.q.y)
             .attr("visibility", "hidden")
-            .classed("qCircle", true);
+            .classed("qCircle", true)
+            .style("pointer-events", "none")
+            .on(this._e.enter, () => { this.focus = { obj: edge, type: "q" }; })
+            .on(this._e.leave, () => { this.focus.obj = undefined; });
     }
 
     /**

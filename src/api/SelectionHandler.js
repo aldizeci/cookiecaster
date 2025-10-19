@@ -189,13 +189,13 @@ export default class SelectionHandler {
     clear() {
         const svgHandler = SvgHandler.instance;
         //deselect _nodes
-        this._nodes.forEach((id, node) => {
+        this._nodes.forEach((node) => {
             svgHandler.selectNode(node, false);
         });
         this._nodes.clear();
 
         //deselect _edges
-        this._edges.forEach((id, edge) => {
+        this._edges.forEach((edge) => {
             svgHandler.selectEdge(edge, false);
         });
         this._edges.clear();
