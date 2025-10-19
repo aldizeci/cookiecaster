@@ -90,7 +90,7 @@ export default class Graph {
      * @param {function} callback - callback function
      */
     forEachNode(callback) {
-        this._nodes.values().forEach(callback);
+        Array.from(this._nodes.values()).forEach(callback);
     }
 
     // ============ Edges ============
@@ -146,7 +146,7 @@ export default class Graph {
      * @param {function} callback - callback function
      */
     forEachEdge(callback) {
-        this._edges.values().forEach(callback);
+        Array.from(this._edges.values()).forEach(callback);
     }
 
     /**

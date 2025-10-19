@@ -9,7 +9,7 @@ let _visited, _path, _A, _segments;
  * @returns {{forms: Array, segments: Array, intersections: Array}}
  */
 export default function validateGraph(graph) {
-    const forms = trace(graph._nodes.values());
+    const forms = trace(Array.from(graph._nodes.values()));
     return {forms: forms, segments: _segments, intersections: intersections(_segments)}
 }
 
@@ -107,38 +107,33 @@ let traceEdge = (from, to, q) => {
 };
 
 /**
- * Determines the meta information of a form
- * @param {string} path - form as svg path
- * @returns {{points: Array, meta: {width: number, height: number, center: {x: number, y: number}}}}
+ * Calculates the bounding box, center, and polyline points of a path.
+ * Uses only the browser’s native SVG API — no external libs.
  */
-let calcPathMeta = (path) => {
+function calcPathMeta(path) {
     const contour = pathToPoints(path);
-    if (contour === undefined) return;
+    if (!contour || contour.length === 0) return;
+
     const points = [];
     const plen = contour.length;
     let x1 = Number.MAX_VALUE, y1 = Number.MAX_VALUE, x2 = 0, y2 = 0;
     let cx = 0, cy = 0;
+
     for (let i = 0; i < plen - 1; i++) {
-        const p0x = contour[i][0];
-        const p0y = contour[i][1];
-        const p1x = contour[i + 1][0];
-        const p1y = contour[i + 1][1];
+        const [p0x, p0y] = contour[i];
+        const [p1x, p1y] = contour[i + 1];
 
-        const x = Math.abs(p0x - p1x);
-        const y = Math.abs(p0y - p1y);
-
-        if (x < _eta && y < _eta) continue;  //remove double vertices
+        const dx = Math.abs(p0x - p1x);
+        const dy = Math.abs(p0y - p1y);
+        if (dx < _eta && dy < _eta) continue; // skip duplicates
 
         // bounding box
-        if (p0x < x1)
-            x1 = p0x;
-        else if (p0x > x2)
-            x2 = p0x;
-        if (p0y < y1)
-            y1 = p0y;
-        else if (p0y > y2)
-            y2 = p0y;
-        //center
+        x1 = Math.min(x1, p0x);
+        x2 = Math.max(x2, p0x);
+        y1 = Math.min(y1, p0y);
+        y2 = Math.max(y2, p0y);
+
+        // center
         cx += p0x;
         cy += p0y;
 
@@ -147,22 +142,29 @@ let calcPathMeta = (path) => {
     }
 
     return {
-        points: points,
+        points,
         meta: {
             width: x2 - x1,
             height: y2 - y1,
-            center: {x: cx / points.length, y: cy / points.length},
+            center: { x: cx / points.length, y: cy / points.length }
         }
-    }
-};
-
+    };
+}
+/**
+ * Samples an SVG path string into [x, y] points using native DOM APIs.
+ * @param {string} path
+ * @returns {number[][]}
+ */
 function pathToPoints(path) {
+    // Create a temporary in-memory <path> element
     const temp = document.createElementNS("http://www.w3.org/2000/svg", "path");
     temp.setAttribute("d", path);
-    const len = temp.getTotalLength();
+
+    const total = temp.getTotalLength();
     const points = [];
-    const step = 1; // sample step size (1px)
-    for (let i = 0; i <= len; i += step) {
+    const step = 1; // sample every 1px
+
+    for (let i = 0; i <= total; i += step) {
         const { x, y } = temp.getPointAtLength(i);
         points.push([x, y]);
     }

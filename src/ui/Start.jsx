@@ -182,7 +182,8 @@ export default function Start() {
         if (!data.valid) return;
 
         const crit = Graph.instance.analyze(data, analyze.data);
-        if (crit.critNodes.length === 0 && crit.critSeg.length === 0) {
+        const segCount = Array.from(crit.critSeg).length;
+        if (crit.critNodes.length === 0 && segCount === 0) {
             window.alert(formatMessage(msgs.export));
         } else {
             setAnalyze((prev) => ({...prev, status: true, data: profiles.default}));

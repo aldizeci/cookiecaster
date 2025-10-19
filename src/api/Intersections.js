@@ -1,4 +1,4 @@
-const eta = 1e-9;
+const eta = 1e-9; // precision
 
 /**
  *
@@ -39,13 +39,13 @@ export default function intersections(segments) {
         if (event.type === 'start') {
             // console.log(`pos: (${event.pos.x}, ${event.pos.y}), vec: (${event.vec.x}, ${event.vec.y})`);
             // eslint-disable-next-line
-            map.forEach((key, value) => {
+            map.forEach((value) => {
                 const i = intersect(value.pos, value.vec, event.pos, event.vec);
                 if (i !== undefined) intersections.push(i);
             });
-            map.put(event.segId, {pos: event.pos, vec: event.vec});
+            map.set(event.segId, {pos: event.pos, vec: event.vec});
         } else {
-            map.remove(event.segId);
+            map.delete(event.segId);
         }
         event= queue.pop();
     }
@@ -55,10 +55,10 @@ export default function intersections(segments) {
 /**
  * Calculates the intersection between 2 line segments
  *
- * @param {{x: number, y number}} r1 - origin segment 1
- * @param {{x: number, y number}} a1 - vector segment 1
- * @param {{x: number, y number}} r2 - origin segment 2
- * @param {{x: number, y number}} a2 - vector segment 2
+ * @param {{x: number, y: number}} r1 - origin segment 1
+ * @param {{x: number, y: number}} a1 - vector segment 1
+ * @param {{x: number, y: number}} r2 - origin segment 2
+ * @param {{x: number, y: number}} a2 - vector segment 2
  * @returns {number[] | undefined} - intersection point
  */
 function intersect(r1, a1, r2, a2) {
