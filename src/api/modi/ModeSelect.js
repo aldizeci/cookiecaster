@@ -110,9 +110,11 @@ export default class ModeSelect extends AbstractMode {
 }
 
 let checkMirror = (selh) => {
+    const sNodes = Array.from(selh.selectedNodes);   // convert from Map/Set to array
+    const sEdges = Array.from(selh.selectedEdges);
+
     let a1 = 0;
     const comp = {};
-    const sNodes = selh.selectedNodes;
     for(let i  = 0; i < sNodes.length; i++) {
         const sn = sNodes[i];
         if (sn.adjacent.length === 0) return false;
@@ -123,7 +125,6 @@ let checkMirror = (selh) => {
     }
     if (a1 !== 2) return false;
     let size = sNodes.length;
-    const sEdges = selh.selectedEdges;
     sEdges.forEach(se => {
         const fromId = se.from.id;
         const toId = se.to.id;
