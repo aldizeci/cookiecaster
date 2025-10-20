@@ -53,6 +53,20 @@ function validateGraph(formatMessage, messages) {
     return data;
 }
 
+// ---------- Local Storage Helpers ----------
+function getAllDrawings() {
+    return JSON.parse(localStorage.getItem("drawings")) || [];
+}
+
+function saveAllDrawings(drawings) {
+    localStorage.setItem("drawings", JSON.stringify(drawings));
+}
+
+function clearUnsavedDrawings() {
+    const drawings = getAllDrawings().filter(d => d.saved);
+    saveAllDrawings(drawings);
+}
+
 // ---------- component ----------
 export default function Start() {
     const intl = useIntl();
@@ -150,28 +164,35 @@ export default function Start() {
     }, []);
 
     const saveGraph = useCallback(() => {
-        const data = validateGraph(formatMessage, msgs);
-        if (!data.valid) return;
+        const graph = Graph.instance;
+        const jsonData = graph.toJSON();
+        const forms = Graph.instance.validate()?.forms || [];
+        const svgPath = forms.map(f => f.path).join(" ");
 
         const name = window.prompt(formatMessage(msgs.enterName), formatMessage(msgs.exampleName));
-        if (name === null) return;
-        if (!name.trim()) {
+        if (!name || !name.trim()) {
             window.alert(formatMessage(msgs.noName));
             return;
         }
 
-        // Persist path in LocalStorage
-        const path = data.forms.map((f) => f.path).join(" ");
         try {
-            const key = `cookiecaster:graph:${name.trim()}`;
             const payload = {
-                name: name.trim(), savedAt: new Date().toISOString(), path, version: "3.0",
+                id: "drawing-" + Date.now(),
+                name: name.trim(),
+                graphJSON: jsonData,
+                svgPath,
+                saved: true,
+                timestamp: new Date().toISOString(),
             };
-            window.localStorage.setItem(key, JSON.stringify(payload));
+
+            const drawings = getAllDrawings();
+            drawings.push(payload);
+            saveAllDrawings(drawings);
+
             window.alert(formatMessage(msgs.save));
-            console.log(`Saved to LocalStorage under key "${key}"`);
-        } catch (e) {
-            console.error(e);
+            console.log(`Saved "${payload.name}" successfully`);
+        } catch (err) {
+            console.error(err);
             window.alert(formatMessage(msgs.noSave));
         }
     }, [formatMessage, msgs]);
@@ -224,117 +245,201 @@ export default function Start() {
 
     // ---- lifecycle: mount -> attach interactions, restore graph ----
     useEffect(() => {
-        // mark navbar id (kept from original)
-        d3.selectAll("nav.navbar.navbar-default").attr("id", "startNavBar");
+            // mark navbar id (kept from original)
+            d3.selectAll("nav.navbar.navbar-default").attr("id", "startNavBar");
 
-        const ctr = Controller.instance;
+            const ctr = Controller.instance;
+            const svgSel = d3.select(svgRef.current);
+            const svgNode = svgSel.node();
 
-        const svgSel = d3.select(svgRef.current);
-        const svgNode = svgSel.node();
+            const pointerPos = (evt) => {
+                const [x, y] = d3.pointer(evt, svgNode);
+                return {x: Math.round(x), y: Math.round(y)};
+            };
 
-        const pointerPos = (evt) => {
-            const [x, y] = d3.pointer(evt, svgNode);
-            return {x: Math.round(x), y: Math.round(y)};
-        };
+// mouse/touch handlers using D3 v6+ pointer API
+            const onDown = (evt) => {
+                if (analyze.status) SvgHandler.instance.clearWarnings();
+                d3.select("#layer").remove();
+                ctr.mouseDown(pointerPos(evt));
+            };
+            const onMove = (evt) => ctr.mouseMove(pointerPos(evt));
+            const onUp = () => {
+                ctr.mouseUp();
 
-        // mouse/touch handlers using D3 v6+ pointer API
-        const onDown = (evt) => {
-            if (analyze.status) SvgHandler.instance.clearWarnings();
-            d3.select("#layer").remove();
-            ctr.mouseDown(pointerPos(evt));
-        };
-        const onMove = (evt) => ctr.mouseMove(pointerPos(evt));
-        const onUp = () => ctr.mouseUp();
+                try {
+                    const graph = Graph.instance;
 
-        svgSel.on("pointerdown", onDown);
-        svgSel.on("pointermove", onMove);
-        svgSel.on("pointerup", onUp);
-        svgSel.on("pointercancel", onUp);
-        svgSel.on("mouseleave", onUp);
+                    const drawings = getAllDrawings().filter(d => d.saved);
+                    const temp = {
+                        id: "temp-autosave",
+                        name: "Temporär",
+                        graphJSON: graph.toJSON(),
+                        saved: false,
+                        timestamp: new Date().toISOString(),
+                    };
+                    drawings.push(temp);
+                    saveAllDrawings(drawings);
+                } catch (err) {
+                    console.warn("Autosave skipped:", err);
+                }
+            };
 
-        // keyboard
-        const onKeyDown = (evt) => {
-            switch (evt.key) {
-                case "Escape":
-                    ctr.escape();
-                    break;
-                case "Delete":
-                    ctr.erase();
-                    break;
-                case "c":
-                    if (evt.ctrlKey || evt.metaKey) ctr.copy();
-                    break;
-                default:
-            }
-        };
-        window.addEventListener("keydown", onKeyDown);
+            svgSel.on("pointerdown", onDown);
+            svgSel.on("pointermove", onMove);
+            svgSel.on("pointerup", onUp);
+            svgSel.on("pointercancel", onUp);
+            svgSel.on("mouseleave", onUp);
+
+// keyboard
+            const onKeyDown = (evt) => {
+                switch (evt.key) {
+                    case "Escape":
+                        ctr.escape();
+                        break;
+                    case "Delete":
+                        ctr.erase();
+                        break;
+                    case "c":
+                        if (evt.ctrlKey || evt.metaKey) ctr.copy();
+                        break;
+                    default:
+                }
+            };
+            window.addEventListener("keydown", onKeyDown);
 
 // --- Buttons / modes ---
-        d3.select("#reset").on("click", () => ctr.reset());
+            d3.select("#reset").on("click", () => {
+                ctr.reset();
+                clearUnsavedDrawings(); // remove only temporary drawings
+            });
 
 // assign pre-instantiated mode objects
-        d3.select("#draw").on("click", () => {
-            ctr.mode = ctr.modi.MODE_DRAW;
-        });
+            d3.select("#draw").on("click", () => {
+                ctr.mode = ctr.modi.MODE_DRAW;
+            });
 
-        d3.select("#select").on("click", () => {
-            ctr.mode = ctr.modi.MODE_SELECT;
-        });
+            d3.select("#select").on("click", () => {
+                ctr.mode = ctr.modi.MODE_SELECT;
+            });
 
-        d3.select("#move").on("click", () => {
-            ctr.mode = ctr.modi.MODE_MOVE;
-        });
+            d3.select("#move").on("click", () => {
+                ctr.mode = ctr.modi.MODE_MOVE;
+            });
 
-        d3.select("#rotate").on("click", () => {
-            ctr.mode = ctr.modi.MODE_ROTATE;
-        });
+            d3.select("#rotate").on("click", () => {
+                ctr.mode = ctr.modi.MODE_ROTATE;
+            });
 
-        d3.select("#mirror").on("click", () => ctr.mirror());
-        d3.select("#copy").on("click", () => ctr.copy());
-        d3.select("#erase").on("click", () => ctr.erase());
+            d3.select("#mirror").on("click", () => ctr.mirror());
+            d3.select("#copy").on("click", () => ctr.copy());
+            d3.select("#erase").on("click", () => ctr.erase());
 
-        d3.select("#analyze").on("click", () => analyzeGraph());
-        d3.select("#save").on("click", () => saveGraph());
+            d3.select("#analyze").on("click", () => analyzeGraph());
+            d3.select("#save").on("click", () => saveGraph());
 
 
-        // --- Init default mode ---
-        if (!ctr.mode) {
-            ctr.mode = new ctr.modi.MODE_DRAW();
-            ctr.mode.enable();
-        }
-
-        // init graph on mount
-        ctr.mode.enable();
-        const graph = Graph.instance;
-        if (graph.nodeSize > 0) {
-            const svgh = SvgHandler.instance;
-            graph.forEachNode((n) => svgh.addNode(n));
-            graph.forEachEdge((e) => svgh.addEdge(e));
-            d3.select("#layer").remove();
-            svgh.updateMessage();
-        } else if (window.sessionStorage["graph"]) {
-            const path = window.sessionStorage["graph"];
-            if (path) {
-                graph.fromJSON(path);
-                window.sessionStorage.setItem("graph", "");
-                d3.select("#layer").remove();
-                if (window.sessionStorage["draw"] === "0") ctr.mode = ctr.modi.MODE_SELECT;
+// --- Init default mode ---
+            if (!ctr.mode) {
+                ctr.mode = new ctr.modi.MODE_DRAW();
+                ctr.mode.enable();
             }
+
+            ctr.mode.enable();
+            const graph = Graph.instance;
+            if (graph.nodeSize > 0) {
+                const svgh = SvgHandler.instance;
+                graph.forEachNode((n) => svgh.addNode(n));
+                graph.forEachEdge((e) => svgh.addEdge(e));
+                d3.select("#layer").remove();
+                svgh.updateMessage();
+            }
+
+            return () => {
+                window.removeEventListener("keydown", onKeyDown);
+                svgSel.on(".pointerdown", null).on(".pointermove", null).on(".pointerup", null);
+            };
+// eslint-disable-next-line react-hooks/exhaustive-deps
         }
+        ,
+        [analyze.status, analyzeGraph, saveGraph]
+    );
 
-        return () => {
-            window.removeEventListener("keydown", onKeyDown);
-            svgSel.on(".pointerdown", null).on(".pointermove", null).on(".pointerup", null);
+    // --- Restore selected drawing from gallery ---
+    useEffect(() => {
+        const ctr = Controller.instance;
+        const graph = Graph.instance;
+        const svgh = SvgHandler.instance;
+        const drawings = getAllDrawings();
+        const selectedId = sessionStorage.getItem("selectedDrawingId");
+
+        const loadDrawing = async (drawing) => {
+            if (!drawing) return;
+            console.log(`📂 Loading "${drawing.name}" from gallery...`);
+
+            // 🧹 Trigger a clean reset
+            document.querySelector("#reset")?.click();
+            await new Promise((resolve) => setTimeout(resolve, 50)); // wait for reset to complete
+
+            try {
+                const json =
+                    typeof drawing.graphJSON === "string"
+                        ? drawing.graphJSON
+                        : JSON.stringify(drawing.graphJSON);
+
+                if (drawing.graphJSON) graph.fromJSON(json);
+                else if (drawing.svgPath) graph.fromSvg([drawing.svgPath]);
+
+                svgh.updateMessage();
+
+                // 🧭 Automatically switch to SELECT mode
+                ctr.mode = ctr.modi.MODE_SELECT;
+                ctr.mode.enable();
+
+                console.log(`✅ "${drawing.name}" loaded successfully in SELECT mode`);
+            } catch (err) {
+                console.error("❌ Error while loading gallery drawing:", err);
+            } finally {
+                sessionStorage.removeItem("selectedDrawingId");
+                window.__loadedFromGallery = true;
+            }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [analyze.status, analyzeGraph, saveGraph]);
 
-    // keep grid visibility in sync
+        if (selectedId) {
+            const selectedDrawing = drawings.find((d) => d.id === selectedId);
+            loadDrawing(selectedDrawing);
+        }
+    }, []);
+
+    // --- Restore unsaved autosave drawing on mount ---
+    useEffect(() => {
+        const graph = Graph.instance;
+        const temp = getAllDrawings().find((d) => !d.saved);
+
+        if (!temp) return;
+
+        try {
+            console.log("♻️ Restoring temporary autosaved drawing...");
+            const json =
+                typeof temp.graphJSON === "string"
+                    ? temp.graphJSON
+                    : JSON.stringify(temp.graphJSON);
+
+            if (temp.graphJSON) graph.fromJSON(json);
+            else if (temp.svgPath) graph.fromSvg([temp.svgPath]);
+
+            SvgHandler.instance.updateMessage();
+        } catch (err) {
+            console.warn("⚠️ Failed to restore autosave:", err);
+        }
+    }, []); // separate and independent
+
+// keep grid visibility in sync
     useEffect(() => {
         d3.select("#raster").attr("visibility", showGrid ? "visible" : "hidden");
     }, [showGrid]);
 
-    // ---- render ----
+// ---- render ----
     return (<div className="start-root">
         <div className="start-layout">
             <div className="canvas-wrap">
@@ -425,8 +530,8 @@ export default function Start() {
                             onChange={(e) => changeZoom(e.target.value)}
                         >
                             {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
-                                    {z}
-                                </option>))}
+                                {z}
+                            </option>))}
                         </select>
                     </div>
                 </div>

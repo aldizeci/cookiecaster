@@ -1,14 +1,14 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { IntlProvider } from "react-intl";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {IntlProvider} from "react-intl";
 
 // Components
 import Home from "./ui/Home";
 import Start from "./ui/Start";
 // import Export from "./components/Export";
 import Navbar from "./ui/CustomNavbar";
-// import Gallery from "./components/Gallery";
+import Gallery from "./ui/Gallery";
 // import Ueber from "./components/Ueber";
 // import ErrorPage from "./components/Error";
 // import About from "./components/About";
@@ -34,13 +34,13 @@ export default function App() {
     return (
         <IntlProvider locale={locale} key={locale} messages={messages[locale]}>
             <Router basename="/cookiecaster">
-                <Navbar />
+                <Navbar/>
                 <main>
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/start" element={<Start />} />
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/start" element={<Start/>}/>
                         {/*<Route path="/export" element={<Export />} />*/}
-                        {/*<Route path="/gallery" element={<Gallery />} />*/}
+                        <Route path="/gallery" element={<Gallery/>}/>
                         {/*<Route path="/ueber" element={<Ueber />} />*/}
                         {/*<Route path="/about" element={<About />} />*/}
                         {/*<Route path="*" element={<ErrorPage />} />*/}
