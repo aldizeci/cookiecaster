@@ -6,6 +6,8 @@ import * as d3 from "d3";
 import config from "../client_config.json";
 import * as bootstrap from "bootstrap";
 
+import {importCC3File} from "../utils/FileImport.js";
+import {exportCC3File} from "../utils/FileExport.js";
 import Graph from "../api/graph/Graph";
 import Controller from "../api/Controller";
 import SvgHandler from "../api/SvgHandler";
@@ -153,10 +155,6 @@ export default function Start() {
         }
     }, [pictureUrl, temporaryUrl]);
 
-    const loadProfile = useCallback((i) => {
-        setAnalyze((prev) => ({...prev, data: profiles[prev.keys[i]]}));
-    }, []);
-
     const changeZoom = useCallback((idx) => {
         const zoom = parseInt(idx, 10);
         SvgHandler.instance.setZoomLevel(zoom + 1);
@@ -190,7 +188,6 @@ export default function Start() {
             saveAllDrawings(drawings);
 
             window.alert(formatMessage(msgs.save));
-            console.log(`Saved "${payload.name}" successfully`);
         } catch (err) {
             console.error(err);
             window.alert(formatMessage(msgs.noSave));
@@ -338,8 +335,37 @@ export default function Start() {
             d3.select("#analyze").on("click", () => analyzeGraph());
             d3.select("#save").on("click", () => saveGraph());
 
+            // --- File Import/Export (.cc3) ---
+            d3.select("#loadFromFile").on("click", async () => {
+                try {
+                    const project = await importCC3File();
+                    if (!project) return;
 
-// --- Init default mode ---
+                    document.querySelector("#reset")?.click();
+                    await new Promise(r => setTimeout(r, 50));
+
+                    Graph.instance.fromJSON(
+                        typeof project.graphJSON === "string"
+                            ? project.graphJSON
+                            : JSON.stringify(project.graphJSON)
+                    );
+
+                    SvgHandler.instance.updateMessage();
+                    Controller.instance.mode = Controller.instance.modi.MODE_SELECT;
+                    Controller.instance.mode.enable();
+
+                    alert("Vorlage erfolgreich geladen!");
+                } catch (err) {
+                    console.warn("Import abgebrochen oder fehlgeschlagen:", err);
+                }
+            });
+
+            d3.select("#exportToFile").on("click", () => {
+                const data = Graph.instance.toJSON();
+                exportCC3File(data, "drawing");
+            });
+
+            // --- Init default mode ---
             if (!ctr.mode) {
                 ctr.mode = new ctr.modi.MODE_DRAW();
                 ctr.mode.enable();
@@ -375,9 +401,8 @@ export default function Start() {
 
         const loadDrawing = async (drawing) => {
             if (!drawing) return;
-            console.log(`📂 Loading "${drawing.name}" from gallery...`);
 
-            // 🧹 Trigger a clean reset
+            // Trigger a clean reset
             document.querySelector("#reset")?.click();
             await new Promise((resolve) => setTimeout(resolve, 50)); // wait for reset to complete
 
@@ -392,13 +417,11 @@ export default function Start() {
 
                 svgh.updateMessage();
 
-                // 🧭 Automatically switch to SELECT mode
+                // Automatically switch to SELECT mode
                 ctr.mode = ctr.modi.MODE_SELECT;
                 ctr.mode.enable();
-
-                console.log(`✅ "${drawing.name}" loaded successfully in SELECT mode`);
             } catch (err) {
-                console.error("❌ Error while loading gallery drawing:", err);
+                console.error("Error while loading gallery drawing:", err);
             } finally {
                 sessionStorage.removeItem("selectedDrawingId");
                 window.__loadedFromGallery = true;
@@ -419,7 +442,6 @@ export default function Start() {
         if (!temp) return;
 
         try {
-            console.log("♻️ Restoring temporary autosaved drawing...");
             const json =
                 typeof temp.graphJSON === "string"
                     ? temp.graphJSON
@@ -600,6 +622,14 @@ export default function Start() {
                     <i className="fas fa-upload"></i>{" "}
                     <FormattedMessage id="start.loadFromGallery"/>
                 </Link>
+
+                <button id="loadFromFile">
+                    <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
+                </button>
+
+                <button id="exportToFile">
+                    <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
+                </button>
 
                 <Link id="goToExport" className="nav-link" to="/export">
                     <i className="fas fa-download"></i> Export 3D

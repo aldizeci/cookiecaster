@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
+import {exportCC3File} from "../utils/FileExport.js";
 import "./Gallery.css";
 
 export default function Gallery() {
@@ -54,6 +55,10 @@ export default function Gallery() {
                             <p>{item.name}</p>
                             <button className="btn btn-sm btn-danger" onClick={() => handleDelete(item.id)}>
                                 <FormattedMessage id="gallery.delete" defaultMessage="Löschen"/>
+                            </button>
+                            <button className="btn btn-sm btn-secondary"
+                                    onClick={() => exportCC3File(item.graphJSON, item.name)}>
+                                <FormattedMessage id="gallery.export" defaultMessage="Exportieren"/>
                             </button>
                         </div>
                     </div>
