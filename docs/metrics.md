@@ -92,4 +92,4 @@ This page defines all useful metrics about Cookiecaster 2.0 and Cookiecaster 3.0
 |----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 | 4323 | 31 | 10 | 38 | 11 | 37 | 28 | 238 | 565 | 147 |
 
-* Imports are excluded from `Total Lines of Code``
+* Imports are excluded from `Total Lines of Code`
