@@ -3,6 +3,41 @@
 ## Introduction
 This page defines all useful metrics about Cookiecaster 2.0 and Cookiecaster 3.0 to compare them
 
+## Current Versions
+
+| Library | Version |
+|----------|----------|
+| canny-edge-detector | 1.0.0 |
+| cropperjs | 1.5.11 |
+| d3 | 5.7.0 |
+| distance-to-line-segment | 0.2.0 |
+| image-js | 0.31.4 |
+| jquery | 3.3.1 |
+| js-canny-edge-detector | github:petarjs/js-canny-edge-detector |
+| js-file-download | 0.4.4 |
+| parse-svg-path | 0.1.2 |
+| point-in-polygon | 1.0.1 |
+| prop-types | 15.6.2 |
+| react | 16.6.0 |
+| react-bootstrap | 0.32.4 |
+| react-cropper | 2.1.7 |
+| react-device-detect | 1.6.1 |
+| react-dom | 16.6.0 |
+| react-intl | 2.7.2 |
+| react-popup | 0.9.3 |
+| react-router-dom | 4.3.1 |
+| react-scripts | 2.0.5 |
+| stl | 1.1.1 |
+| svg-path-contours | 2.0.0 |
+| svgpath | 2.2.1 |
+| video-react | 0.13.0 |
+| body-parser | 1.19.0 |
+| express | 4.17.1 |
+| mongodb | 3.6.9 |
+| path | 0.12.7 |
+
+
+
 ## Cookiecaster 2.0 Summary
 
 ### Frontend 
@@ -29,7 +64,7 @@ This page defines all useful metrics about Cookiecaster 2.0 and Cookiecaster 3.0
 | api/Controller.js | 241 | 9 | - Controller | - instance<br>- grid (2x)<br>- mode(2x)<br>- fixAtBoundary<br>- updatePoint<br>- mouseDown<br>- mouseUp<br>- mouseMove<br>- reset<br>- erase<br>- copy<br>- mirror<br>- escape | N/A | 9 | Behavior of the Control Buttons in CookieCaster |
 | api/DBHandler.js | 105 | 0 | - DBHandler | - instance<br>- sendReq<br>- svae<br>- getAll<br>- get<br>- update<br>- delete | N/A | 46 | Handle Requests to DB |
 | api/Intersections.js | 94 | 1 | 0 | N/A | - intersections<br>- intersect<br> | 22 | Finds intersection points between line segments using a sweep-line algorithm |
-| api/Map | 102 | 0 | - Map | - size<br>- hasKey<br>- put<br>- putIfAbsent<br>- get<br>- remove<br>- clear<br>- forEach<br>- keys<br>- values | 43 | Own written Map for CookieCaster |
+| api/Map.js | 102 | 0 | - Map | - size<br>- hasKey<br>- put<br>- putIfAbsent<br>- get<br>- remove<br>- clear<br>- forEach<br>- keys<br>- values | N/A | 43 | Own written Map for CookieCaster |
 | api/SelectionHandler.js | 195 | 3 | - SelectionHandler | - singleEdge<br>- instance<br>- isAnySelected<br>- isNodeSelected<br>- selectedNodes<br>- isEdgeSelected<br>- selectedEdges<br>- isEdgeAffected<br>- affectedEdges<br>- selectNode<br>- selectEdge<br>- startRectSelection<br>- moveRectSelection<br>- endRectSelection<br>- cancelRectSelection<br>- isRectActive<br>- clear | N/A | 32 | How to handle Selects |
 | api/SvgHandler.js | 372 | 3 | - SvgHandler | - get<br>- instance<br>- getRasterSpace<br>- getDrawingAreaSize<br>- resetMoveEdge<br>- setMoveEdgeTo<br>- setMoveEdgeVisible<br>- setRectSelection<br>- setRectSelectionVisible<br>- addNode<br>- updateNode<br>- selectNode<br>- removeNode<br>- setQEdgeVisibility<br>- setQEdge<br>- addEdge<br>- updateEdge<br>- removeEdge<br>- selectEdge<br>- setCritNodes<br>- setCritSeg<br>- setIntersections<br>- setZoomLevel<br>- getZoomLevels<br>- getZoomLevel<br>- getActZoomValue<br>- updateMessage<br>- clearWarnings<br>- clear | - rect | 53 | Manages SVG rendering of nodes, edges, selections, and warnings in a graph, including zoom and interactive updates |
 | components/About.jsx | 78 | 3 | - About | - render | N/A | 0 | Appearence of About Page |
@@ -44,3 +79,17 @@ This page defines all useful metrics about Cookiecaster 2.0 and Cookiecaster 3.0
 | components/Templates/SwitchButton.jsx | 33 | 3 | - SwitchButton | - change<br>- render | N/A | 0 | Template for Switch Buttons |
 
 ### Backend
+
+| Filename | Lines of Code | Imports Count | Classes | Class Functions | Functions | Comments Count | Description |
+|----------|----------|----------|----------|----------|----------|----------|----------|
+| app.js | 35 | 0 | 0 | N/A | N/A | 1 | Entrypoint to API f Backend Service |
+| dbs.js | 13 | 0 | 0 | N/A | - connect<br>- async | 0 | MongoDB Connection |
+| routes.js | 106 | 0 | 0 | N/A | - createQuery<br>- checkName<br>- checkSvg<br>- 6x API routes | 1 | API Routes to handle REST Requests against the Backend |
+
+## Metrics
+### Cookiecaster 2.0
+| Total Lines of Code | Total Count of Libraries | Total Count of CSS Files | Total Count of Files | Count of JSX Files | Count of JS Files | Count of Classes | Count of Functions | Count of Comments from Code | Count of Imports |
+|----------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| 4323 | 31 | 10 | 38 | 11 | 37 | 28 | 238 | 565 | 147 |
+
+* Imports are excluded from `Total Lines of Code``
