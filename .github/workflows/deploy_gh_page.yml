@@ -18,14 +18,16 @@ jobs:
                   node-version: 22
 
             - name: Install dependencies
-              run: yarn install
+              run: |
+                rm -rf node_modules package-lock.json
+                npm install
 
             - name: Build project
-              run: yarn run build
+              run: npm run build
 
             - name: Deploy to GitHub Pages
               run: | 
                 git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-                yarn run deploy -- -u "github-actions-bot <cookiecaster+actions@github.com>"
+                npm run deploy -- -u "github-actions-bot <cookiecaster+actions@github.com>"
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
