@@ -5,6 +5,9 @@ on:
     branches:
       - poc
 
+permissions:
+  contents: write
+
 jobs:
     deploy_gh_pages:
         runs-on: ubuntu-latest
