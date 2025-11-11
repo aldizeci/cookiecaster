@@ -1,0 +1,93 @@
+/* ============================================================
+   CookieCaster 3.0 – CustomNavbar (Bootstrap 5 compatible)
+   Preserves original colors and font from CookieCaster 2.0
+   ============================================================ */
+
+.custom-navbar {
+    background-color: var(--akzentfarbe1) !important;
+    font-family: var(--hausschrift);
+    font-size: 20px;
+    width: 100%;
+    z-index: 2;
+    position: sticky;
+    top: 0;
+    border: none;
+    border-radius: 0;
+}
+
+/* Brand text */
+.navbar-brand {
+    color: white !important;
+    font-size: 30pt;
+    font-family: var(--hausschrift);
+    text-shadow: none;
+    transition: color 0.2s ease;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+    color: var(--akzentfarbe2) !important;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+/* Navbar links */
+.navbar-nav .nav-link {
+    color: white !important;
+    text-shadow: none;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    color: var(--akzentfarbe2) !important;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+/* Dropdown styling */
+.navbar-nav .dropdown-menu {
+    background-color: var(--akzentfarbe1);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.navbar-nav .dropdown-item {
+    color: white;
+    font-size: 20px;
+    font-family: var(--hausschrift);
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .dropdown-item:hover,
+.navbar-nav .dropdown-item:focus {
+    color: var(--akzentfarbe2);
+    background-color: transparent;
+}
+
+/* Language dropdown toggle icon */
+#basic-nav-dropdown {
+    color: white;
+}
+
+#basic-nav-dropdown:hover,
+#basic-nav-dropdown:focus {
+    color: var(--akzentfarbe2);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+/* Mobile toggle button */
+.navbar-toggler {
+    border-color: white;
+}
+
+.navbar-toggler-icon {
+    filter: invert(100%);
+}
+
+/* Utility */
+a:focus {
+    outline: none;
+}
