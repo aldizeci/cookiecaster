@@ -58,7 +58,7 @@ jobs:
               id: version
               run: |
                 NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
-                echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+                echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
         
             - name: Generate Release Notes
               id: release_notes
