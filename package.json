@@ -16,11 +16,12 @@
   },
   "jest": {
     "collectCoverage": true,
-    "coverageReporters": ["json", "lcov", "html"],
     "collectCoverageFrom": [
       "src/**/*.js",
       "!src/**/*.test.js"
-    ]
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["json", "json-summary", "lcov", "text", "html"]
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",
