@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    "plugins/markdown",
+    "jsdoc-babel"
+  ],
+  "babel": {
+    "presets": ["@babel/preset-react"]
+  },
+  "source": {
+    "include": ["src"],
+    "includePattern": ".+\\.(js|jsx)$",
+    "excludePattern": "(node_modules|dist)"
+  },
+  "tutorials": "./docs",
+  "opts": {
+    "destination": "./documentation",
+    "recurse": true
+  }
+}

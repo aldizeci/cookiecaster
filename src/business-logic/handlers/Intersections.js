@@ -2,7 +2,7 @@ const eta = 1e-9; // precision
 
 /**
  *
- * @param {*[]} segments
+ * @param {number[][][]} segments
  * @returns {number[] | undefined} - intersection point
  */
 export default function intersections(segments) {

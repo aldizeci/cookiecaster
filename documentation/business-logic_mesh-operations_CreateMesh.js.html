@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: business-logic/mesh-operations/CreateMesh.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: business-logic/mesh-operations/CreateMesh.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @author Claudio
  * @date 03.07.2018
  * @version 1.1
@@ -29,12 +57,12 @@ export default function createMesh(data, thickness, height, name) {
     _cws = Array(forms.length);
     _vertices = Array(forms.length === 1 ? 1 : 3);
     //discrete svg into 2D vectors
-    for (let j = 0; j < forms.length; j++) {
+    for (let j = 0; j &lt; forms.length; j++) {
         const form = forms[j];
         const points = form.points;
         const origin = new Vec2(points[0][0], points[0][1]);
         const inner = [];
-        for (let i = 0; i < points.length - 1; i++) {
+        for (let i = 0; i &lt; points.length - 1; i++) {
             const p0 = {x: points[i][0], y: points[i][1]};
             const p1 = {x: points[i + 1][0], y: points[i + 1][1]};
             inner.push(new Vec2((p1.x - p0.x), (p1.y - p0.y)));
@@ -74,7 +102,7 @@ let calcQ = (p, a, b, ts, cw) => {
     const bend = Math.sign(a.x * b.y - a.y * b.x);
     if (bend !== 0) {
         const q = Vec2.ZERO.sub(a.normalize()).add(b.normalize()).normalize();
-        const a2 = bend < 0 ? new Vec2(-a.y, a.x) : new Vec2(a.y, -a.x);
+        const a2 = bend &lt; 0 ? new Vec2(-a.y, a.x) : new Vec2(a.y, -a.x);
         const dt = 1 / (q.dot(a2) / (q.length() * a2.length()));
         return ts.map(t => {
             if (!cw) t *= -1;
@@ -103,7 +131,7 @@ let createOuterVertices = (thickness, height, origin, inner) => {
     verts[4].push(Q[1].toVec3(thickness));
     verts[5].push(Q[1].toVec3(0));
 
-    for (let i = 1; i < n; i++) {
+    for (let i = 1; i &lt; n; i++) {
         p = p.add(b);
         a = inner[i - 1];
         b = inner[i];
@@ -134,7 +162,7 @@ let createInnerVertices = (thickness, height, origin, inner, cw) => {
     verts[2].push(Q[0].toVec3(height));
     verts[3].push(Q[0].toVec3(0));
 
-    for (let i = 1; i < n; i++) {
+    for (let i = 1; i &lt; n; i++) {
         p = p.add(b);
         a = inner[i - 1];
         b = inner[i];
@@ -160,7 +188,7 @@ let createConnectionVertices = (data, t) => {
     const intersections = interections(segments);
     intersections.sort((a, b) => a[0] - b[0]);
     let idx = 0;
-    for(let i = 0; i < intersections.length - 1; i++) {
+    for(let i = 0; i &lt; intersections.length - 1; i++) {
         if (intersections[i][0] > x) {
             idx = i;
         }
@@ -226,7 +254,7 @@ triangle vertices are right hand ordered
 normal is redundant, let software calculate normal by right hand order
  */
     const n = vert1.length;
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i &lt; n; i++) {
         const i2 = (i + 1) % n;
         const a = vert1[i];
         const b = vert2[i2];
@@ -258,7 +286,7 @@ let createMeshSingleForm = () => {
      |   3 - 4
      |       |
      0 - - - 5
-    <- inside
+    &lt;- inside
     outside ->
      */
 
@@ -282,7 +310,7 @@ let createMeshIOForm = () => {
     |   3 - 4
     |       |
     0 - - - 5
-    <- inner form
+    &lt;- inner form
     outside ->
     */
     const outerVerts = _vertices[0];
@@ -301,7 +329,7 @@ let createMeshIOForm = () => {
     |   |
     |   |
     3 - 0
-    <- inside
+    &lt;- inside
     outer form ->
     */
     const innerVerts = _vertices[1];
@@ -317,4 +345,26 @@ let createMeshIOForm = () => {
     const connVerts = _vertices[2];
     createFace(connVerts[0], connVerts[1], false);
     createFace(connVerts[2], connVerts[3], false);
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.html#.exports">exports</a></li><li><a href="module.exports_module.exports.html">exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DRAWING_AREA_GRID_RASTER_SPACE">DRAWING_AREA_GRID_RASTER_SPACE</a></li><li><a href="global.html#_transition">_transition</a></li><li><a href="global.html#addEdge">addEdge</a></li><li><a href="global.html#addNode">addNode</a></li><li><a href="global.html#calcPathMeta">calcPathMeta</a></li><li><a href="global.html#calcQ">calcQ</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#copy">copy</a></li><li><a href="global.html#createFace">createFace</a></li><li><a href="global.html#createFacet">createFacet</a></li><li><a href="global.html#createMeshSingleForm">createMeshSingleForm</a></li><li><a href="global.html#edgeSize">edgeSize</a></li><li><a href="global.html#erase">erase</a></li><li><a href="global.html#escape">escape</a></li><li><a href="global.html#exportCC3File">exportCC3File</a></li><li><a href="global.html#fixAndSnapPoint">fixAndSnapPoint</a></li><li><a href="global.html#forEachEdge">forEachEdge</a></li><li><a href="global.html#forEachNode">forEachNode</a></li><li><a href="global.html#fromJSON">fromJSON</a></li><li><a href="global.html#getAdjacentNodes">getAdjacentNodes</a></li><li><a href="global.html#getEdge">getEdge</a></li><li><a href="global.html#getNode">getNode</a></li><li><a href="global.html#hasEdge">hasEdge</a></li><li><a href="global.html#hasNode">hasNode</a></li><li><a href="global.html#importCC3File">importCC3File</a></li><li><a href="global.html#instance">instance</a></li><li><a href="global.html#intersect">intersect</a></li><li><a href="global.html#mirror">mirror</a></li><li><a href="global.html#nodeSize">nodeSize</a></li><li><a href="global.html#pathToPoints">pathToPoints</a></li><li><a href="global.html#registerAdjacentEdge">registerAdjacentEdge</a></li><li><a href="global.html#removeEdge">removeEdge</a></li><li><a href="global.html#removeNode">removeNode</a></li><li><a href="global.html#reset">reset</a></li><li><a href="global.html#sanitizeFileName">sanitizeFileName</a></li><li><a href="global.html#selectEdge">selectEdge</a></li><li><a href="global.html#selectNode">selectNode</a></li><li><a href="global.html#setQEdge">setQEdge</a></li><li><a href="global.html#toJSON">toJSON</a></li><li><a href="global.html#trace">trace</a></li><li><a href="global.html#traceEdge">traceEdge</a></li><li><a href="global.html#traceForm">traceForm</a></li><li><a href="global.html#unregisterAdjacentEdge">unregisterAdjacentEdge</a></li><li><a href="global.html#updateEdge">updateEdge</a></li><li><a href="global.html#updateNode">updateNode</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 23 2025 21:20:24 GMT+0100 (Mitteleuropäische Normalzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
