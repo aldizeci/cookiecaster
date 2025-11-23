@@ -14,6 +14,8 @@ jobs:
     release:
         name: Create Release Tag and Notes
         runs-on: ubuntu-latest
+        outputs:
+            did_release: ${{ steps.result.outputs.did_release }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
