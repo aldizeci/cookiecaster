@@ -1,10 +1,11 @@
 name: Release New Version
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
+    paths:
+      - 'VERSION.md'
 
 permissions:
   contents: write
