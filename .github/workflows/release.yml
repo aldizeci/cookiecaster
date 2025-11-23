@@ -14,7 +14,6 @@ jobs:
     release:
         name: Create Release Tag and Notes
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
