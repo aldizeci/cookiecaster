@@ -52,9 +52,68 @@ jobs:
                 NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
                 git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
                 git push origin "v$NEW_VERSION"
+            - name: Read version
+              id: version
+              run: |
+                NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
+                echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
         
             - name: Generate Release Notes
+              id: release_notes
               if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_version.outputs.is_greater == 'true'
               uses: softprops/action-gh-release@v2
+              with:
+                tag_name: ${{ steps.version.outputs.version }}
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Set result output
+              id: result
+              run: |
+                if [ "${{ steps.release_notes.outcome }}" = "success" ]; then
+                    echo "did_release=true" >> $GITHUB_OUTPUT
+                else
+                    echo "did_release=false" >> $GITHUB_OUTPUT
+                fi
+
+    deploy_gh_pages:
+        runs-on: ubuntu-latest
+        needs: release
+        if: needs.release.outputs.did_release == 'true'
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+
+            - name: Install dependencies
+              run: |
+                rm -rf node_modules package-lock.json
+                npm install
+
+            - name: Build project
+              run: |
+                START_TIME=$(date +%s)
+                npm run build
+                END_TIME=$(date +%s)
+                BUILD_TIME=$((END_TIME - START_TIME))
+                echo "Build completed in ${BUILD_TIME} seconds"
+                echo "${BUILD_TIME}" > build-time.txt
+
+            - name: Deploy to GitHub Pages
+              run: | 
+                git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+                npm run deploy -- -u "github-actions-bot <cookiecaster+actions@github.com>"
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: build-artifacts
+                path: |
+                    dist/
+                    build-time.txt
