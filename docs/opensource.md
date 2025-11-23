@@ -37,6 +37,7 @@ Here I my referencing Open Source Projects:
 - Requirements
 - Logging
 - Describes how to create Pull Requests and what happens and how to Review
+- Code Owners File
 
 ## CI/CD
 - Mostly triggered when Pull Requests are created
