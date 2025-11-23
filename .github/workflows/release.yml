@@ -1,10 +1,11 @@
 name: Release New Version
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
+    paths:
+      - 'VERSION.md'
 
 permissions:
   contents: write
@@ -50,7 +51,7 @@ jobs:
                 git config user.name "cookiecaster+actions"
                 git config user.email "cookiecaster+actions@github.com"
                 NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
-                git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION
+                git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
                 git push origin "v$NEW_VERSION"
         
             - name: Generate Release Notes
