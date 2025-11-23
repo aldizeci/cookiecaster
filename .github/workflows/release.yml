@@ -56,7 +56,5 @@ jobs:
             - name: Generate Release Notes
               if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_version.outputs.is_greater == 'true'
               uses: softprops/action-gh-release@v2
-              with:
-                tag_name: "v$(cat VERSION.md | tr -d ' \n')"
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
