@@ -32,6 +32,14 @@ jobs:
 
       - run: npm run coverage:badge
 
+      - name: Commit and push updated badge
+        run: |
+          git config user.name "cookiecaster+actions"
+          git config user.email "cookiecaster+actions@github.com"
+          git add README.md
+          git diff --quiet && echo "No changes to commit" || git commit -m "Update coverage badge [skip ci]"
+          git push
+
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
