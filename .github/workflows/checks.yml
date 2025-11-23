@@ -1,7 +1,6 @@
 name: Checks Before Merging
 
 on:
-    #push:
     pull_request:
         branches:
             - development
