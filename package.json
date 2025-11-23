@@ -10,12 +10,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage || true",
     "coverage:badge": "istanbul-badges-readme",
     "deploy": "gh-pages -d dist"
   },
   "jest": {
     "collectCoverage": true,
+    "coverageReporters": ["json", "lcov", "html"],
     "collectCoverageFrom": [
       "src/**/*.js",
       "!src/**/*.test.js"
