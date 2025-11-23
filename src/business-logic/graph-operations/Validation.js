@@ -1,4 +1,4 @@
-import intersections from "../Intersections";
+import intersections from "../handlers/Intersections.js";
 
 const _eta = 1e-6; //precision
 let _visited, _path, _A, _segments;

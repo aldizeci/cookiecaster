@@ -4,8 +4,8 @@
  * @version 1.1
  */
 
-import {Vec2, Vec3} from './Vec'
-import interections from '../Intersections';
+import {Vec2, Vec3} from '../../entities/mesh/Vec.js'
+import interections from '../handlers/Intersections.js';
 
 let _mesh, _vertices, _cws;
 /**

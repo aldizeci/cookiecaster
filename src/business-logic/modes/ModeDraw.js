@@ -5,13 +5,13 @@
  */
 
 import * as d3 from "d3";
-import AbstractMode from "./AbstractMode";
-import Node from '../graph/Node'
-import Edge from '../graph/Edge'
-import SvgHandler from '../SvgHandler'
-import Graph from "../graph/Graph";
-import Controller from "../Controller";
-import SelectionHandler from "../SelectionHandler";
+import AbstractMode from "./AbstractMode.js";
+import Node from '../../entities/graph/Node.js'
+import Edge from '../../entities/graph/Edge.js'
+import SvgHandler from '../handlers/SvgHandler.js'
+import Graph from "../../entities/graph/Graph.js";
+import Controller from "../handlers/Controller.js";
+import SelectionHandler from "../handlers/SelectionHandler.js";
 
 export default class ModeDraw extends AbstractMode {
     constructor() {

@@ -1,5 +1,5 @@
-import SvgHandler from "./SvgHandler";
-import Graph from "./graph/Graph";
+import SvgHandler from "./SvgHandler.js";
+import Graph from "../../entities/graph/Graph.js";
 
 let _singleton = Symbol();
 
