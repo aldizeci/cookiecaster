@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import Graph from "./graph/Graph";
+import Graph from "../../entities/graph/Graph.js";
 
 /**
  * @author Sadik Hrnjica

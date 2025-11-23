@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
-import { exportCC3File } from "../utils/FileExport.js";
+import { exportCC3File } from "../../utils/FileExport.js";
 import "./Gallery.css";
 
 // Dynamischer Import aller JSON Templates im Ordner /templates

@@ -4,11 +4,11 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {IntlProvider} from "react-intl";
 
 // Components
-import Home from "./ui/Home";
-import Start from "./ui/Start";
+import Home from "./ui/pages/Home.jsx";
+import Start from "./ui/pages/Start.jsx";
 // import Export from "./components/Export";
-import Navbar from "./ui/CustomNavbar";
-import Gallery from "./ui/Gallery";
+import Navbar from "./ui/components/CustomNavbar.jsx";
+import Gallery from "./ui/pages/Gallery.jsx";
 // import Ueber from "./components/Ueber";
 // import ErrorPage from "./components/Error";
 // import About from "./components/About";

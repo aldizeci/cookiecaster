@@ -4,11 +4,11 @@
  * @version 2.0 (refactored)
  */
 
-import AbstractMode from "./AbstractMode";
+import AbstractMode from "./AbstractMode.js";
 import * as d3 from "d3";
-import SvgHandler from "../SvgHandler";
-import Controller from "../Controller";
-import SelectionHandler from "../SelectionHandler";
+import SvgHandler from "../handlers/SvgHandler.js";
+import Controller from "../handlers/Controller.js";
+import SelectionHandler from "../handlers/SelectionHandler.js";
 
 const round5 = x => Math.round(2 * x) * 0.5;
 

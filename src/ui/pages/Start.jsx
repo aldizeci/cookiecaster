@@ -3,15 +3,15 @@ import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {Link} from "react-router-dom";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
-import config from "../client_config.json";
+import config from "../../client_config.json";
 import * as bootstrap from "bootstrap";
 
-import {importCC3File} from "../utils/FileImport.js";
-import {exportCC3File} from "../utils/FileExport.js";
-import Graph from "../api/graph/Graph";
-import Controller from "../api/Controller";
-import SvgHandler from "../api/SvgHandler";
-import SelectionHandler from "../api/SelectionHandler";
+import {importCC3File} from "../../utils/FileImport.js";
+import {exportCC3File} from "../../utils/FileExport.js";
+import Graph from "../../entities/graph/Graph.js";
+import Controller from "../../business-logic/handlers/Controller.js";
+import SvgHandler from "../../business-logic/handlers/SvgHandler.js";
+import SelectionHandler from "../../business-logic/handlers/SelectionHandler.js";
 
 import "./Start.css";
 

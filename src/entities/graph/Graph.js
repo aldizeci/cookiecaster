@@ -1,8 +1,8 @@
-import Node from './Node'
-import Edge from './Edge'
-import validateGraph from './Validation'
-import analyzeGraph from './Analysis'
-import SvgHandler from '../SvgHandler'
+import Node from './Node.js'
+import Edge from './Edge.js'
+import validateGraph from '../../business-logic/graph-operations/Validation.js'
+import analyzeGraph from '../../business-logic/graph-operations/Analysis.js'
+import SvgHandler from '../../business-logic/handlers/SvgHandler.js'
 
 let _singleton = Symbol();
 

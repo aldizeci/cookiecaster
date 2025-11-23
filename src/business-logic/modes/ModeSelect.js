@@ -5,9 +5,9 @@
  */
 
 import * as d3 from "d3";
-import AbstractMode from "./AbstractMode";
-import SelectionHandler from '../SelectionHandler';
-import SvgHandler from '../SvgHandler';
+import AbstractMode from "./AbstractMode.js";
+import SelectionHandler from '../handlers/SelectionHandler.js';
+import SvgHandler from '../handlers/SvgHandler.js';
 
 export default class ModeSelect extends AbstractMode {
     enable() {

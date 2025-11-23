@@ -5,10 +5,10 @@
  */
 
 import * as d3 from "d3";
-import AbstractMode from "./AbstractMode";
-import SelectionHandler from '../SelectionHandler';
-import SvgHandler from '../SvgHandler';
-import Controller from "../Controller";
+import AbstractMode from "./AbstractMode.js";
+import SelectionHandler from '../handlers/SelectionHandler.js';
+import SvgHandler from '../handlers/SvgHandler.js';
+import Controller from "../handlers/Controller.js";
 
 export default class ModeMove extends AbstractMode {
     enable() {

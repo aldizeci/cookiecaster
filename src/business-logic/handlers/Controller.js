@@ -1,12 +1,12 @@
-import Graph from "./graph/Graph";
-import Node from "./graph/Node";
-import Edge from "./graph/Edge";
-import SvgHandler from "./SvgHandler";
-import SelectionHandler from "./SelectionHandler";
-import ModeDraw from "./modi/ModeDraw";
-import ModeMove from "./modi/ModeMove";
-import ModeRotate from "./modi/ModeRotate";
-import ModeSelect from "./modi/ModeSelect";
+import Graph from "../../entities/graph/Graph.js";
+import Node from "../../entities/graph/Node.js";
+import Edge from "../../entities/graph/Edge.js";
+import SvgHandler from "./SvgHandler.js";
+import SelectionHandler from "./SelectionHandler.js";
+import ModeDraw from "../modes/ModeDraw.js";
+import ModeMove from "../modes/ModeMove.js";
+import ModeRotate from "../modes/ModeRotate.js";
+import ModeSelect from "../modes/ModeSelect.js";
 
 let _singleton = Symbol();
 
