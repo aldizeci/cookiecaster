@@ -513,60 +513,6 @@ export default function Start() {
         [analyze.status, analyzeGraph, saveGraph]
     );
 
-    useEffect(() => {
-        const graph = Graph.instance;
-        if (graph.nodeSize > 0) {
-            const svgh = SvgHandler.instance;
-            graph.forEachNode((n) => svgh.addNode(n));
-            graph.forEachEdge((e) => svgh.addEdge(e));
-            d3.select("#layer").remove();
-            svgh.updateMessage();
-        }
-    }, []); // Nur beim Mount
-
-    // --- Restore selected drawing from gallery ---
-    useEffect(() => {
-        const ctr = Controller.instance;
-        const graph = Graph.instance;
-        const svgh = SvgHandler.instance;
-        const drawings = getAllDrawings();
-        const selectedId = sessionStorage.getItem("selectedDrawingId");
-
-        const loadDrawing = async (drawing) => {
-            if (!drawing) return;
-
-            // Trigger a clean reset
-            document.querySelector("#reset")?.click();
-            await new Promise((resolve) => setTimeout(resolve, 50)); // wait for reset to complete
-
-            try {
-                const json =
-                    typeof drawing.graphJSON === "string"
-                        ? drawing.graphJSON
-                        : JSON.stringify(drawing.graphJSON);
-
-                if (drawing.graphJSON) graph.fromJSON(json);
-                else if (drawing.svgPath) graph.fromSvg([drawing.svgPath]);
-
-                svgh.updateMessage();
-
-                // Automatically switch to SELECT mode
-                ctr.mode = ctr.modi.MODE_SELECT;
-                ctr.mode.enable();
-            } catch (err) {
-                console.error("Error while loading gallery drawing:", err);
-            } finally {
-                sessionStorage.removeItem("selectedDrawingId");
-                window.__loadedFromGallery = true;
-            }
-        };
-
-        if (selectedId) {
-            const selectedDrawing = drawings.find((d) => d.id === selectedId);
-            loadDrawing(selectedDrawing);
-        }
-    }, []);
-
     // --- Restore unsaved autosave drawing on mount ---
     useEffect(() => {
         const graph = Graph.instance;
