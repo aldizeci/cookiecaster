@@ -195,9 +195,17 @@ export default class SvgHandler {
             .attr("cy", edge.q.y)
             .attr("visibility", "hidden")
             .classed("qCircle", true)
-            .style("pointer-events", "none")
-            .on(this._e.enter, () => { this.focus = { obj: edge, type: "q" }; })
-            .on(this._e.leave, () => { this.focus.obj = undefined; });
+            .on(this._e.enter, () => {
+                this.focus = { obj: edge, type: "q" };
+                d3.select(`#q${edge.id}`).attr("visibility", "visible");
+            })
+            .on(this._e.leave, () => {
+                const isSelected = d3.select(`#e${edge.id}`).classed("pathSelected");
+                if (!isSelected) {
+                    d3.select(`#q${edge.id}`).attr("visibility", "hidden");
+                }
+                this.focus.obj = undefined;
+            });
     }
 
     /**
