@@ -6,7 +6,6 @@ import * as d3 from "d3";
 import config from "../../client_config.json";
 import * as bootstrap from "bootstrap";
 import {Modal} from "bootstrap";
-
 import {importCC3File} from "../../utils/FileImport.js";
 import {exportCC3File} from "../../utils/FileExport.js";
 import Graph from "../../entities/graph/Graph.js";
