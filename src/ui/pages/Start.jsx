@@ -502,14 +502,6 @@ export default function Start() {
             }
 
             ctr.mode.enable();
-            const graph = Graph.instance;
-            if (graph.nodeSize > 0) {
-                const svgh = SvgHandler.instance;
-                graph.forEachNode((n) => svgh.addNode(n));
-                graph.forEachEdge((e) => svgh.addEdge(e));
-                d3.select("#layer").remove();
-                svgh.updateMessage();
-            }
 
             return () => {
                 window.removeEventListener("keydown", onKeyDown);
@@ -520,6 +512,17 @@ export default function Start() {
         ,
         [analyze.status, analyzeGraph, saveGraph]
     );
+
+    useEffect(() => {
+        const graph = Graph.instance;
+        if (graph.nodeSize > 0) {
+            const svgh = SvgHandler.instance;
+            graph.forEachNode((n) => svgh.addNode(n));
+            graph.forEachEdge((e) => svgh.addEdge(e));
+            d3.select("#layer").remove();
+            svgh.updateMessage();
+        }
+    }, []); // Nur beim Mount
 
     // --- Restore selected drawing from gallery ---
     useEffect(() => {
