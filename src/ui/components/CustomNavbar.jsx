@@ -51,7 +51,7 @@ export default function CustomNavbar() {
 
                     {/* Language Dropdown */}
                     <NavDropdown
-                        title={<span><i className="glyphicon glyphicon-globe"></i></span>}
+                        title={<span><i className="fa-solid fa-globe"></i></span>}
                         id="basic-nav-dropdown"
                         align="end"
                         onSelect={handleSelect}>
