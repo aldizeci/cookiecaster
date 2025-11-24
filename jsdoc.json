@@ -1,19 +1,39 @@
 {
   "plugins": [
+    "better-docs/component",
+    "better-docs/category",
     "plugins/markdown",
     "jsdoc-babel"
   ],
   "babel": {
-    "presets": ["@babel/preset-react"]
+    "presets": [
+      "@babel/preset-react",
+      "@babel/preset-env"
+    ]
   },
   "source": {
-    "include": ["src"],
+    "include": [
+      "src"
+    ],
     "includePattern": ".+\\.(js|jsx)$",
     "excludePattern": "(node_modules|dist)"
   },
-  "tutorials": "./docs",
   "opts": {
-    "destination": "./documentation",
-    "recurse": true
+    "destination": "docs/documentation",
+    "template": "node_modules/better-docs",
+    "recurse": true,
+    "encoding": "utf8"
+  },
+  "templates": {
+    "better-docs": {
+      "name": "CookieCaster 3.0 Documentation",
+      "hideGenerator": false,
+      "navigation": [
+        {
+          "label": "Guides",
+          "href": "docs"
+        }
+      ]
+    }
   }
 }
