@@ -429,3 +429,106 @@
         padding: 0;
     }
 }
+
+
+/* Upload Button and Preview Container */
+.upload-button-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.upload-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Upload Drop Zone */
+.upload-drop-zone {
+    border: 2px dashed var(--akzentfarbe1);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: rgba(240, 137, 46, 0.05);
+    transition: all 0.3s ease;
+}
+
+.upload-drop-zone:hover {
+    border-color: var(--akzentfarbe2);
+    background-color: rgba(240, 137, 46, 0.1);
+}
+
+.upload-drop-zone img {
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Styling */
+.modal {
+    z-index: 1070 !important;
+}
+
+.modal-backdrop {
+    z-index: 1060 !important;
+}
+
+.modal.fade.show {
+    z-index: 1070 !important;
+}
+
+.modal-header {
+    background-color: var(--akzentfarbe1);
+    color: white;
+}
+
+.modal-header .modal-title {
+    font-family: var(--hausschrift);
+    font-weight: 600;
+}
+
+.modal-body {
+    background-color: var(--hintergrundfarbe);
+    color: var(--akzentfarbe2);
+}
+
+.modal-footer {
+    background-color: var(--hintergrundfarbe);
+    color: var(--akzentfarbe2);
+}
+
+/* Radio Button Styling */
+.form-check-input {
+    accent-color: var(--akzentfarbe1);
+}
+
+.form-check-label {
+    color: var(--akzentfarbe2);
+    cursor: pointer;
+}
+
+.form-label {
+    color: var(--akzentfarbe2);
+}
+
+/* Upload Modal Animations */
+.modal.fade .modal-dialog {
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.fade.show .modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}

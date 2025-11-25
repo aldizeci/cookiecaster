@@ -5,7 +5,7 @@ import { exportCC3File } from "../../utils/FileExport.js";
 import "./Gallery.css";
 
 // Dynamischer Import aller JSON Templates im Ordner /templates
-const templateFiles = import.meta.glob("../templates/*.json", { eager: true });
+const templateFiles = import.meta.glob("../../templates/*.json", { eager: true });
 
 export default function Gallery() {
     const [templates, setTemplates] = useState([]);

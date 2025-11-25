@@ -5,7 +5,7 @@ import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
 import config from "../../client_config.json";
 import * as bootstrap from "bootstrap";
-
+import {Modal} from "bootstrap";
 import {importCC3File} from "../../utils/FileImport.js";
 import {exportCC3File} from "../../utils/FileExport.js";
 import Graph from "../../entities/graph/Graph.js";
@@ -115,7 +115,9 @@ export default function Start() {
         status: false, keys: Object.keys(profiles), data: profiles.default,
     });
     const [zoomIndex, setZoomIndex] = useState(() => SvgHandler.instance.getZoomLevel() - 1);
-
+    const [uploadMode, setUploadMode] = useState("shrink"); // "shrink" oder "scale"
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const uploadModalRef = useRef(null);
     const svgRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -137,6 +139,108 @@ export default function Start() {
 
         // Optional: clean up on unmount
         return () => tooltipList.forEach((t) => t.dispose());
+    }, []);
+
+    const handleUploadClick = useCallback(() => {
+        const modalElement = uploadModalRef.current;
+        if (modalElement) {
+            const modal = new Modal(modalElement);
+            modal.show();
+        }
+    }, []);
+
+    const handleFileSelected = useCallback((e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const url = event.target.result;
+            setPreviewUrl(url);
+        };
+        reader.readAsDataURL(file);
+    }, []);
+
+    const handleConfirmUpload = useCallback(async () => {
+        if (!previewUrl) return;
+
+        const {formatMessage} = intl;
+
+        try {
+            if (uploadMode === "scale") {
+                await cropImage(previewUrl);
+            } else {
+                setPictureUrl(previewUrl);
+                setTemporaryUrl(previewUrl);
+            }
+
+            // Aktiviere den Background-Slider
+            const sliderCheckbox = document.querySelector('input[type="checkbox"][aria-label="Background"]');
+            if (sliderCheckbox) {
+                sliderCheckbox.checked = true;
+                sliderCheckbox.dispatchEvent(new Event("change", {bubbles: true}));
+            }
+
+            // Schließe das Modal
+            const modalElement = uploadModalRef.current;
+            if (modalElement) {
+                const modal = Modal.getInstance(modalElement);
+                modal?.hide();
+            }
+
+            setPreviewUrl(null);
+            setUploadMode("shrink");
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        } catch (error) {
+            console.error("Fehler beim Upload:", error);
+            alert(formatMessage({id: "alert.uploadError"}));
+        }
+    }, [previewUrl, uploadMode, intl]);
+
+    const cropImage = (uploadedURL) => {
+        return new Promise((resolve) => {
+            const outputImageAspectRatio = 1;
+            const inputImage = new Image();
+            inputImage.src = uploadedURL;
+
+            inputImage.onload = () => {
+                const inputWidth = inputImage.naturalWidth;
+                const inputHeight = inputImage.naturalHeight;
+                const inputImageAspectRatio = inputWidth / inputHeight;
+                const outputImage = document.createElement("canvas");
+                let outputWidth = inputWidth;
+                let outputHeight = inputHeight;
+
+                if (inputImageAspectRatio > outputImageAspectRatio) {
+                    outputWidth = inputHeight * outputImageAspectRatio;
+                } else if (inputImageAspectRatio < outputImageAspectRatio) {
+                    outputHeight = inputWidth / outputImageAspectRatio;
+                }
+
+                outputImage.width = outputWidth;
+                outputImage.height = outputHeight;
+
+                const ctx = outputImage.getContext("2d");
+                ctx.drawImage(inputImage, 0, 0);
+
+                const croppedUrl = outputImage.toDataURL();
+                setPictureUrl(croppedUrl);
+                setTemporaryUrl(croppedUrl);
+                resolve();
+            };
+        });
+    };
+
+    const handleCancelUpload = useCallback(() => {
+        setPreviewUrl(null);
+        setUploadMode("shrink");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+
+        const modalElement = uploadModalRef.current;
+        if (modalElement) {
+            const modal = Modal.getInstance(modalElement);
+            modal?.hide();
+        }
     }, []);
 
     // ---- handlers ----
@@ -211,18 +315,6 @@ export default function Start() {
             svgh.setCritSeg(crit.critSeg);
         }
     }, [analyze.data, formatMessage, msgs]);
-
-    const onUploadClick = useCallback(() => {
-        fileInputRef.current?.click();
-    }, []);
-
-    const onFilePicked = useCallback((e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        setPictureUrl(url);
-        setTemporaryUrl(url);
-    }, []);
 
     // ---- grid lines generation ----
     const rasterLines = useMemo(() => {
@@ -409,14 +501,6 @@ export default function Start() {
             }
 
             ctr.mode.enable();
-            const graph = Graph.instance;
-            if (graph.nodeSize > 0) {
-                const svgh = SvgHandler.instance;
-                graph.forEachNode((n) => svgh.addNode(n));
-                graph.forEachEdge((e) => svgh.addEdge(e));
-                d3.select("#layer").remove();
-                svgh.updateMessage();
-            }
 
             return () => {
                 window.removeEventListener("keydown", onKeyDown);
@@ -427,49 +511,6 @@ export default function Start() {
         ,
         [analyze.status, analyzeGraph, saveGraph]
     );
-
-    // --- Restore selected drawing from gallery ---
-    useEffect(() => {
-        const ctr = Controller.instance;
-        const graph = Graph.instance;
-        const svgh = SvgHandler.instance;
-        const drawings = getAllDrawings();
-        const selectedId = sessionStorage.getItem("selectedDrawingId");
-
-        const loadDrawing = async (drawing) => {
-            if (!drawing) return;
-
-            // Trigger a clean reset
-            document.querySelector("#reset")?.click();
-            await new Promise((resolve) => setTimeout(resolve, 50)); // wait for reset to complete
-
-            try {
-                const json =
-                    typeof drawing.graphJSON === "string"
-                        ? drawing.graphJSON
-                        : JSON.stringify(drawing.graphJSON);
-
-                if (drawing.graphJSON) graph.fromJSON(json);
-                else if (drawing.svgPath) graph.fromSvg([drawing.svgPath]);
-
-                svgh.updateMessage();
-
-                // Automatically switch to SELECT mode
-                ctr.mode = ctr.modi.MODE_SELECT;
-                ctr.mode.enable();
-            } catch (err) {
-                console.error("Error while loading gallery drawing:", err);
-            } finally {
-                sessionStorage.removeItem("selectedDrawingId");
-                window.__loadedFromGallery = true;
-            }
-        };
-
-        if (selectedId) {
-            const selectedDrawing = drawings.find((d) => d.id === selectedId);
-            loadDrawing(selectedDrawing);
-        }
-    }, []);
 
     // --- Restore unsaved autosave drawing on mount ---
     useEffect(() => {
@@ -499,179 +540,293 @@ export default function Start() {
     }, [showGrid]);
 
 // ---- render ----
+
+    // ---- render ----
     return (<div className="start-root">
-        <div className="start-layout">
-            <div className="canvas-wrap">
-                <svg
-                    ref={svgRef}
-                    viewBox={viewBox}
-                    style={backgroundStyle}
-                    preserveAspectRatio="xMidYMid meet"
-                    id="drawingarea"
-                    className="mouse"
-                >
-                    <g id="raster">
-                        {rasterLines.linesY}
-                        {rasterLines.linesX}
-                    </g>
+            <div className="start-layout">
+                <div className="canvas-wrap">
+                    <svg
+                        ref={svgRef}
+                        viewBox={viewBox}
+                        style={backgroundStyle}
+                        preserveAspectRatio="xMidYMid meet"
+                        id="drawingarea"
+                        className="mouse"
+                    >
+                        <g id="raster">
+                            {rasterLines.linesY}
+                            {rasterLines.linesX}
+                        </g>
 
-                    <g id="layer" transform={translate}>
-                        <text textAnchor="middle">{formatMessage(msgs.drawingarea)}</text>
-                    </g>
+                        <g id="layer" transform={translate}>
+                            <text textAnchor="middle">{formatMessage(msgs.drawingarea)}</text>
+                        </g>
 
-                    <line id="moveEdge" visibility="hidden"/>
-                    <path id="selectionRect" visibility="hidden"/>
-                    <g id="edges"/>
-                    <line id="qEdge1" className="qEdge" visibility="hidden"/>
-                    <line id="qEdge2" className="qEdge" visibility="hidden"/>
-                    <g id="nodes"/>
-                    <g id="warnings"/>
-                    <g>
-                        <text id="message1"/>
-                        <text id="message2"/>
-                    </g>
-                </svg>
+                        <line id="moveEdge" visibility="hidden"/>
+                        <path id="selectionRect" visibility="hidden"/>
+                        <g id="edges"/>
+                        <line id="qEdge1" className="qEdge" visibility="hidden"/>
+                        <line id="qEdge2" className="qEdge" visibility="hidden"/>
+                        <g id="nodes"/>
+                        <g id="warnings"/>
+                        <g>
+                            <text id="message1"/>
+                            <text id="message2"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <aside className="sidenav">
+                    <h5>
+                        <FormattedMessage id="start.title"/>
+                    </h5>
+
+                    <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex align-items-center gap-2 standard-font">
+                            <i className="fas fa-table-cells-large"></i>
+                            <FormattedMessage id="start.helplines"/>
+                        </div>
+
+                        <div>
+                            <label className="switch m-0">
+                                <input
+                                    type="checkbox"
+                                    checked={showGrid}
+                                    onChange={(e) => changeGrid(e.target.checked)}
+                                />
+                                <span className="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="list-group-item d-flex justify-content-between align-items-center">
+                        <div className="d-flex align-items-center gap-2">
+                            <i className="far fa-image"></i>
+                            <FormattedMessage id="start.backgroundImage"/>
+                        </div>
+
+                        <div className="material-switch m-0 flex-shrink-0">
+                            <label className="switch m-0">
+                                <input
+                                    type="checkbox"
+                                    checked={!!pictureUrl}
+                                    onChange={(e) => toggleBackground(e.target.checked)}
+                                />
+                                <span className="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="list-group-item d-flex justify-content-between align-items-center">
+                        <div className="d-flex align-items-center gap-2">
+                            <i className="fa fa-search"></i>
+                            <FormattedMessage id="start.zoom"/>
+                        </div>
+
+                        <div className="selector m-0 flex-shrink-0">
+                            <select
+                                className="form-select form-select-sm"
+                                aria-label="Zoom"
+                                value={zoomIndex}
+                                onChange={(e) => changeZoom(e.target.value)}
+                            >
+                                {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
+                                    {z}
+                                </option>))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="d-flex justify-content-start">
+                        <button id="reset" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-title={intl.formatMessage({id: "start.deleteEverything"})}>
+                            <i className="far fa-file"></i> <FormattedMessage id="start.new"/>
+                        </button>
+                    </div>
+
+                    <button id="draw">
+                        <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
+                    </button>
+
+                    <button id="select">
+                        <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
+                    </button>
+
+                    <button id="move">
+                        <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
+                    </button>
+
+                    <button id="rotate">
+                        <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
+                    </button>
+
+                    <button id="mirror">
+                        <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
+                    </button>
+
+                    <button id="copy">
+                        <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
+                    </button>
+
+                    <div className="upload-button-container">
+                        <button
+                            id="upload"
+                            type="button"
+                            onClick={handleUploadClick}
+                            className="btn btn-sm"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-title={intl.formatMessage({id: "start.uploadTooltip"})}
+                        >
+                            <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
+                        </button>
+                    </div>
+
+                    {/* Hidden file input */}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="d-none"
+                        onChange={handleFileSelected}
+                    />
+
+                    <button id="erase" data-toggle="tooltip" data-placement="top"
+                            data-bs-title={intl.formatMessage({id: "start.deleteTooltip"})}>
+                        <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
+                    </button>
+
+                    <hr/>
+
+                    <button id="analyze" data-bs-toggle="tooltip" data-bs-placement="top"
+                            data-bs-title={intl.formatMessage({id: "start.analyzeText"})}>
+                        <i className="fab fa-searchengin"></i>{" "}
+                        <FormattedMessage id="start.analyze"/>
+                    </button>
+
+                    <button id="save">
+                        <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
+                    </button>
+
+                    <Link id="load" className="nav-link" to="/gallery">
+                        <i className="fas fa-upload"></i>{" "}
+                        <FormattedMessage id="start.loadFromGallery"/>
+                    </Link>
+
+                    <button id="loadFromFile">
+                        <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
+                    </button>
+
+                    <button id="exportToFile">
+                        <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
+                    </button>
+
+                    <Link id="goToExport" className="nav-link" to="/export">
+                        <i className="fas fa-download"></i> Export 3D
+                    </Link>
+                </aside>
             </div>
 
-            <aside className="sidenav">
-                <h5>
-                    <FormattedMessage id="start.title"/>
-                </h5>
+            {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
+            <div
+                ref={uploadModalRef}
+                className="modal fade"
+                tabIndex="-1"
+                aria-labelledby="uploadModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="uploadModalLabel">
+                                <FormattedMessage id="alert.imageUploadTitle"/>
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                                onClick={handleCancelUpload}
+                            ></button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="text-center mb-3">
+                                <label className="form-label">
+                                    <FormattedMessage id="alert.enterFile"/>
+                                </label>
+                                <div
+                                    className="upload-drop-zone"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Preview"
+                                             style={{maxWidth: "100%", maxHeight: "200px"}}/>
+                                    ) : (
+                                        <div>
+                                            <i className="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                            <small className="text-muted">
+                                                <FormattedMessage id="alert.imageUploadText"/>
+                                            </small>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center gap-2 standard-font">
-                        <i className="fas fa-table-cells-large"></i>
-                        <FormattedMessage id="start.helplines"/>
-                    </div>
-
-                    <div>
-                        <label className="switch m-0">
-                            <input
-                                type="checkbox"
-                                checked={showGrid}
-                                onChange={(e) => changeGrid(e.target.checked)}
-                            />
-                            <span className="slider round"></span>
-                        </label>
+                            {/* Scale Options */}
+                            <div className="mt-4">
+                                <label className="form-label d-block mb-3">
+                                    <strong><FormattedMessage id="alert.scale"/></strong>
+                                </label>
+                                <div className="form-check mb-2">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        id="scaleWhole"
+                                        name="scaleMode"
+                                        value="scale"
+                                        checked={uploadMode === "scale"}
+                                        onChange={(e) => setUploadMode(e.target.value)}
+                                    />
+                                    <label className="form-check-label" htmlFor="scaleWhole">
+                                        <FormattedMessage id="alert.scale"/>
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        id="shrinkMode"
+                                        name="scaleMode"
+                                        value="shrink"
+                                        checked={uploadMode === "shrink"}
+                                        onChange={(e) => setUploadMode(e.target.value)}
+                                    />
+                                    <label className="form-check-label" htmlFor="shrinkMode">
+                                        <FormattedMessage id="alert.shrink"/>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={handleCancelUpload}
+                            >
+                                <FormattedMessage id="alert.cancelButton"/>
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleConfirmUpload}
+                                disabled={!previewUrl}
+                            >
+                                <FormattedMessage id="alert.saveButton"/>
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center gap-2">
-                        <i className="far fa-image"></i>
-                        <FormattedMessage id="start.backgroundImage"/>
-                    </div>
-
-                    <div className="material-switch m-0 flex-shrink-0">
-                        <label className="switch m-0">
-                            <input
-                                type="checkbox"
-                                checked={!!pictureUrl}
-                                onChange={(e) => toggleBackground(e.target.checked)}
-                            />
-                            <span className="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
-
-                <div className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center gap-2">
-                        <i className="fa fa-search"></i>
-                        <FormattedMessage id="start.zoom"/>
-                    </div>
-
-                    <div className="selector m-0 flex-shrink-0">
-                        <select
-                            className="form-select form-select-sm"
-                            aria-label="Zoom"
-                            value={zoomIndex}
-                            onChange={(e) => changeZoom(e.target.value)}
-                        >
-                            {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
-                                {z}
-                            </option>))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="d-flex justify-content-start">
-                    <button id="reset" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-title={intl.formatMessage({id: "start.deleteEverything"})}>
-                        <i className="far fa-file"></i> <FormattedMessage id="start.new"/>
-                    </button>
-                </div>
-
-                <button id="draw">
-                    <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
-                </button>
-
-                <button id="select">
-                    <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
-                </button>
-
-                <button id="move">
-                    <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
-                </button>
-
-                <button id="rotate">
-                    <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
-                </button>
-
-                <button id="mirror">
-                    <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
-                </button>
-
-                <button id="copy">
-                    <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
-                </button>
-
-                <button id="upload" type="button" onClick={onUploadClick} data-bs-toggle="tooltip"
-                        data-bs-placement="top" data-bs-title={intl.formatMessage({id: "start.uploadTooltip"})}>
-                    <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
-                </button>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={onFilePicked}
-                />
-
-                <button id="erase" data-toggle="tooltip" data-placement="top"
-                        data-bs-title={intl.formatMessage({id: "start.deleteTooltip"})}>
-                    <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
-                </button>
-
-                <hr/>
-
-                <button id="analyze" data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-title={intl.formatMessage({id: "start.analyzeText"})}>
-                    <i className="fab fa-searchengin"></i>{" "}
-                    <FormattedMessage id="start.analyze"/>
-                </button>
-
-                <button id="save">
-                    <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-                </button>
-
-                <Link id="load" className="nav-link" to="/gallery">
-                    <i className="fas fa-upload"></i>{" "}
-                    <FormattedMessage id="start.loadFromGallery"/>
-                </Link>
-
-                <button id="loadFromFile">
-                    <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
-                </button>
-
-                <button id="exportToFile">
-                    <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
-                </button>
-
-                <Link id="goToExport" className="nav-link" to="/export">
-                    <i className="fas fa-download"></i> Export 3D
-                </Link>
-            </aside>
+            </div>
         </div>
-    </div>);
+    );
 }

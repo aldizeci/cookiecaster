@@ -41,7 +41,7 @@ export default function Home() {
 
     // Default layout for desktop/tablet
     return (
-        <Container className="mt-5">
+        <Container className="mt-5 home-page">
             <div className="p-5 mb-4 bg-light rounded-3">
                 <Row>
                     <Col xs={12} sm={8} className="main-section">

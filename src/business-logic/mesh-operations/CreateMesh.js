@@ -201,7 +201,7 @@ let createConnectionVertices = (data, t) => {
  * @param {Vec3} a - first vertex of triangle
  * @param {Vec3} b - second vertex of triangle
  * @param {Vec3} c - third vertex of triangle
- * @returns {{normal: *[], verts: *[]}}
+ * @returns {{normal: number[], verts: number[][]}}
  */
 let createFacet = (n, a, b, c) => {
     return {
