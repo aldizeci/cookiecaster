@@ -1,6 +1,6 @@
 {
   "home.device": "Gerät wird nicht unterstützt",
-  "home.welcome": "Willkommen beim CookieCaster 2.0",
+  "home.welcome": "Willkommen beim CookieCaster 3.0",
   "home.start": "Möchtest Du Deine eigene persönliche Keksform gestalten?",
   "home.startButton": "Los geht's!",
   "home.needHelp": "Bist Du neu hier? Klicke auf das Fragezeichensymbol oben rechts, um die wichtigsten Schritte zu lernen.",
@@ -46,9 +46,13 @@
   "gallery.backButton": "Zurück",
   "gallery.notLoad": "Galerie konnte nicht geladen werden.",
   "gallery.empty": "Galerie ist leer.",
+  "gallery.export": "Exportieren",
+  "gallery.delete": "Löschen",
+  "gallery.templates": "Vorlagen",
+  "gallery.custom": "Eigene Formen",
 
-  "ueber.title": "Was kann der CookieCaster 2.0?",
-  "ueber.text1": "Mit dem Cookiecaster 2.0 kannst Du Deine ganz persönliche Keksform gestalten.",
+  "ueber.title": "Was kann der CookieCaster 3.0?",
+  "ueber.text1": "Mit dem Cookiecaster 3.0 kannst Du Deine ganz persönliche Keksform gestalten.",
   "ueber.text2": "Mit den vielen Funktionen, wie zum Beispiel drehen und spiegeln, sind Deinen Fantasien keine Grenzen gesetzt. Speichere Deine Form, um sie später in der Galerie wieder zu finden oder exportiere sie,um sie auf einem 3D-Drucker auszudrucken.",
   "ueber.text3": "Und jetzt viel Spass beim Ausprobieren!",
   "ueber.text4": "Hier noch ein kurzes Anleitungsvideo:",

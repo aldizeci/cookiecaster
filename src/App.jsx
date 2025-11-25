@@ -9,9 +9,9 @@ import Start from "./ui/pages/Start.jsx";
 import Export from "./ui/pages/Export.jsx";
 import Navbar from "./ui/components/CustomNavbar.jsx";
 import Gallery from "./ui/pages/Gallery.jsx";
-// import Ueber from "./components/Ueber";
-// import ErrorPage from "./components/Error";
-// import About from "./components/About";
+import Ueber from "./ui/pages/Ueber.jsx";
+import ErrorPage from "./ui/pages/Error.jsx";
+import About from "./ui/pages/About.jsx";
 
 // Translations
 import messages_de from "./translations/de.json";
@@ -41,9 +41,9 @@ export default function App() {
                         <Route path="/start" element={<Start/>}/>
                         <Route path="/export" element={<Export/>}/>
                         <Route path="/gallery" element={<Gallery/>}/>
-                        {/*<Route path="/ueber" element={<Ueber />} />*/}
-                        {/*<Route path="/about" element={<About />} />*/}
-                        {/*<Route path="*" element={<ErrorPage />} />*/}
+                        <Route path="/ueber" element={<Ueber/>}/>
+                        <Route path="/about" element={<About/>}/>
+                        <Route path="*" element={<ErrorPage/>}/>
                     </Routes>
                 </main>
             </Router>

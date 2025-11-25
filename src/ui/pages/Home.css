@@ -3,8 +3,9 @@
     margin-top: 70px;
 }
 
-.jumbotron, p, h2 {
-    color: var(--akzentfarbe2) !important;
+.home-page p,
+.home-page h2 {
+    color: var(--akzentfarbe2);
     font-size: 40px;
 }
 

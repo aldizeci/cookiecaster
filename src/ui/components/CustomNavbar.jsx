@@ -60,7 +60,7 @@ export default function CustomNavbar() {
                     </NavDropdown>
 
                     <Nav.Link as={Link} to="/ueber">
-                        <i className="glyphicon glyphicon-question-sign"></i>
+                        <i className="fa-solid fa-question"></i>
                     </Nav.Link>
 
                     <Nav.Link as={Link} to="/about">
