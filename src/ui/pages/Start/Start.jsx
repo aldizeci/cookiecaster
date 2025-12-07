@@ -1,7 +1,6 @@
 import './Start.css'
-import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
+import React, {useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
-import * as d3 from "d3";
 import Controller from "../../../business-logic/handlers/Controller.js";
 import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
 import Sidebar from "./components/Sidebar.jsx";
@@ -70,7 +69,6 @@ export default function Start() {
     const changeGrid = useCallback((checked) => {
         Controller.instance.grid = checked;
         setShowGrid(checked);
-        d3.select("#raster").attr("visibility", checked ? "visible" : "hidden");
     }, []);
 
     const toggleBackground = useCallback((checked) => {
@@ -123,13 +121,6 @@ export default function Start() {
         saveGraph,
     });
 
-// keep grid visibility in sync
-    useEffect(() => {
-        d3.select("#raster").attr("visibility", showGrid ? "visible" : "hidden");
-    }, [showGrid]);
-
-// ---- render ----
-
     // ---- render ----
     return (
         <div className="start-root">
@@ -142,6 +133,7 @@ export default function Start() {
                     rasterLines={rasterLines}
                     formatMessage={formatMessage}
                     msgs={msgs}
+                    showGrid={showGrid}
                 />
 
                 <Sidebar intl={intl}
