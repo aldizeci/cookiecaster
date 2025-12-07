@@ -2,22 +2,18 @@ import './Start.css'
 import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
-import config from "../../../client_config.json";
 import * as bootstrap from "bootstrap";
 import {Modal} from "bootstrap";
 import Graph from "../../../entities/graph/Graph.js";
 import Controller from "../../../business-logic/handlers/Controller.js";
 import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
-import SelectionHandler from "../../../business-logic/handlers/SelectionHandler.js";
 import Sidebar from "./components/Sidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
-import {validateGraph} from "../../../business-logic/services/graphValidation";
-
+import useGraphAnalysis from "./hooks/useGraphAnalysis";
 import "./Start.css";
 import Canvas from "./components/Canvas.jsx";
 
-const profiles = config.profiles;
 const zoomLevels = SvgHandler.instance.getZoomLevels();
 
 // ---------- Local Storage Helpers ----------
@@ -71,12 +67,10 @@ export default function Start() {
     const [showGrid, setShowGrid] = useState(true);
     const [pictureUrl, setPictureUrl] = useState(null);
     const [temporaryUrl, setTemporaryUrl] = useState(null);
-    const [analyze, setAnalyze] = useState({
-        status: false, keys: Object.keys(profiles), data: profiles.default,
-    });
     const [zoomIndex, setZoomIndex] = useState(() => SvgHandler.instance.getZoomLevel() - 1);
     const [uploadMode, setUploadMode] = useState("shrink"); // "shrink" oder "scale"
     const [previewUrl, setPreviewUrl] = useState(null);
+    const {analyze, analyzeGraph} = useGraphAnalysis(formatMessage, msgs);
     const uploadModalRef = useRef(null);
     const svgRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -257,24 +251,6 @@ export default function Start() {
             window.alert(formatMessage(msgs.noSave));
         }
     }, [formatMessage, msgs]);
-
-    const analyzeGraph = useCallback(() => {
-        SelectionHandler.instance.clear();
-        const data = validateGraph(Graph.instance, SvgHandler.instance, formatMessage, msgs);
-        if (!data.valid) return;
-
-        const crit = Graph.instance.analyze(data, analyze.data);
-        const segCount = Array.from(crit.critSeg).length;
-        if (crit.critNodes.length === 0 && segCount === 0) {
-            window.alert(formatMessage(msgs.export));
-        } else {
-            setAnalyze((prev) => ({...prev, status: true, data: profiles.default}));
-            const svgh = SvgHandler.instance;
-            svgh.setCritNodes(crit.critNodes);
-            window.alert(formatMessage(msgs.useful));
-            svgh.setCritSeg(crit.critSeg);
-        }
-    }, [analyze.data, formatMessage, msgs]);
 
     // ---- grid lines generation ----
     const rasterLines = useMemo(() => {
