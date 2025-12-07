@@ -1,8 +1,6 @@
 import './Start.css'
 import React, {useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
-import Controller from "../../../business-logic/handlers/Controller.js";
-import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
 import Sidebar from "./components/Sidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
@@ -10,8 +8,7 @@ import useGraphAnalysis from "./hooks/useGraphAnalysis";
 import Canvas from "./components/Canvas.jsx";
 import useGraphStorage from "./hooks/useGraphStorage.js";
 import useImageUpload from "./hooks/useImageUpload.js";
-
-const zoomLevels = SvgHandler.instance.getZoomLevels();
+import useCanvasConfig from "./hooks/useCanvasConfig.js";
 
 // ---------- component ----------
 export default function Start() {
@@ -46,30 +43,30 @@ export default function Start() {
     }), []);
 
     // ---- local state ----
-    const [showGrid, setShowGrid] = useState(true);
     const [pictureUrl, setPictureUrl] = useState(null);
     const [temporaryUrl, setTemporaryUrl] = useState(null);
-    const [zoomIndex, setZoomIndex] = useState(() => SvgHandler.instance.getZoomLevel() - 1);
     const {analyze, analyzeGraph} = useGraphAnalysis(formatMessage, msgs);
     const {saveGraph} = useGraphStorage(formatMessage, msgs);
     const svgRef = useRef(null);
+    const {
+        showGrid,
+        changeGrid,
+        zoomIndex,
+        changeZoom,
+        zoomLevels,
+        viewBox,
+        translate,
+        size,
+        raster
+    } = useCanvasConfig();
 
     // ---- derived values ----
-    const size = SvgHandler.instance.getDrawingAreaSize();
-    const viewBox = `0 0 ${size} ${size}`;
-    const translate = `translate(${size / 2},${size / 2})`;
     const backgroundStyle = pictureUrl ? {
         backgroundImage: `url(${pictureUrl})`,
         backgroundPosition: "center",
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
     } : undefined;
-
-    // ---- handlers ----
-    const changeGrid = useCallback((checked) => {
-        Controller.instance.grid = checked;
-        setShowGrid(checked);
-    }, []);
 
     const toggleBackground = useCallback((checked) => {
         if (!checked) {
@@ -92,24 +89,16 @@ export default function Start() {
         closeUpload,
     } = useImageUpload({setPictureUrl, setTemporaryUrl, toggleBackground, intl});
 
-    const changeZoom = useCallback((idx) => {
-        const zoom = parseInt(idx, 10);
-        SvgHandler.instance.setZoomLevel(zoom + 1);
-        setZoomIndex(zoom);
-    }, []);
-
     // ---- grid lines generation ----
     const rasterLines = useMemo(() => {
         const linesY = [];
         const linesX = [];
-        const raster = SvgHandler.instance.getRasterSpace();
-        const s = SvgHandler.instance.getDrawingAreaSize();
-        const end = s / raster;
+        const end = size / raster;
         for (let i = 1; i < end; i++) {
             const y = i * raster;
             const x = i * raster;
-            linesY.push(<line key={`ry-${i}`} x1="0" y1={y} x2={s} y2={y}/>);
-            linesX.push(<line key={`rx-${i}`} y1="0" x1={x} y2={s} x2={x}/>);
+            linesY.push(<line key={`ry-${i}`} x1="0" y1={y} x2={size} y2={y}/>);
+            linesX.push(<line key={`rx-${i}`} y1="0" x1={x} y2={size} x2={x}/>);
         }
         return {linesY, linesX};
     }, []);
