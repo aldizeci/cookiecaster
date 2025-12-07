@@ -4,26 +4,16 @@ import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
 import * as bootstrap from "bootstrap";
 import {Modal} from "bootstrap";
-import Graph from "../../../entities/graph/Graph.js";
 import Controller from "../../../business-logic/handlers/Controller.js";
 import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
 import Sidebar from "./components/Sidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
 import useGraphAnalysis from "./hooks/useGraphAnalysis";
-import "./Start.css";
 import Canvas from "./components/Canvas.jsx";
+import useGraphStorage from "./hooks/useGraphStorage.js";
 
 const zoomLevels = SvgHandler.instance.getZoomLevels();
-
-// ---------- Local Storage Helpers ----------
-function getAllDrawings() {
-    return JSON.parse(localStorage.getItem("drawings")) || [];
-}
-
-function saveAllDrawings(drawings) {
-    localStorage.setItem("drawings", JSON.stringify(drawings));
-}
 
 // ---------- component ----------
 export default function Start() {
@@ -71,6 +61,7 @@ export default function Start() {
     const [uploadMode, setUploadMode] = useState("shrink"); // "shrink" oder "scale"
     const [previewUrl, setPreviewUrl] = useState(null);
     const {analyze, analyzeGraph} = useGraphAnalysis(formatMessage, msgs);
+    const {saveGraph} = useGraphStorage(formatMessage, msgs);
     const uploadModalRef = useRef(null);
     const svgRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -219,39 +210,6 @@ export default function Start() {
         setZoomIndex(zoom);
     }, []);
 
-    const saveGraph = useCallback(() => {
-        const graph = Graph.instance;
-        const jsonData = graph.toJSON();
-        const forms = Graph.instance.validate()?.forms || [];
-        const svgPath = forms.map(f => f.path).join(" ");
-
-        const name = window.prompt(formatMessage(msgs.enterName), formatMessage(msgs.exampleName));
-        if (!name || !name.trim()) {
-            window.alert(formatMessage(msgs.noName));
-            return;
-        }
-
-        try {
-            const payload = {
-                id: "drawing-" + Date.now(),
-                name: name.trim(),
-                graphJSON: jsonData,
-                svgPath,
-                saved: true,
-                timestamp: new Date().toISOString(),
-            };
-
-            const drawings = getAllDrawings();
-            drawings.push(payload);
-            saveAllDrawings(drawings);
-
-            window.alert(formatMessage(msgs.save));
-        } catch (err) {
-            console.error(err);
-            window.alert(formatMessage(msgs.noSave));
-        }
-    }, [formatMessage, msgs]);
-
     // ---- grid lines generation ----
     const rasterLines = useMemo(() => {
         const linesY = [];
@@ -274,28 +232,6 @@ export default function Start() {
         analyzeGraph,
         saveGraph,
     });
-
-    // --- Restore unsaved autosave drawing on mount ---
-    useEffect(() => {
-        const graph = Graph.instance;
-        const temp = getAllDrawings().find((d) => !d.saved);
-
-        if (!temp) return;
-
-        try {
-            const json =
-                typeof temp.graphJSON === "string"
-                    ? temp.graphJSON
-                    : JSON.stringify(temp.graphJSON);
-
-            if (temp.graphJSON) graph.fromJSON(json);
-            else if (temp.svgPath) graph.fromSvg([temp.svgPath]);
-
-            SvgHandler.instance.updateMessage();
-        } catch (err) {
-            console.warn("⚠️ Failed to restore autosave:", err);
-        }
-    }, []); // separate and independent
 
 // keep grid visibility in sync
     useEffect(() => {
