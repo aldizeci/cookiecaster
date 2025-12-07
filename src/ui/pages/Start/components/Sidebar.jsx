@@ -1,9 +1,9 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
+import SidebarButtonWithTooltip from "./SidebarButtonWithTooltip";
 
 export default function Sidebar({
-                                    intl,
                                     showGrid,
                                     changeGrid,
                                     pictureUrl,
@@ -17,16 +17,14 @@ export default function Sidebar({
                                 }) {
     return (
         <aside className="sidenav">
-            <h5>
-                <FormattedMessage id="start.title"/>
-            </h5>
+            <h5><FormattedMessage id="start.title"/></h5>
 
+            {/* GRID */}
             <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center gap-2 standard-font">
                     <i className="fas fa-table-cells-large"></i>
                     <FormattedMessage id="start.helplines"/>
                 </div>
-
                 <label className="switch m-0">
                     <input
                         type="checkbox"
@@ -37,12 +35,12 @@ export default function Sidebar({
                 </label>
             </div>
 
+            {/* BACKGROUND IMAGE */}
             <div className="list-group-item d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center gap-2">
                     <i className="far fa-image"></i>
                     <FormattedMessage id="start.backgroundImage"/>
                 </div>
-
                 <label className="switch m-0">
                     <input
                         type="checkbox"
@@ -53,6 +51,7 @@ export default function Sidebar({
                 </label>
             </div>
 
+            {/* ZOOM SELECTOR */}
             <div className="list-group-item d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center gap-2">
                     <i className="fa fa-search"></i>
@@ -72,50 +71,47 @@ export default function Sidebar({
                 </div>
             </div>
 
-            <button id="reset" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                    data-bs-title={intl.formatMessage({id: "start.deleteEverything"})}>
+            {/* TOOL BUTTONS */}
+            <SidebarButtonWithTooltip id="reset" msgId="start.deleteEverything" type="button">
                 <i className="far fa-file"></i> <FormattedMessage id="start.new"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="draw">
+            <SidebarButtonWithTooltip id="draw" msgId="start.draw">
                 <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="select">
+            <SidebarButtonWithTooltip id="select" msgId="start.select">
                 <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="move">
+            <SidebarButtonWithTooltip id="move" msgId="start.move">
                 <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="rotate">
+            <SidebarButtonWithTooltip id="rotate" msgId="start.rotate">
                 <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="mirror">
+            <SidebarButtonWithTooltip id="mirror" msgId="start.mirror">
                 <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="copy">
+            <SidebarButtonWithTooltip id="copy" msgId="start.copy">
                 <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <div className="upload-button-container">
-                <button
-                    id="upload"
-                    type="button"
-                    onClick={handleUploadClick}
-                    className="btn btn-sm"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-title={intl.formatMessage({id: "start.uploadTooltip"})}
-                >
-                    <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
-                </button>
-            </div>
+            {/* UPLOAD IMAGE */}
+            <SidebarButtonWithTooltip
+                id="upload"
+                msgId="start.uploadTooltip"
+                type="button"
+                className="btn btn-sm"
+                onClick={handleUploadClick}
+            >
+                <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
+            </SidebarButtonWithTooltip>
 
-            {/* Hidden file input */}
+            {/* File input hidden */}
             <input
                 ref={fileInputRef}
                 type="file"
@@ -124,32 +120,33 @@ export default function Sidebar({
                 onChange={handleFileSelected}
             />
 
-            <button id="erase" data-bs-title={intl.formatMessage({id: "start.deleteTooltip"})}>
+            <SidebarButtonWithTooltip id="erase" msgId="start.deleteTooltip">
                 <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
             <hr/>
 
-            <button id="analyze" data-bs-title={intl.formatMessage({id: "start.analyzeText"})}>
+            <SidebarButtonWithTooltip id="analyze" msgId="start.analyzeText">
                 <i className="fab fa-searchengin"></i> <FormattedMessage id="start.analyze"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="save">
+            <SidebarButtonWithTooltip id="save" msgId="start.save">
                 <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-            </button>
+            </SidebarButtonWithTooltip>
 
+            {/* Links cannot have tooltips easily via wrapper => left as plain */}
             <Link id="load" className="nav-link" to="/gallery">
                 <i className="fas fa-upload"></i>{" "}
                 <FormattedMessage id="start.loadFromGallery"/>
             </Link>
 
-            <button id="loadFromFile">
+            <SidebarButtonWithTooltip id="loadFromFile" msgId="start.loadFromFile">
                 <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
-            </button>
+            </SidebarButtonWithTooltip>
 
-            <button id="exportToFile">
+            <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportToFile">
                 <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
-            </button>
+            </SidebarButtonWithTooltip>
 
             <Link id="goToExport" className="nav-link" to="/export">
                 <i className="fas fa-download"></i> Export 3D

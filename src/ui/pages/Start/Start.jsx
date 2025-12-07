@@ -2,8 +2,6 @@ import './Start.css'
 import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
-import * as bootstrap from "bootstrap";
-import {Modal} from "bootstrap";
 import Controller from "../../../business-logic/handlers/Controller.js";
 import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
 import Sidebar from "./components/Sidebar.jsx";
@@ -47,12 +45,6 @@ export default function Start() {
         upload: {id: "alert.upload"},
     }), []);
 
-    useEffect(() => {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map((el) => new bootstrap.Tooltip(el));
-        return () => tooltipList.forEach((t) => t.dispose());
-    }, []);
-
     // ---- local state ----
     const [showGrid, setShowGrid] = useState(true);
     const [pictureUrl, setPictureUrl] = useState(null);
@@ -60,9 +52,9 @@ export default function Start() {
     const [zoomIndex, setZoomIndex] = useState(() => SvgHandler.instance.getZoomLevel() - 1);
     const [uploadMode, setUploadMode] = useState("shrink"); // "shrink" oder "scale"
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
     const {analyze, analyzeGraph} = useGraphAnalysis(formatMessage, msgs);
     const {saveGraph} = useGraphStorage(formatMessage, msgs);
-    const uploadModalRef = useRef(null);
     const svgRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -77,21 +69,8 @@ export default function Start() {
         backgroundRepeat: "no-repeat",
     } : undefined;
 
-    useEffect(() => {
-        // Enable all tooltips on page load
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
-
-        // Optional: clean up on unmount
-        return () => tooltipList.forEach((t) => t.dispose());
-    }, []);
-
     const handleUploadClick = useCallback(() => {
-        const modalElement = uploadModalRef.current;
-        if (modalElement) {
-            const modal = new Modal(modalElement);
-            modal.show();
-        }
+        setIsUploadOpen(true);
     }, []);
 
     const handleFileSelected = useCallback((e) => {
@@ -126,12 +105,8 @@ export default function Start() {
                 sliderCheckbox.dispatchEvent(new Event("change", {bubbles: true}));
             }
 
-            // Schließe das Modal
-            const modalElement = uploadModalRef.current;
-            if (modalElement) {
-                const modal = Modal.getInstance(modalElement);
-                modal?.hide();
-            }
+            // Schliesse das Modal
+            setIsUploadOpen(false);
 
             setPreviewUrl(null);
             setUploadMode("shrink");
@@ -175,18 +150,6 @@ export default function Start() {
             };
         });
     };
-
-    const handleCancelUpload = useCallback(() => {
-        setPreviewUrl(null);
-        setUploadMode("shrink");
-        if (fileInputRef.current) fileInputRef.current.value = "";
-
-        const modalElement = uploadModalRef.current;
-        if (modalElement) {
-            const modal = Modal.getInstance(modalElement);
-            modal?.hide();
-        }
-    }, []);
 
     // ---- handlers ----
     const changeGrid = useCallback((checked) => {
@@ -269,13 +232,13 @@ export default function Start() {
 
             {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
             <UploadModal
-                uploadModalRef={uploadModalRef}
+                show={isUploadOpen}
+                onHide={() => setIsUploadOpen(false)}
                 fileInputRef={fileInputRef}
                 previewUrl={previewUrl}
                 uploadMode={uploadMode}
                 setUploadMode={setUploadMode}
                 handleFileSelected={handleFileSelected}
-                handleCancelUpload={handleCancelUpload}
                 handleConfirmUpload={handleConfirmUpload}
             />
         </div>
