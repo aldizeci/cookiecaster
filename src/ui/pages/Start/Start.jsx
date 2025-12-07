@@ -1,21 +1,24 @@
 import './Start.css'
 import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
-import {Link} from "react-router-dom";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
 import * as d3 from "d3";
-import config from "../../client_config.json";
+import config from "../../../client_config.json";
 import * as bootstrap from "bootstrap";
 import {Modal} from "bootstrap";
-import {importCC3File} from "../../utils/FileImport.js";
-import {exportCC3File} from "../../utils/FileExport.js";
-import Graph from "../../entities/graph/Graph.js";
-import Controller from "../../business-logic/handlers/Controller.js";
-import SvgHandler from "../../business-logic/handlers/SvgHandler.js";
-import SelectionHandler from "../../business-logic/handlers/SelectionHandler.js";
+import {importCC3File} from "../../../utils/FileImport.js";
+import {exportCC3File} from "../../../utils/FileExport.js";
+import Graph from "../../../entities/graph/Graph.js";
+import Controller from "../../../business-logic/handlers/Controller.js";
+import SvgHandler from "../../../business-logic/handlers/SvgHandler.js";
+import SelectionHandler from "../../../business-logic/handlers/SelectionHandler.js";
+import Sidebar from "./components/Sidebar.jsx";
+import UploadModal from "./components/UploadModal.jsx";
 
 import "./Start.css";
+import Canvas from "./components/Canvas.jsx";
 
 const profiles = config.profiles;
+const zoomLevels = SvgHandler.instance.getZoomLevels();
 
 // ---------- helpers ----------
 function validateGraph(formatMessage, messages) {
@@ -542,291 +545,43 @@ export default function Start() {
 // ---- render ----
 
     // ---- render ----
-    return (<div className="start-root">
+    return (
+        <div className="start-root">
             <div className="start-layout">
-                <div className="canvas-wrap">
-                    <svg
-                        ref={svgRef}
-                        viewBox={viewBox}
-                        style={backgroundStyle}
-                        preserveAspectRatio="xMidYMid meet"
-                        id="drawingarea"
-                        className="mouse"
-                    >
-                        <g id="raster">
-                            {rasterLines.linesY}
-                            {rasterLines.linesX}
-                        </g>
+                <Canvas
+                    svgRef={svgRef}
+                    viewBox={viewBox}
+                    backgroundStyle={backgroundStyle}
+                    translate={translate}
+                    rasterLines={rasterLines}
+                    formatMessage={formatMessage}
+                    msgs={msgs}
+                />
 
-                        <g id="layer" transform={translate}>
-                            <text textAnchor="middle">{formatMessage(msgs.drawingarea)}</text>
-                        </g>
-
-                        <line id="moveEdge" visibility="hidden"/>
-                        <path id="selectionRect" visibility="hidden"/>
-                        <g id="edges"/>
-                        <line id="qEdge1" className="qEdge" visibility="hidden"/>
-                        <line id="qEdge2" className="qEdge" visibility="hidden"/>
-                        <g id="nodes"/>
-                        <g id="warnings"/>
-                        <g>
-                            <text id="message1"/>
-                            <text id="message2"/>
-                        </g>
-                    </svg>
-                </div>
-
-                <aside className="sidenav">
-                    <h5>
-                        <FormattedMessage id="start.title"/>
-                    </h5>
-
-                    <div className="d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center gap-2 standard-font">
-                            <i className="fas fa-table-cells-large"></i>
-                            <FormattedMessage id="start.helplines"/>
-                        </div>
-
-                        <div>
-                            <label className="switch m-0">
-                                <input
-                                    type="checkbox"
-                                    checked={showGrid}
-                                    onChange={(e) => changeGrid(e.target.checked)}
-                                />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="list-group-item d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center gap-2">
-                            <i className="far fa-image"></i>
-                            <FormattedMessage id="start.backgroundImage"/>
-                        </div>
-
-                        <div className="material-switch m-0 flex-shrink-0">
-                            <label className="switch m-0">
-                                <input
-                                    type="checkbox"
-                                    checked={!!pictureUrl}
-                                    onChange={(e) => toggleBackground(e.target.checked)}
-                                />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="list-group-item d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center gap-2">
-                            <i className="fa fa-search"></i>
-                            <FormattedMessage id="start.zoom"/>
-                        </div>
-
-                        <div className="selector m-0 flex-shrink-0">
-                            <select
-                                className="form-select form-select-sm"
-                                aria-label="Zoom"
-                                value={zoomIndex}
-                                onChange={(e) => changeZoom(e.target.value)}
-                            >
-                                {SvgHandler.instance.getZoomLevels().map((z, i) => (<option key={z} value={i}>
-                                    {z}
-                                </option>))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="d-flex justify-content-start">
-                        <button id="reset" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                data-bs-title={intl.formatMessage({id: "start.deleteEverything"})}>
-                            <i className="far fa-file"></i> <FormattedMessage id="start.new"/>
-                        </button>
-                    </div>
-
-                    <button id="draw">
-                        <i className="far fa-edit"></i> <FormattedMessage id="start.draw"/>
-                    </button>
-
-                    <button id="select">
-                        <i className="fas fa-expand"></i> <FormattedMessage id="start.select"/>
-                    </button>
-
-                    <button id="move">
-                        <i className="fas fa-arrows-alt"></i> <FormattedMessage id="start.move"/>
-                    </button>
-
-                    <button id="rotate">
-                        <i className="fas fa-sync-alt"></i> <FormattedMessage id="start.rotate"/>
-                    </button>
-
-                    <button id="mirror">
-                        <i className="far fa-star-half"></i> <FormattedMessage id="start.mirror"/>
-                    </button>
-
-                    <button id="copy">
-                        <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
-                    </button>
-
-                    <div className="upload-button-container">
-                        <button
-                            id="upload"
-                            type="button"
-                            onClick={handleUploadClick}
-                            className="btn btn-sm"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            data-bs-title={intl.formatMessage({id: "start.uploadTooltip"})}
-                        >
-                            <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
-                        </button>
-                    </div>
-
-                    {/* Hidden file input */}
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="d-none"
-                        onChange={handleFileSelected}
-                    />
-
-                    <button id="erase" data-toggle="tooltip" data-placement="top"
-                            data-bs-title={intl.formatMessage({id: "start.deleteTooltip"})}>
-                        <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
-                    </button>
-
-                    <hr/>
-
-                    <button id="analyze" data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-title={intl.formatMessage({id: "start.analyzeText"})}>
-                        <i className="fab fa-searchengin"></i>{" "}
-                        <FormattedMessage id="start.analyze"/>
-                    </button>
-
-                    <button id="save">
-                        <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-                    </button>
-
-                    <Link id="load" className="nav-link" to="/gallery">
-                        <i className="fas fa-upload"></i>{" "}
-                        <FormattedMessage id="start.loadFromGallery"/>
-                    </Link>
-
-                    <button id="loadFromFile">
-                        <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
-                    </button>
-
-                    <button id="exportToFile">
-                        <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
-                    </button>
-
-                    <Link id="goToExport" className="nav-link" to="/export">
-                        <i className="fas fa-download"></i> Export 3D
-                    </Link>
-                </aside>
+                <Sidebar intl={intl}
+                         showGrid={showGrid}
+                         changeGrid={changeGrid}
+                         pictureUrl={pictureUrl}
+                         toggleBackground={toggleBackground}
+                         zoomIndex={zoomIndex}
+                         changeZoom={changeZoom}
+                         handleUploadClick={handleUploadClick}
+                         fileInputRef={fileInputRef}
+                         handleFileSelected={handleFileSelected}
+                         zoomLevels={zoomLevels}/>
             </div>
 
             {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
-            <div
-                ref={uploadModalRef}
-                className="modal fade"
-                tabIndex="-1"
-                aria-labelledby="uploadModalLabel"
-                aria-hidden="true"
-            >
-                <div className="modal-dialog modal-dialog-centered">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="uploadModalLabel">
-                                <FormattedMessage id="alert.imageUploadTitle"/>
-                            </h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                                onClick={handleCancelUpload}
-                            ></button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="text-center mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage id="alert.enterFile"/>
-                                </label>
-                                <div
-                                    className="upload-drop-zone"
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    {previewUrl ? (
-                                        <img src={previewUrl} alt="Preview"
-                                             style={{maxWidth: "100%", maxHeight: "200px"}}/>
-                                    ) : (
-                                        <div>
-                                            <i className="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                                            <small className="text-muted">
-                                                <FormattedMessage id="alert.imageUploadText"/>
-                                            </small>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Scale Options */}
-                            <div className="mt-4">
-                                <label className="form-label d-block mb-3">
-                                    <strong><FormattedMessage id="alert.scale"/></strong>
-                                </label>
-                                <div className="form-check mb-2">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        id="scaleWhole"
-                                        name="scaleMode"
-                                        value="scale"
-                                        checked={uploadMode === "scale"}
-                                        onChange={(e) => setUploadMode(e.target.value)}
-                                    />
-                                    <label className="form-check-label" htmlFor="scaleWhole">
-                                        <FormattedMessage id="alert.scale"/>
-                                    </label>
-                                </div>
-                                <div className="form-check">
-                                    <input
-                                        className="form-check-input"
-                                        type="radio"
-                                        id="shrinkMode"
-                                        name="scaleMode"
-                                        value="shrink"
-                                        checked={uploadMode === "shrink"}
-                                        onChange={(e) => setUploadMode(e.target.value)}
-                                    />
-                                    <label className="form-check-label" htmlFor="shrinkMode">
-                                        <FormattedMessage id="alert.shrink"/>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={handleCancelUpload}
-                            >
-                                <FormattedMessage id="alert.cancelButton"/>
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={handleConfirmUpload}
-                                disabled={!previewUrl}
-                            >
-                                <FormattedMessage id="alert.saveButton"/>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <UploadModal
+                uploadModalRef={uploadModalRef}
+                fileInputRef={fileInputRef}
+                previewUrl={previewUrl}
+                uploadMode={uploadMode}
+                setUploadMode={setUploadMode}
+                handleFileSelected={handleFileSelected}
+                handleCancelUpload={handleCancelUpload}
+                handleConfirmUpload={handleConfirmUpload}
+            />
         </div>
     );
 }
