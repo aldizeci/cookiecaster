@@ -10,6 +10,7 @@ import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
 import useGraphAnalysis from "./hooks/useGraphAnalysis";
 import Canvas from "./components/Canvas.jsx";
 import useGraphStorage from "./hooks/useGraphStorage.js";
+import useImageUpload from "./hooks/useImageUpload.js";
 
 const zoomLevels = SvgHandler.instance.getZoomLevels();
 
@@ -50,13 +51,9 @@ export default function Start() {
     const [pictureUrl, setPictureUrl] = useState(null);
     const [temporaryUrl, setTemporaryUrl] = useState(null);
     const [zoomIndex, setZoomIndex] = useState(() => SvgHandler.instance.getZoomLevel() - 1);
-    const [uploadMode, setUploadMode] = useState("shrink"); // "shrink" oder "scale"
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [isUploadOpen, setIsUploadOpen] = useState(false);
     const {analyze, analyzeGraph} = useGraphAnalysis(formatMessage, msgs);
     const {saveGraph} = useGraphStorage(formatMessage, msgs);
     const svgRef = useRef(null);
-    const fileInputRef = useRef(null);
 
     // ---- derived values ----
     const size = SvgHandler.instance.getDrawingAreaSize();
@@ -68,84 +65,6 @@ export default function Start() {
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
     } : undefined;
-
-    const handleUploadClick = useCallback(() => {
-        setIsUploadOpen(true);
-    }, []);
-
-    const handleFileSelected = useCallback((e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const url = event.target.result;
-            setPreviewUrl(url);
-        };
-        reader.readAsDataURL(file);
-    }, []);
-
-    const handleConfirmUpload = useCallback(async () => {
-        if (!previewUrl) return;
-
-        const {formatMessage} = intl;
-
-        try {
-            if (uploadMode === "scale") {
-                await cropImage(previewUrl);
-            } else {
-                setPictureUrl(previewUrl);
-                setTemporaryUrl(previewUrl);
-            }
-
-            // Aktiviere den Background-Slider
-            toggleBackground(true);
-
-            // Schliesse das Modal
-            setIsUploadOpen(false);
-
-            setPreviewUrl(null);
-            setUploadMode("shrink");
-            if (fileInputRef.current) fileInputRef.current.value = "";
-        } catch (error) {
-            console.error("Fehler beim Upload:", error);
-            alert(formatMessage({id: "alert.uploadError"}));
-        }
-    }, [previewUrl, uploadMode, intl]);
-
-    const cropImage = (uploadedURL) => {
-        return new Promise((resolve) => {
-            const outputImageAspectRatio = 1;
-            const inputImage = new Image();
-            inputImage.src = uploadedURL;
-
-            inputImage.onload = () => {
-                const inputWidth = inputImage.naturalWidth;
-                const inputHeight = inputImage.naturalHeight;
-                const inputImageAspectRatio = inputWidth / inputHeight;
-                const outputImage = document.createElement("canvas");
-                let outputWidth = inputWidth;
-                let outputHeight = inputHeight;
-
-                if (inputImageAspectRatio > outputImageAspectRatio) {
-                    outputWidth = inputHeight * outputImageAspectRatio;
-                } else if (inputImageAspectRatio < outputImageAspectRatio) {
-                    outputHeight = inputWidth / outputImageAspectRatio;
-                }
-
-                outputImage.width = outputWidth;
-                outputImage.height = outputHeight;
-
-                const ctx = outputImage.getContext("2d");
-                ctx.drawImage(inputImage, 0, 0);
-
-                const croppedUrl = outputImage.toDataURL();
-                setPictureUrl(croppedUrl);
-                setTemporaryUrl(croppedUrl);
-                resolve();
-            };
-        });
-    };
 
     // ---- handlers ----
     const changeGrid = useCallback((checked) => {
@@ -162,6 +81,18 @@ export default function Start() {
             setPictureUrl((prev) => prev ?? temporaryUrl);
         }
     }, [pictureUrl, temporaryUrl]);
+
+    const {
+        fileInputRef,
+        isUploadOpen,
+        previewUrl,
+        uploadMode,
+        setUploadMode,
+        openUpload,
+        selectFile,
+        confirmUpload,
+        closeUpload,
+    } = useImageUpload({setPictureUrl, setTemporaryUrl, toggleBackground, intl});
 
     const changeZoom = useCallback((idx) => {
         const zoom = parseInt(idx, 10);
@@ -220,22 +151,22 @@ export default function Start() {
                          toggleBackground={toggleBackground}
                          zoomIndex={zoomIndex}
                          changeZoom={changeZoom}
-                         handleUploadClick={handleUploadClick}
+                         handleUploadClick={openUpload}
                          fileInputRef={fileInputRef}
-                         handleFileSelected={handleFileSelected}
+                         handleFileSelected={selectFile}
                          zoomLevels={zoomLevels}/>
             </div>
 
             {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
             <UploadModal
                 show={isUploadOpen}
-                onHide={() => setIsUploadOpen(false)}
+                onHide={closeUpload}
                 fileInputRef={fileInputRef}
                 previewUrl={previewUrl}
                 uploadMode={uploadMode}
                 setUploadMode={setUploadMode}
-                handleFileSelected={handleFileSelected}
-                handleConfirmUpload={handleConfirmUpload}
+                handleFileSelected={selectFile}
+                handleConfirmUpload={confirmUpload}
             />
         </div>
     );
