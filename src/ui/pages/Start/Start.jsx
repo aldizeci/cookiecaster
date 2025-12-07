@@ -99,11 +99,7 @@ export default function Start() {
             }
 
             // Aktiviere den Background-Slider
-            const sliderCheckbox = document.querySelector('input[type="checkbox"][aria-label="Background"]');
-            if (sliderCheckbox) {
-                sliderCheckbox.checked = true;
-                sliderCheckbox.dispatchEvent(new Event("change", {bubbles: true}));
-            }
+            toggleBackground(true);
 
             // Schliesse das Modal
             setIsUploadOpen(false);
