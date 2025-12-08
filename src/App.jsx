@@ -5,7 +5,7 @@ import {IntlProvider} from "react-intl";
 
 // Components
 import Home from "./ui/pages/Home.jsx";
-import Start from "./ui/pages/Start.jsx";
+import Start from "./ui/pages/Start/Start.jsx";
 import Export from "./ui/pages/Export.jsx";
 import Navbar from "./ui/components/CustomNavbar.jsx";
 import Gallery from "./ui/pages/Gallery.jsx";
