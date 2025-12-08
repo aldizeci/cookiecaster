@@ -1,4 +1,4 @@
-import Node from '../../src/api/graph/Node.js';
+import Node from '../../src/entities/graph/Node.js';
 import { beforeEach, test, expect, jest } from '@jest/globals';
 
 let node, otherNode;

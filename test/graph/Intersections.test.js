@@ -1,4 +1,4 @@
-import intersections from '../../src/api/Intersections';
+import intersections from '../../src/business-logic/handlers/Intersections';
 import { test, expect } from '@jest/globals';
 
 
