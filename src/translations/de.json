@@ -87,6 +87,6 @@
   "alert.enterFile": "Bitte wählen Sie zuerst ein Bild aus",
   "alert.back": "Zurück",
   "alert.upload": "Bild hochladen",
-  "alert.imageUploadText": "Wählen Sie ein Bild aus Ihrer Galerie aus"
+  "alert.imageUploadText": "Wählen Sie ein Bild aus Ihrer Galerie aus (Drag & Drop)"
   
 }

@@ -92,5 +92,5 @@
   "alert.enterFile": "Please select a picture first",
   "alert.back": "Back",
   "alert.upload": "Upload Picture",
-  "alert.imageUploadText": "Choose a picture from your gallery"
+  "alert.imageUploadText": "Choose a picture from your gallery (Drag & Drop)"
 }
