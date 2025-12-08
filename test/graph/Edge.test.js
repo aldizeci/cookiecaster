@@ -1,4 +1,4 @@
-import Edge from '../../src/api/graph/Edge.js'
+import Edge from '../../src/entities/graph/Edge.js'
 import { beforeEach, test, expect, jest } from '@jest/globals';
 
 
