@@ -85,8 +85,12 @@ export default function Start() {
         setUploadMode,
         openUpload,
         selectFile,
+        handleDragOver,
+        handleDragLeave,
+        handleDrop,
+        isDragActive,
         confirmUpload,
-        closeUpload,
+        closeUpload
     } = useImageUpload({setPictureUrl, setTemporaryUrl, toggleBackground, intl});
 
     // ---- grid lines generation ----
@@ -148,6 +152,10 @@ export default function Start() {
                 setUploadMode={setUploadMode}
                 handleFileSelected={selectFile}
                 handleConfirmUpload={confirmUpload}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragLeave={handleDragLeave}
+                isDragActive={isDragActive}
             />
         </div>
     );

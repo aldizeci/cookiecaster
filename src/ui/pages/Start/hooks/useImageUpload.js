@@ -4,6 +4,7 @@ export default function useImageUpload({setPictureUrl, setTemporaryUrl, toggleBa
     const [isUploadOpen, setIsUploadOpen] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [uploadMode, setUploadMode] = useState("shrink");
+    const [isDragActive, setIsDragActive] = useState(false);
 
     const fileInputRef = useRef(null);
 
@@ -17,6 +18,33 @@ export default function useImageUpload({setPictureUrl, setTemporaryUrl, toggleBa
 
     const selectFile = useCallback((e) => {
         const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => setPreviewUrl(event.target.result);
+        reader.readAsDataURL(file);
+    }, []);
+
+      // Handle drag over (needed to allow drop)
+    const handleDragOver = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragActive(true); // Highlight on drag over
+    }, []);
+
+    const handleDragLeave = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragActive(false); // Remove highlight when leaving
+    }, []);
+
+    // Handle dropped file
+    const handleDrop = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragActive(false); // Remove highlight after drop
+
+        const file = e.dataTransfer?.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
@@ -75,6 +103,10 @@ export default function useImageUpload({setPictureUrl, setTemporaryUrl, toggleBa
         openUpload,
         closeUpload,
         selectFile,
+        handleDragOver,
+        handleDragLeave,
+        handleDrop,
         confirmUpload,
+        isDragActive
     };
 }

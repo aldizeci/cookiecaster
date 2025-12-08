@@ -10,6 +10,10 @@ export default function UploadModal({
                                         setUploadMode,
                                         handleFileSelected,
                                         handleConfirmUpload,
+                                        onDragOver,
+                                        onDragLeave,
+                                        onDrop,
+                                        isDragActive
                                     }) {
     return (
         <Modal show={show} onHide={onHide} centered backdrop="static">
@@ -26,8 +30,11 @@ export default function UploadModal({
                     </label>
 
                     <div
-                        className="upload-drop-zone"
+                        className={`upload-drop-zone ${isDragActive ? 'drag-active' : ''}`}
                         onClick={() => fileInputRef.current?.click()}
+                        onDragOver={onDragOver}
+                        onDragLeave={onDragLeave}
+                        onDrop={onDrop}
                     >
                         {previewUrl ? (
                             <img

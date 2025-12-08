@@ -464,6 +464,11 @@
     transition: all 0.3s ease;
 }
 
+.upload-drop-zone.drag-active {
+  border-color: var(--akzentfarbe2);
+  background-color: rgba(240, 137, 46, 0.1);
+}
+
 .upload-drop-zone:hover {
     border-color: var(--akzentfarbe2);
     background-color: rgba(240, 137, 46, 0.1);
