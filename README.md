@@ -2,7 +2,7 @@
 
 | Code Coverage Lines |
 | ------------------- |
-|  ![Lines](https://img.shields.io/badge/lines-6.24%25-red.svg?style=flat)  |
+|  ![Lines](https://img.shields.io/badge/lines-5.13%25-red.svg?style=flat)  |
 
 **! STILL UNDER CONSTRUCTION !**
 
