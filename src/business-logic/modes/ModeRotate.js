@@ -1,28 +1,25 @@
-/**
- * @author Sadik Hrnjica
- * @date 19.10.2025
- * @version 2.0 (refactored)
- */
-
 import AbstractMode from "./AbstractMode.js";
 import * as d3 from "d3";
-import SvgHandler from "../handlers/SvgHandler.js";
-import Controller from "../handlers/Controller.js";
-import SelectionHandler from "../handlers/SelectionHandler.js";
 
 const round5 = x => Math.round(2 * x) * 0.5;
 
 export default class ModeRotate extends AbstractMode {
+    constructor({controller, svgHandler, selectionHandler}) {
+        super();
+        this._controller = controller;
+        this._svgHandler = svgHandler;
+        this._selectionHandler = selectionHandler;
+    }
+
     enable() {
         d3.select("#rotate").classed("activeMode", true);
-        this.data = { pivot: null, vec: null, nodePos: {}, qPos: {} };
+        this.data = {pivot: null, vec: null, nodePos: {}, qPos: {}};
         console.log("ModeRotate enabled");
     }
 
     onMouseDown(point) {
-        const selh = SelectionHandler.instance;
-        const nodes = Array.from(selh.selectedNodes);
-        const edges = Array.from(selh.selectedEdges);
+        const nodes = Array.from(this._selectionHandler.selectedNodes);
+        const edges = Array.from(this._selectionHandler.selectedEdges);
 
         if (!nodes.length && !edges.length) {
             console.log("No nodes or edges selected");
@@ -33,18 +30,18 @@ export default class ModeRotate extends AbstractMode {
         const pivot = nodes.reduce(
             (acc, n) => {
                 this.data.nodePos[n.id] = n.pos;
-                return { x: acc.x + n.pos.x, y: acc.y + n.pos.y };
+                return {x: acc.x + n.pos.x, y: acc.y + n.pos.y};
             },
-            { x: 0, y: 0 }
+            {x: 0, y: 0}
         );
 
         pivot.x /= nodes.length;
         pivot.y /= nodes.length;
         this.data.pivot = pivot;
-        this.data.vec = { x: point.x - pivot.x, y: point.y - pivot.y };
+        this.data.vec = {x: point.x - pivot.x, y: point.y - pivot.y};
 
         // --- store edge control points ---
-        [...selh.selectedEdges, ...selh.affectedEdges].forEach(item => {
+        [...this._selectionHandler.selectedEdges, ...this._selectionHandler.affectedEdges].forEach(item => {
             const edge = item.edge || item; // handle affectedEdges which wrap {edge, mod}
             this.data.qPos[edge.id] = edge.q;
         });
@@ -53,11 +50,8 @@ export default class ModeRotate extends AbstractMode {
     }
 
     onMouseMove(point) {
-        const { pivot, vec } = this.data;
+        const {pivot, vec} = this.data;
         if (!vec) return;
-
-        const svgh = SvgHandler.instance;
-        const selh = SelectionHandler.instance;
 
         const vx = vec.x, vy = vec.y;
         const dx = point.x - pivot.x, dy = point.y - pivot.y;
@@ -80,27 +74,27 @@ export default class ModeRotate extends AbstractMode {
         });
 
         // --- update nodes ---
-        for (const node of selh.selectedNodes) {
+        for (const node of this._selectionHandler.selectedNodes) {
             const old = this.data.nodePos[node.id];
             node.pos = rotatePoint(old.x, old.y);
-            svgh.updateNode(node);
+            this._svgHandler.updateNode(node);
         }
 
         // --- update selected edges ---
-        for (const edge of selh.selectedEdges) {
+        for (const edge of this._selectionHandler.selectedEdges) {
             const old = this.data.qPos[edge.id];
             edge.q = rotatePoint(old.x, old.y);
-            svgh.updateEdge(edge);
+            this._svgHandler.updateEdge(edge);
         }
 
         // --- update affected edges ---
-        for (const { edge } of selh.affectedEdges) {
+        for (const {edge} of this._selectionHandler.affectedEdges) {
             const old = this.data.qPos[edge.id];
             edge.q = rotatePoint(old.x, old.y, cosHalf, sinHalf);
-            svgh.updateEdge(edge);
+            this._svgHandler.updateEdge(edge);
         }
 
-        svgh.updateMessage();
+        this._svgHandler.updateMessage();
     }
 
     onMouseUp() {
@@ -108,11 +102,10 @@ export default class ModeRotate extends AbstractMode {
     }
 
     onEscape() {
-        return Controller.instance.modi.MODE_SELECT;
+        return this._controller().modi.MODE_SELECT;
     }
 
     disable() {
         d3.select("#rotate").classed("activeMode", false);
-        console.log("ModeRotate disabled");
     }
 }

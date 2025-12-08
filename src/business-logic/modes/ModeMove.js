@@ -1,16 +1,14 @@
-/**
- * @author Claudio
- * @date 29.04.2018
- * @version 1.0
- */
-
 import * as d3 from "d3";
 import AbstractMode from "./AbstractMode.js";
-import SelectionHandler from '../handlers/SelectionHandler.js';
-import SvgHandler from '../handlers/SvgHandler.js';
-import Controller from "../handlers/Controller.js";
 
 export default class ModeMove extends AbstractMode {
+    constructor({controller, svgHandler, selectionHandler}) {
+        super();
+        this._controller = controller;
+        this._svgHandler = svgHandler;
+        this._selectionHandler = selectionHandler;
+    }
+
     enable() {
         d3.select("#move").classed("activeMode", true);
         this.data = {cursor: undefined, nodePos: {}, qPos: {}};
@@ -18,10 +16,9 @@ export default class ModeMove extends AbstractMode {
 
     onMouseDown(point) {
         this.data.cursor = point;
-        const selh = SelectionHandler.instance;
-        selh.selectedNodes.forEach(node => this.data.nodePos[node.id] = node.pos);
-        selh.selectedEdges.forEach(edge => this.data.qPos[edge.id] = edge.q);
-        selh.affectedEdges.forEach(affected => {
+        this._selectionHandler.selectedNodes.forEach(node => this.data.nodePos[node.id] = node.pos);
+        this._selectionHandler.selectedEdges.forEach(edge => this.data.qPos[edge.id] = edge.q);
+        this._selectionHandler.affectedEdges.forEach(affected => {
             const edge = affected.edge;
             this.data.qPos[edge.id] = edge.q
         });
@@ -29,29 +26,27 @@ export default class ModeMove extends AbstractMode {
 
     onMouseMove(point) {
         if (this.data.cursor !== undefined) {
-            const svgh = SvgHandler.instance;
-            const selh = SelectionHandler.instance;
             const dx = point.x - this.data.cursor.x;
             const dy = point.y - this.data.cursor.y;
-            selh.selectedNodes.forEach(node => {
+            this._selectionHandler.selectedNodes.forEach(node => {
                 const np = this.data.nodePos[node.id];
                 node.pos = {x: np.x + dx, y: np.y + dy};
-                svgh.updateNode(node);
+                this._svgHandler.updateNode(node);
             });
-            selh.selectedEdges.forEach(edge => {
+            this._selectionHandler.selectedEdges.forEach(edge => {
                 const q = this.data.qPos[edge.id];
                 edge.q = {x: q.x + dx, y: q.y + dy};
-                svgh.updateEdge(edge);
+                this._svgHandler.updateEdge(edge);
             });
             const dx2 = dx * 0.5;
             const dy2 = dy * 0.5;
-            selh.affectedEdges.forEach(affected => {
+            this._selectionHandler.affectedEdges.forEach(affected => {
                 const edge = affected.edge;
                 const q = this.data.qPos[edge.id];
                 edge.q = {x: q.x + dx2, y: q.y + dy2};
-                svgh.updateEdge(edge);
+                this._svgHandler.updateEdge(edge);
             });
-            svgh.updateMessage();
+            this._svgHandler.updateMessage();
         }
     }
 
@@ -60,7 +55,7 @@ export default class ModeMove extends AbstractMode {
     }
 
     onEscape() {
-        return Controller.instance.modi.MODE_SELECT;
+        return this._controller().modi.MODE_SELECT;
     }
 
     disable() {
