@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import {IntlProvider} from "react-intl";
 
 // Components
@@ -33,7 +33,7 @@ export default function App() {
 
     return (
         <IntlProvider locale={locale} key={locale} messages={messages[locale]}>
-            <Router basename="/cookiecaster">
+            <Router>
                 <Navbar/>
                 <main>
                     <Routes>
