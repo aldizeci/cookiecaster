@@ -101,7 +101,7 @@ export default function Start() {
             linesX.push(<line key={`rx-${i}`} y1="0" x1={x} y2={size} x2={x}/>);
         }
         return {linesY, linesX};
-    }, []);
+    }, [raster, size]);
 
     useCanvasInteractions({
         svgRef,

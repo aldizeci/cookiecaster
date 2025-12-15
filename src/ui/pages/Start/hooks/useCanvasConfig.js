@@ -23,7 +23,7 @@ export default function useCanvasConfig() {
     const changeGrid = useCallback((checked) => {
         controller.grid = checked;
         setShowGrid(checked);
-    }, []);
+    }, [controller]);
 
     const changeZoom = useCallback((idx) => {
         const zoom = parseInt(idx, 10);

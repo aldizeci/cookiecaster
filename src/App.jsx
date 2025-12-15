@@ -8,7 +8,7 @@ import Home from "./ui/pages/Home.jsx";
 import Start from "./ui/pages/Start/Start.jsx";
 import Export from "./ui/pages/Export.jsx";
 import Navbar from "./ui/components/CustomNavbar.jsx";
-import Gallery from "./ui/pages/Gallery.jsx";
+import Gallery from "./ui/pages/Gallery/Gallery.jsx";
 import Ueber from "./ui/pages/Ueber.jsx";
 import ErrorPage from "./ui/pages/Error.jsx";
 import About from "./ui/pages/About.jsx";
