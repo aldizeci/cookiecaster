@@ -71,6 +71,9 @@
     overflow-x: hidden;
     margin-top: 1rem;
 }
+.sidenav > * + * {
+    margin-top: 0.75rem;
+}
 
 .sidenav a,
 .sidenav button {
