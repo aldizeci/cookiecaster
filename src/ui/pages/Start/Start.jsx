@@ -138,62 +138,75 @@ export default function Start() {
 
     // ---- render ----
     return (
-        <div className="start-root">
-            {
-                showDrawerIcon()
-            }
-            
-
-            <div className="start-layout">
-                <div className="left-sidebar">
-                    <ControlSidebar />
-                </div>
-
-                <Canvas
-                    svgRef={svgRef}
-                    viewBox={viewBox}
-                    backgroundStyle={backgroundStyle}
-                    translate={translate}
-                    rasterLines={rasterLines}
-                    formatMessage={formatMessage}
-                    msgs={msgs}
-                    showGrid={showGrid}
-                />
-
-                <DrawSidebar intl={intl}
-                         showGrid={showGrid}
-                         changeGrid={changeGrid}
-                         pictureUrl={pictureUrl}
-                         toggleBackground={toggleBackground}
-                         zoomIndex={zoomIndex}
-                         changeZoom={changeZoom}
-                         handleUploadClick={openUpload}
-                         fileInputRef={fileInputRef}
-                         handleFileSelected={selectFile}
-                         zoomLevels={zoomLevels}/>
+        <div>
+            { /* MOBILE VERSION */ }
+            <div className="p-5 bg-light rounded text-center d-block d-lg-none">
+                <h2>
+                    <FormattedMessage
+                        id="start.querformat"
+                        defaultMessage="Please use a tablet or desktop device."
+                    />
+                </h2>
             </div>
 
-            <Drawer position="start" showDrawer={  showDrawer } setShowSidebar={setShowDrawer} onAnalyze={ analyzeGraph } 
-                onSave={saveGraph}
-                onLoadFromFile={importFromFile}
-                onExportToFile={exportToFile}
-                />
+            <div className="start-root d-none d-md-block">
+                {
+                    showDrawerIcon()
+                }
+                
 
-            {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
-            <UploadModal
-                show={isUploadOpen}
-                onHide={closeUpload}
-                fileInputRef={fileInputRef}
-                previewUrl={previewUrl}
-                uploadMode={uploadMode}
-                setUploadMode={setUploadMode}
-                handleFileSelected={selectFile}
-                handleConfirmUpload={confirmUpload}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onDragLeave={handleDragLeave}
-                isDragActive={isDragActive}
-            />
+                <div className="start-layout">
+                    <div className="left-sidebar">
+                        <ControlSidebar />
+                    </div>
+
+                    <Canvas
+                        svgRef={svgRef}
+                        viewBox={viewBox}
+                        backgroundStyle={backgroundStyle}
+                        translate={translate}
+                        rasterLines={rasterLines}
+                        formatMessage={formatMessage}
+                        msgs={msgs}
+                        showGrid={showGrid}
+                    />
+
+                    <DrawSidebar intl={intl}
+                            showGrid={showGrid}
+                            changeGrid={changeGrid}
+                            pictureUrl={pictureUrl}
+                            toggleBackground={toggleBackground}
+                            zoomIndex={zoomIndex}
+                            changeZoom={changeZoom}
+                            handleUploadClick={openUpload}
+                            fileInputRef={fileInputRef}
+                            handleFileSelected={selectFile}
+                            zoomLevels={zoomLevels}/>
+                </div>
+
+                <Drawer position="start" showDrawer={  showDrawer } setShowSidebar={setShowDrawer} onAnalyze={ analyzeGraph } 
+                    onSave={saveGraph}
+                    onLoadFromFile={importFromFile}
+                    onExportToFile={exportToFile}
+                    />
+
+                {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
+                <UploadModal
+                    show={isUploadOpen}
+                    onHide={closeUpload}
+                    fileInputRef={fileInputRef}
+                    previewUrl={previewUrl}
+                    uploadMode={uploadMode}
+                    setUploadMode={setUploadMode}
+                    handleFileSelected={selectFile}
+                    handleConfirmUpload={confirmUpload}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    onDragLeave={handleDragLeave}
+                    isDragActive={isDragActive}
+                />
+            </div>
         </div>
+
     );
 }

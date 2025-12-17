@@ -16,7 +16,7 @@ export default function Home() {
     const isMobile = width <= 768;
 
     // MOBILE VERSION
-    if (isMobile) {
+    /*if (isMobile) {
         return (
             <Container className="mt-5">
                 <div className="p-5 bg-light rounded text-center">
@@ -29,12 +29,23 @@ export default function Home() {
                 </div>
             </Container>
         );
-    }
+    } */
 
-    // DESKTOP/TABLET VERSION
+    
     return (
         <Container className="mt-5">
-            <div className="p-5 bg-light rounded">
+            { /* MOBILE VERSION */ }
+            <div className="p-5 bg-light rounded text-center d-block d-md-none">
+                <h2>
+                    <FormattedMessage
+                        id="home.device"
+                        defaultMessage="Please use a tablet or desktop device."
+                    />
+                </h2>
+            </div>
+
+            { /* DESKTOP/TABLET VERSION */ }
+            <div className="p-5 bg-light rounded d-none d-md-block">
                 {/* Welcome section */}
                 <Row className="align-items-center">
                     <Col md={8} className="mb-4 mb-md-0">
@@ -51,7 +62,7 @@ export default function Home() {
                                 defaultMessage="Get started by designing your cookie cutter."
                             />
                         </p>
-                        <Button as={Link} to="/start" size="lg" variant="primary">
+                        <Button as={Link} to="/start" size="lg" variant="primary" className="d-none d-md-inline-block">
                                 <FormattedMessage
                                     id="home.startButton"
                                     defaultMessage="Start Drawing"
