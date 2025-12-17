@@ -51,10 +51,14 @@
     padding-top: 100%;*/
 }
 
+
+
+
+/* === SIDENAV === */
 .sidenav {
    /* width: clamp(300px, 25vw, 320px); */
-    width: 320px;
-    min-width: 300px;
+    width: 380px;
+    min-width: 360px;
     /*min-width: 0px;*/
     /*min-width: 0;*/
     background-color: var(--akzentfarbe1);
@@ -65,12 +69,6 @@
     height: fit-content;
     font-family: var(--hausschrift);
     overflow-x: hidden;
-}
-
-/* === SIDENAV === */
-.sidenav {
-   /*width: 320px;*/
-   /*min-width: 300px;*/
     margin-top: 1rem;
 }
 
@@ -101,7 +99,6 @@
 .sidenav h5 {
     color: var(--akzentfarbe2);
 }
-
 
 /* Sidenav styling */
 
@@ -150,8 +147,9 @@
 }
 
 
+
 /* === PORTRAIT MODE: hide complex UI, show only title === */
-@media (orientation: portrait) {
+/*@media (orientation: portrait) {
     #drawingarea,
     .sidenav,
     .btn-primary,
@@ -164,13 +162,13 @@
     h7 {
         font-size: 2rem;
         color: var(--akzentfarbe2);
-    }
+    }*/
 
     /* replace old .col-xs-6 with new Bootstrap 5 grid utility */
-    .col-6 {
+   /* .col-6 {
         padding-top: 50%;
     }
-}
+}*/
 
 
 h7 {
@@ -284,6 +282,7 @@ hr {
 }
 
 /* Adjusted height responsiveness */
+/*
 @media (max-height: 450px) {
     .sidenav {
         padding-top: 15px;
@@ -295,7 +294,7 @@ hr {
         width: 200px;
         float: right;
     }
-}
+}*/
 
 /* === Tooltip === */
 .tooltip {

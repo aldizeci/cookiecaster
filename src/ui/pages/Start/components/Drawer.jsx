@@ -25,7 +25,7 @@ export default function Drawer( {showDrawer, setShowSidebar, position, onAnalyze
                             <FormattedMessage id="start.analyze" defaultMessage="Analyze" />
                         </DrawerItem>
                         <DrawerItem closeDrawer={setShowSidebar} to="/gallery" >
-                            <i className="fas fa-upload"></i>{" "}
+                            <i className="fas fa-upload"></i>
                             <FormattedMessage id="start.loadFromGallery"/>
                         </DrawerItem>
                         <DrawerItem onButtonClick={onSave}>

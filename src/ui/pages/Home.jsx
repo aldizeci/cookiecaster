@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
 
 
 export default function Home() {
-    const [width, setWidth] = useState(window.innerWidth);
+   /* const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
         const handleResize = () => setWidth(window.innerWidth);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    }, []); */
 
-    const isMobile = width <= 768;
+    //const isMobile = width <= 768;
 
     // MOBILE VERSION
     /*if (isMobile) {
@@ -34,18 +33,8 @@ export default function Home() {
     
     return (
         <Container className="mt-5">
-            { /* MOBILE VERSION */ }
-            <div className="p-5 bg-light rounded text-center d-block d-md-none">
-                <h2>
-                    <FormattedMessage
-                        id="home.device"
-                        defaultMessage="Please use a tablet or desktop device."
-                    />
-                </h2>
-            </div>
-
             { /* DESKTOP/TABLET VERSION */ }
-            <div className="p-5 bg-light rounded d-none d-md-block">
+            <div className="p-5 bg-light rounded">
                 {/* Welcome section */}
                 <Row className="align-items-center">
                     <Col md={8} className="mb-4 mb-md-0">
@@ -62,7 +51,7 @@ export default function Home() {
                                 defaultMessage="Get started by designing your cookie cutter."
                             />
                         </p>
-                        <Button as={Link} to="/start" size="lg" variant="primary" className="d-none d-md-inline-block">
+                        <Button as={Link} to="/start" size="lg" variant="primary">
                                 <FormattedMessage
                                     id="home.startButton"
                                     defaultMessage="Start Drawing"
