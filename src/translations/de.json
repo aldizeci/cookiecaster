@@ -5,13 +5,15 @@
   "home.startButton": "Los geht's!",
   "home.needHelp": "Bist Du neu hier? Klicke auf das Fragezeichensymbol oben rechts, um die wichtigsten Schritte zu lernen.",
 
+  "customNavbar.draw": "Zeichnen",
   "customNavbar.gallery": "Galerie",
   "customNavbar.about": "Impressum",
 
   "error.404": "Die gewünschte Seite wurde leider nicht gefunden",
 
   "start.drawingarea": "Klicke in dieses Feld, um mit Zeichnen zu beginnen",
-  "start.title": "Was möchtest Du tun?",
+  "start.drawSidebarTitle": "Was möchtest Du tun?",
+  "start.controlSidebarTitle": "Form überprüfen und speichern",
   "start.grid.comment": "Die Rastergrösse entspricht 6x6mm.",
   "start.helplines": " Raster anzeigen",
   "start.zoom": " Grösse ändern",
@@ -24,6 +26,7 @@
   "start.rotate": " Drehen",
   "start.mirror": " Spiegeln",
   "start.loadFromGallery": " Vorlagen aus Galerie laden",
+  "start.loadFromFile": " Vorlage aus Datei laden",
   "start.upload": " Bild hochladen",
   "start.uploadTooltip": "Bild aus Galerie in Hintergrund laden",
   "start.delete": " Löschen",
@@ -31,6 +34,7 @@
   "start.analyze": " Überprüfen",
   "start.analyzeText": "Ist Deine Form brauchbar?",
   "start.save": " In die Galerie speichern",
+  "start.exportAsFile": " Vorlage als Datei exportieren",
   "start.export": " Export 3D",
   "start.querformat": "Bitte halte Dein Gerät im Querformat",
   "start.backgroundImage": " Hintergrundbild anzeigen",

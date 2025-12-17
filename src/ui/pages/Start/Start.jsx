@@ -1,7 +1,7 @@
 import './Start.css'
 import React, {useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
-import Sidebar from "./components/Sidebar.jsx";
+import DrawSidebar from "./components/DrawSidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
 import useGraphAnalysis from "./hooks/useGraphAnalysis";
@@ -9,11 +9,18 @@ import Canvas from "./components/Canvas.jsx";
 import useGraphStorage from "./hooks/useGraphStorage.js";
 import useImageUpload from "./hooks/useImageUpload.js";
 import useCanvasConfig from "./hooks/useCanvasConfig.js";
+import ControlSidebar from './components/ControlSidebar.jsx';
+import { Button } from "react-bootstrap";
+import Drawer from './components/Drawer.jsx';
+
 
 // ---------- component ----------
 export default function Start() {
     const intl = useIntl();
     const {formatMessage} = intl;
+
+    const [showDrawer, setShowDrawer] = useState(false);
+
 
     const msgs = useMemo(() => defineMessages({
         drawingarea: {id: "start.drawingarea"},
@@ -107,17 +114,41 @@ export default function Start() {
         return {linesY, linesX};
     }, []);
 
-    useCanvasInteractions({
+    const { importFromFile, exportToFile } = useCanvasInteractions({
         svgRef,
         analyze,
         analyzeGraph,
         saveGraph,
     });
 
+    const showDrawerIcon = () => {
+        if(!showDrawer){
+            return(
+                <div className="sidebar-drawer-trigger-control-utils d-xxl-none">
+                        <Button
+                            variant="primary"
+                            onClick={() => setShowDrawer(true)}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </Button>
+                </div>
+            )
+        }
+    }
+
     // ---- render ----
     return (
         <div className="start-root">
+            {
+                showDrawerIcon()
+            }
+            
+
             <div className="start-layout">
+                <div className="left-sidebar">
+                    <ControlSidebar />
+                </div>
+
                 <Canvas
                     svgRef={svgRef}
                     viewBox={viewBox}
@@ -129,7 +160,7 @@ export default function Start() {
                     showGrid={showGrid}
                 />
 
-                <Sidebar intl={intl}
+                <DrawSidebar intl={intl}
                          showGrid={showGrid}
                          changeGrid={changeGrid}
                          pictureUrl={pictureUrl}
@@ -141,6 +172,12 @@ export default function Start() {
                          handleFileSelected={selectFile}
                          zoomLevels={zoomLevels}/>
             </div>
+
+            <Drawer position="start" showDrawer={  showDrawer } setShowSidebar={setShowDrawer} onAnalyze={ analyzeGraph } 
+                onSave={saveGraph}
+                onLoadFromFile={importFromFile}
+                onExportToFile={exportToFile}
+                />
 
             {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
             <UploadModal

@@ -1,5 +1,5 @@
 import React from "react";
-import "./App.css";
+//import "./App.css";
 import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import {IntlProvider} from "react-intl";
 
@@ -16,6 +16,7 @@ import About from "./ui/pages/About.jsx";
 // Translations
 import messages_de from "./translations/de.json";
 import messages_en from "./translations/en.json";
+
 
 // Define supported locales
 const messages = {
@@ -34,8 +35,8 @@ export default function App() {
     return (
         <IntlProvider locale={locale} key={locale} messages={messages[locale]}>
             <Router>
-                <Navbar/>
-                <main>
+                <Navbar />
+                <main className="container py-4">
                     <Routes>
                         <Route path="/" element={<Home/>}/>
                         <Route path="/start" element={<Start/>}/>

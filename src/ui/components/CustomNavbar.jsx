@@ -25,8 +25,6 @@ export default function CustomNavbar() {
     return (<Navbar
         collapseOnSelect
         expand="md"
-        bg="dark"
-        variant="dark"
         sticky="top"
         className="custom-navbar">
         <Container>
@@ -43,6 +41,10 @@ export default function CustomNavbar() {
                 <Nav className="ms-auto">
                     <Nav.Link as={Link} to="/">
                         Home
+                    </Nav.Link>
+
+                    <Nav.Link as={Link} to="/start">
+                        <FormattedMessage id="customNavbar.draw" defaultMessage="Draw" />
                     </Nav.Link>
 
                     <Nav.Link as={Link} to="/gallery">

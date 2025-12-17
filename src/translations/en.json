@@ -5,13 +5,15 @@
   "home.startButton": "Let's go!",
   "home.needHelp": "Are you new here? Click onto the question mark on the top right to learn some important steps.",
 
+  "customNavbar.draw": "Draw",
   "customNavbar.gallery": "Gallery",
   "customNavbar.about": "Imprint",
 
   "error.404": "Page not found",
 
   "start.drawingarea": "Click onto this area to start drawing",
-  "start.title": "What do you want to do?",
+  "start.drawSidebarTitle": "What do you want to do?",
+  "start.controlSidebarTitle": "Review and save form",
   "start.grid.comment": "The grid size is 6x6mm.",
   "start.helplines": " Show grid",
   "start.zoom": " Set size",
@@ -24,6 +26,7 @@
   "start.rotate": " Rotate",
   "start.mirror": " Mirror",
   "start.loadFromGallery": " Load template from Gallery",
+  "start.loadFromFile": " Import template from file",
   "start.upload": " Upload picture",
   "start.uploadTooltip": "Load picture from Gallery in background",
   "start.delete": " Delete",
@@ -31,6 +34,7 @@
   "start.analyze": " Analyze",
   "start.analyzeText": "Is your design useful?",
   "start.save": " Save into Gallery",
+  "start.exportAsFile": " Export template as file",
   "start.export": " Export 3D",
   "start.querformat": "Please turn your device",
   "start.backgroundImage": " Show background image",
