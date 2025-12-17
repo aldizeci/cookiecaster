@@ -38,8 +38,8 @@
     background: var(--akzentfarbe3);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 8px;
-    width: clamp(250px, 55vw, 20cm);
-    height: clamp(250px, 55vw, 20cm);
+    width: clamp(250px, 55vw, 18cm);
+    height: clamp(250px, 55vw, 18cm);
     flex-shrink: 0;   
 }
 
@@ -57,8 +57,8 @@
 /* === SIDENAV === */
 .sidenav {
    /* width: clamp(300px, 25vw, 320px); */
-    width: 380px;
-    min-width: 360px;
+    width: 350px;
+    min-width: 340px;
     /*min-width: 0px;*/
     /*min-width: 0;*/
     background-color: var(--akzentfarbe1);
@@ -142,12 +142,12 @@
     }
 }*/
 
-/* Hide sidebars on smaller screens */
+/* Hide sidebars on smaller screens 
 @media (max-width: 1450px) {
   .left-sidebar {
     display: none;
   }
-}
+}*/
 
 
 

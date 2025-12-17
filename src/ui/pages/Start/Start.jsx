@@ -145,7 +145,7 @@ export default function Start() {
             
 
             <div className="start-layout">
-                <div className="left-sidebar">
+                <div className="d-none d-xxl-block">
                     <ControlSidebar />
                 </div>
 
