@@ -58,7 +58,7 @@
 .sidenav {
    /* width: clamp(300px, 25vw, 320px); */
     width: 350px;
-    min-width: 340px;
+    min-width: 350px;
     /*min-width: 0px;*/
     /*min-width: 0;*/
     background-color: var(--akzentfarbe1);
