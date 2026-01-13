@@ -36,7 +36,6 @@ All contributors are expected to follow this concept to ensure clean pull reques
 Before you start working on something new, please:
 
 - Check the [open issues](https://github.com/fhnw-makerverse/cookiecaster/issues)
-- Look for issues labeled **`help wanted`** or **`good first issue`** if you’re new to the project
 
 ### Contribution Workflow (High-Level)
 
