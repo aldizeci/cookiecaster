@@ -159,47 +159,146 @@ Steps:
 
 ---
 
-## React project structure
+## React Project Structure
 
-This section will describe how the project structure is constructed, so you will understand better, where to programm. 
+This section explains how the React project is structured. Understanding this layout will help you quickly find the right place to implement features, fixes, or documentation changes.
 
-### Directory structure
+---
 
-Directory structure in the `src` folder
+### Directory Structure
+
+The following structure applies to the `src` directory:
 
 | Path | Purpose |
-| ------- | ------- |
-| `business-logic`  | Every JavaScript stored which delivers functional abilities to the product |
-| `business-logic/graph-operations` | Functions bound to drawing |
-| `business-logic/handlers` | Handlers of cutter forms |
-| `business-logic/mesh-operations` | Functions bound to mesh |
-| `business-logic/modes` | Stores all drawing modes |
-| `business-logic/services` |  Stores services like validation |
-| `entities` | All entity classes |
-| `entities/graph` | All entites for graph or drawboard |
-| `entities/graph` | All entites for mesh |
-| `templates` | Every template you find in the gallery |
-| `translations` | German and english dictionaries to support both languages |
-| `ui` | UI / React objects. Everything frontend related |
-| `ui/components` | All general components not for one specific page |
-| `ui/pages` | All react components and hooks for a specific page |
-| `utils` | All utiliy Java Scripts like File Export and Import |
+|------|--------|
+| `business-logic` | Core JavaScript logic providing functional behavior |
+| `business-logic/graph-operations` | Functions related to drawing and graph operations |
+| `business-logic/handlers` | Handlers for cutter forms |
+| `business-logic/mesh-operations` | Functions related to mesh processing |
+| `business-logic/modes` | All drawing modes |
+| `business-logic/services` | Shared services (e.g. validation) |
+| `entities` | Entity classes |
+| `entities/graph` | Entities related to graph / drawboard |
+| `entities/mesh` | Entities related to mesh handling |
+| `templates` | Templates shown in the gallery |
+| `translations` | German and English translation dictionaries |
+| `ui` | All React UI and frontend-related code |
+| `ui/components` | Shared components used across multiple pages |
+| `ui/pages` | Page-specific components and hooks |
+| `utils` | Utility scripts (e.g. file import/export) |
 
+---
 
-### React Components
+### React Components Structure
 
-This graph will show you how the components inside the `ui`folder are structured, so you can add new ones.
+The following diagram illustrates how components inside the `ui` folder are organized:
 
-![project structur](docs/images/project_structure.png)
+![Project structure](docs/images/project_structure.png)
 
-Every `pages` sub directory contains the components files inside a `component` directory related to that page. If hooks are needed they are stored in the `hooks` directory in the respectice page directory. 
+**Guidelines:**
 
-Inside the `components` folder are all components stores, that are used by more then one page. 
+- Each page inside `ui/pages` has its own directory
+- Page-specific components are stored in a `components` subfolder
+- Page-specific hooks are stored in a `hooks` subfolder
+- Reusable components shared across multiple pages belong in `ui/components`
+- Application routing is defined in `App.jsx`
+- Hash-based routing is used to ensure compatibility with GitHub Pages
 
-In the `App.jsx` you can find the routes to the pages. CookieCaster 3.0 uses Hash Routes, so routing works as GitHub Pages.
+---
 
+## Creating a Branch
 
+Before starting any work, create a new branch from `development` using the naming rules defined in  
+[Branch Naming](./CONTRIBUTING.md#branch-naming)
 
+```shell
+git fetch --all
+git pull
+git checkout -b feature/new-page
+```
+
+You can now work on your feature, fix, or documentation update in this branch.
+
+To start the local development server:
+
+```shell
+yarn run dev
+```
+
+---
+
+## Commits
+
+When your work is complete, commit your changes with clear and meaningful commit messages.
+
+A good commit message includes:
+- A short summary line
+- An optional detailed description
+- A reference to the related issue
+
+**Example: Fix**
+````
+Fix flickering checkbox
+
+On screen sizes around 760x760 the checkbox flickered continuously.
+
+refs #4567
+````
+
+**Example: Feature**
+````
+Add share feature
+
+Users can now share cut-outs via WhatsApp.
+Requires JS library XY.
+
+refs #4568
+````
+
+Multiple commits during development are allowed and encouraged.
+Clear commit messages are essential, as they are used to generate the changelog.
+
+---
+
+## Pull Requests
+
+Once your work is finished:
+1. Push your branch to GitHub
+2. Open a pull request targeting the development branch
+3. Select a reviewer
+4. Address all review comments and requested improvements
+
+Pull requests are reviewed according to
+[How to Review](./CONTRIBUTING.md#pull-requests)
+
+After merging, your changes will be included in the next release.
+See [Releasing](./CONTRIBUTING.md#releasing) for details.
+
+---
+
+## Testing
+
+All new features and fixes **must include appropriate Jest tests**.
+
+**Requirements**:
+- Code coverage must remain between 80% and 100%
+- Pull requests without tests will be declined
+- Pull requests that reduce coverage below 80% will be declined
+
+On every pull request:
+- Code coverage is calculated automatically
+- The README of the source branch is updated with a lines coverage badge
+
+You can find existing tests in the `test` directory for reference.
+
+Helpful resources:
+- Existing test cases in the repository
+- LLM assistance (optional)
+- [Jest Documentation](https://jestjs.io/docs/getting-started) to write your test cases
+
+Feel free to update existing test cases if you think they are not correct. Just write in the commit message why you did it. 
+
+---
 
 Thank you for contributing to CookieCaster 3.0 🚀  
 Your help makes the project better for everyone.
