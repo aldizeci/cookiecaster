@@ -190,7 +190,7 @@ Directory structure in the `src` folder
 
 This graph will show you how the components inside the `ui`folder are structured, so you can add new ones.
 
-![project structur](docs/images/project_structure.png)
+![project structur](docs/images/project_structure.svg)
 
 Every `pages` sub directory contains the components files inside a `component` directory related to that page. If hooks are needed they are stored in the `hooks` directory in the respectice page directory. 
 
