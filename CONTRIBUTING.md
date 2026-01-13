@@ -91,6 +91,8 @@ All contribution branches must be created **from `development`** and follow this
 
 CookieCaster uses GitHub Actions to ensure code quality and stability.
 
+[Git Workflow Illustrated](docs/architecture.md)
+
 ### Developing
 
 On every **pull request** to `development` or `main`:
@@ -105,6 +107,8 @@ On every **pull request** to `development` or `main`:
 ---
 
 ### Releasing
+
+Here is a more [detailed](docs/releasing-strategy.md) version of the releasing. 
 
 The release process is fully automated using CI/CD.
 
