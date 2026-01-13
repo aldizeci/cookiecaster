@@ -159,5 +159,47 @@ Steps:
 
 ---
 
+## React project structure
+
+This section will describe how the project structure is constructed, so you will understand better, where to programm. 
+
+### Directory structure
+
+Directory structure in the `src` folder
+
+| Path | Purpose |
+| ------- | ------- |
+| `business-logic`  | Every JavaScript stored which delivers functional abilities to the product |
+| `business-logic/graph-operations` | Functions bound to drawing |
+| `business-logic/handlers` | Handlers of cutter forms |
+| `business-logic/mesh-operations` | Functions bound to mesh |
+| `business-logic/modes` | Stores all drawing modes |
+| `business-logic/services` |  Stores services like validation |
+| `entities` | All entity classes |
+| `entities/graph` | All entites for graph or drawboard |
+| `entities/graph` | All entites for mesh |
+| `templates` | Every template you find in the gallery |
+| `translations` | German and english dictionaries to support both languages |
+| `ui` | UI / React objects. Everything frontend related |
+| `ui/components` | All general components not for one specific page |
+| `ui/pages` | All react components and hooks for a specific page |
+| `utils` | All utiliy Java Scripts like File Export and Import |
+
+
+### React Components
+
+This graph will show you how the components inside the `ui`folder are structured, so you can add new ones.
+
+![project structur](docs/images/project_structure.png)
+
+Every `pages` sub directory contains the components files inside a `component` directory related to that page. If hooks are needed they are stored in the `hooks` directory in the respectice page directory. 
+
+Inside the `components` folder are all components stores, that are used by more then one page. 
+
+In the `App.jsx` you can find the routes to the pages. CookieCaster 3.0 uses Hash Routes, so routing works as GitHub Pages.
+
+
+
+
 Thank you for contributing to CookieCaster 3.0 🚀  
 Your help makes the project better for everyone.
