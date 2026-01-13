@@ -18,6 +18,13 @@ This guide explains **how to contribute**, **how branching works**, and **how re
 - [How to Review](#how-to-review)
 - [Merging to Main](#merging-to-main)
 - [Merging Releases](#merging-releases)
+- [React Projet Structure](#react-project-structure)
+  - [Directory Structure](#directory-structure)
+  - [React Components Structure](#react-components-structure)
+- [Creating a Branch](#creating-a-branch)
+- [Commits](#commits)
+- [Pull Requests](#pull-requests)
+- [Testing](#testing)
 
 ---
 
