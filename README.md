@@ -6,6 +6,10 @@ CookieCaster 3.0 is a freely available web application that allows users to draw
 
 - **CookieCaster 3.0**: [fhnw-makerverse.github.io](https://fhnw-makerverse.github.io/cookiecaster/)
 
+## Diagrams
+ 
+All diagrams are drawn with [draw.io](https://draw.io). You can find the diagrams in `docs/diagrams/diagrams_cookiecaster.drawio.xml`. Import it in draw.io to edit them.
+
 ## Features
 - Draw personalized cookie cutter shapes directly in the browser
 
