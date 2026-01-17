@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import SidebarButtonWithTooltip from "./SidebarButtonWithTooltip";
 
-export default function Sidebar({
+export default function DrawSidebar({
                                     showGrid,
                                     changeGrid,
                                     pictureUrl,
@@ -17,9 +17,7 @@ export default function Sidebar({
                                 }) {
     return (
         <aside className="sidenav">
-            <h5><FormattedMessage id="start.title"/></h5>
-
-            {/* GRID */}
+            <h5><FormattedMessage id="start.drawSidebarTitle"/></h5>
             <div className="d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center gap-2 standard-font">
                     <i className="fas fa-table-cells-large"></i>
@@ -123,34 +121,6 @@ export default function Sidebar({
             <SidebarButtonWithTooltip id="erase" msgId="start.deleteTooltip">
                 <i className="far fa-trash-alt"></i> <FormattedMessage id="start.delete"/>
             </SidebarButtonWithTooltip>
-
-            <hr/>
-
-            <SidebarButtonWithTooltip id="analyze" msgId="start.analyzeText">
-                <i className="fab fa-searchengin"></i> <FormattedMessage id="start.analyze"/>
-            </SidebarButtonWithTooltip>
-
-            <SidebarButtonWithTooltip id="save" msgId="start.save">
-                <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-            </SidebarButtonWithTooltip>
-
-            {/* Links cannot have tooltips easily via wrapper => left as plain */}
-            <Link id="load" className="nav-link" to="/gallery">
-                <i className="fas fa-upload"></i>{" "}
-                <FormattedMessage id="start.loadFromGallery"/>
-            </Link>
-
-            <SidebarButtonWithTooltip id="loadFromFile" msgId="start.loadFromFile">
-                <i className="fas fa-folder-open"></i> Vorlage aus Datei laden
-            </SidebarButtonWithTooltip>
-
-            <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportToFile">
-                <i className="fas fa-file-export"></i> Vorlage als Datei exportieren
-            </SidebarButtonWithTooltip>
-
-            <Link id="goToExport" className="nav-link" to="/export">
-                <i className="fas fa-download"></i> Export 3D
-            </Link>
         </aside>
     );
 }

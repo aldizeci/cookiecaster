@@ -1,7 +1,7 @@
 import React, {useCallback} from "react";
 import {FormattedMessage} from "react-intl";
 import {Link} from "react-router-dom";
-import {Navbar, Nav, NavDropdown, Container,} from "react-bootstrap";
+import {Navbar, Nav, NavDropdown, Image, Container} from "react-bootstrap";
 import "./CustomNavbar.css";
 
 export default function CustomNavbar() {
@@ -25,14 +25,24 @@ export default function CustomNavbar() {
     return (<Navbar
         collapseOnSelect
         expand="md"
-        bg="dark"
-        variant="dark"
         sticky="top"
         className="custom-navbar">
-        <Container>
+        <Container fluid className="px-3">
             {/* Brand */}
-            <Navbar.Brand as={Link} to="/">
-                CookieCaster 3.0
+            <Navbar.Brand
+                as={Link}
+                to="/"
+                className="d-flex align-items-center gap-3 me-auto"
+            >
+                <span className="fhnw-logo-safezone">
+                    <Image
+                    className="fhnw-logo"
+                    src={`${import.meta.env.BASE_URL}assets/FHNW.svg`}
+                    alt="FHNW Logo"
+                />
+                </span>
+
+                <span>CookieCaster 3.0</span>
             </Navbar.Brand>
 
             {/* Mobile Toggle */}
@@ -43,6 +53,10 @@ export default function CustomNavbar() {
                 <Nav className="ms-auto">
                     <Nav.Link as={Link} to="/">
                         Home
+                    </Nav.Link>
+
+                    <Nav.Link as={Link} to="/start">
+                        <FormattedMessage id="customNavbar.draw" defaultMessage="Draw" />
                     </Nav.Link>
 
                     <Nav.Link as={Link} to="/gallery">

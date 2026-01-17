@@ -1,5 +1,5 @@
 import React from "react";
-import "./App.css";
+//import "./App.css";
 import {HashRouter as Router, Routes, Route} from "react-router-dom";
 import {IntlProvider} from "react-intl";
 
@@ -16,6 +16,8 @@ import About from "./ui/pages/About.jsx";
 // Translations
 import messages_de from "./translations/de.json";
 import messages_en from "./translations/en.json";
+import ResponsiveLayout from "./ui/components/ResponsiveLayout.jsx";
+
 
 // Define supported locales
 const messages = {
@@ -34,17 +36,19 @@ export default function App() {
     return (
         <IntlProvider locale={locale} key={locale} messages={messages[locale]}>
             <Router>
-                <Navbar/>
-                <main>
-                    <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/start" element={<Start/>}/>
-                        <Route path="/export" element={<Export/>}/>
-                        <Route path="/gallery" element={<Gallery/>}/>
-                        <Route path="/ueber" element={<Ueber/>}/>
-                        <Route path="/about" element={<About/>}/>
-                        <Route path="*" element={<ErrorPage/>}/>
-                    </Routes>
+                <Navbar />
+                <main className="container py-4">
+                    <ResponsiveLayout>
+                        <Routes>
+                            <Route path="/" element={<Home/>}/>
+                            <Route path="/start" element={<Start/>}/>
+                            <Route path="/export" element={<Export/>}/>
+                            <Route path="/gallery" element={<Gallery/>}/>
+                            <Route path="/ueber" element={<Ueber/>}/>
+                            <Route path="/about" element={<About/>}/>
+                            <Route path="*" element={<ErrorPage/>}/>
+                        </Routes>
+                    </ResponsiveLayout> 
                 </main>
             </Router>
         </IntlProvider>

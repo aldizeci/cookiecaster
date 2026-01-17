@@ -8,7 +8,7 @@
     flex-direction: column;
     background-color: var(--hintergrundfarbe);
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     box-sizing: border-box;
 }
 
@@ -21,6 +21,8 @@
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
+    position: sticky;
+    top: 100px
 }
 
 /* Center canvas block */
@@ -32,28 +34,77 @@
 
 /* Drawing area styling */
 #drawingarea {
+    position: relative;
     background: var(--akzentfarbe3);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     border-radius: 8px;
-    width: 20cm;
-    height: 20cm;
-    flex-shrink: 0;
+    width: clamp(250px, 55vw, 18cm);
+    height: clamp(250px, 55vw, 18cm);
+    flex-shrink: 0;   
 }
 
-/* Sidenav styling */
+#drawingarea::before {
+    display: none;
+    /*
+    content: "";
+    display: block;
+    padding-top: 100%;*/
+}
+
+
+
+
+/* === SIDENAV === */
 .sidenav {
-    width: 320px;
-    min-width: 280px;
+   /* width: clamp(300px, 25vw, 320px); */
+    width: 350px;
+    min-width: 350px;
+    /*min-width: 0px;*/
+    /*min-width: 0;*/
     background-color: var(--akzentfarbe1);
     color: white;
     padding: 1.5rem 1rem;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     height: fit-content;
     font-family: var(--hausschrift);
-    position: sticky;
-    top: 100px; /* keeps it near navbar */
+    overflow-x: hidden;
+    margin-top: 1rem;
 }
+.sidenav > * + * {
+    margin-top: 0.75rem;
+}
+
+.sidenav a,
+.sidenav button {
+    display: block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 20px;
+    background-color: var(--akzentfarbe1);
+    color: white;
+    border: none;
+    text-align: left;
+    text-decoration: none;
+    font-family: var(--hausschrift);
+}
+
+.sidenav a:hover,
+.sidenav button:hover {
+    color: var(--akzentfarbe2);
+    cursor: pointer;
+}
+
+.sidenav button:focus {
+    outline: none;
+}
+
+.sidenav h5 {
+    color: var(--akzentfarbe2);
+}
+
+/* Sidenav styling */
+
 
 /* Headline in side panel */
 .sidenav h5 {
@@ -68,7 +119,7 @@
 }
 
 /* Responsive adjustment for smaller widths */
-@media (max-width: 1200px) {
+/*@media (max-width: 1400px) {
     .start-layout {
         flex-direction: column;
         align-items: center;
@@ -89,11 +140,19 @@
         margin-top: 1rem;
         position: static;
     }
-}
+}*/
+
+/* Hide sidebars on smaller screens 
+@media (max-width: 1450px) {
+  .left-sidebar {
+    display: none;
+  }
+}*/
+
 
 
 /* === PORTRAIT MODE: hide complex UI, show only title === */
-@media (orientation: portrait) {
+/*@media (orientation: portrait) {
     #drawingarea,
     .sidenav,
     .btn-primary,
@@ -106,331 +165,258 @@
     h7 {
         font-size: 2rem;
         color: var(--akzentfarbe2);
-    }
+    }*/
 
     /* replace old .col-xs-6 with new Bootstrap 5 grid utility */
-    .col-6 {
+   /* .col-6 {
         padding-top: 50%;
     }
-}
+}*/
 
-/* === LANDSCAPE MODE === */
-@media (orientation: landscape) {
-    h7 {
+
+h7 {
         display: none;
     }
 
-    .header-image {
-        width: 100%;
-        margin: -2em 0 2em;
-    }
+.header-image {
+    width: 100%;
+    margin: -2em 0 2em;
+}
 
-    .about-profile-pic {
-        float: left;
-        margin: 0 1em 1em 0;
-    }
+.about-profile-pic {
+    float: left;
+    margin: 0 1em 1em 0;
+}
 
-    /* === Buttons === */
-    .btn-primary {
-        border: none;
-        border-radius: 0.25rem;
-        box-shadow: 0 4px 20px var(--akzentfarbe2);
-        background-color: var(--akzentfarbe2);
-    }
+/* === Canvas Elements === */
+#moveEdge {
+    stroke: #20202060;
+    stroke-width: 4px;
+}
 
-    .btn-primary:hover {
-        background-color: var(--hintergrundfarbe);
-        border-color: var(--akzentfarbe2);
-    }
+path {
+    stroke: #202020;
+    stroke-width: 4px;
+    fill: none;
+}
 
-    .btn-primary:focus {
-        background-color: var(--akzentfarbe2);
-        box-shadow: 0 4px 20px var(--akzentfarbe2);
-    }
+.pathSelected {
+    stroke: lightblue;
+}
 
-    /* === Canvas Elements === */
-    #moveEdge {
-        stroke: #20202060;
-        stroke-width: 4px;
-    }
+circle {
+    stroke: black;
+    fill: lightgreen;
+}
 
-    path {
-        stroke: #202020;
-        stroke-width: 4px;
-        fill: none;
-    }
+.circleSelected {
+    fill: lightblue;
+}
 
-    .pathSelected {
-        stroke: lightblue;
-    }
+.qCircle {
+    fill: yellow;
+}
 
-    circle {
-        stroke: black;
-        fill: lightgreen;
-    }
+.eCircle {
+    stroke: var(--akzentfarbe4);
+    stroke-width: 2px;
+    fill: none;
+}
 
-    .circleSelected {
-        fill: lightblue;
-    }
+.eSeg {
+    stroke: var(--akzentfarbe4);
+    stroke-width: 5px;
+    stroke-linecap: round;
+}
 
-    .qCircle {
-        fill: yellow;
-    }
+.qEdge {
+    stroke: yellow;
+    stroke-width: 1px;
+}
 
-    .eCircle {
-        stroke: var(--akzentfarbe4);
-        stroke-width: 2px;
-        fill: none;
-    }
+#selectionRect {
+    fill: #add8e6;
+    stroke: #add8e6;
+    fill-opacity: 0.3;
+    stroke-opacity: 0.7;
+    stroke-width: 1px;
+    stroke-dasharray: 5, 5;
+}
 
-    .eSeg {
-        stroke: var(--akzentfarbe4);
-        stroke-width: 5px;
-        stroke-linecap: round;
-    }
+.warned {
+    fill: var(--akzentfarbe4);
+}
 
-    .qEdge {
-        stroke: yellow;
-        stroke-width: 1px;
-    }
+.mouse {
+    cursor: pointer;
+}
 
-    #selectionRect {
-        fill: #add8e6;
-        stroke: #add8e6;
-        fill-opacity: 0.3;
-        stroke-opacity: 0.7;
-        stroke-width: 1px;
-        stroke-dasharray: 5, 5;
-    }
+text {
+    fill: var(--akzentfarbe2);
+    font-size: 8px;
+    z-index: 99;
+}
 
-    .warned {
-        fill: var(--akzentfarbe4);
-    }
+.glyphicon-trash {
+    background-color: transparent;
+}
 
-    #drawingarea {
-        position: relative;
-        width: 20cm;
-        height: 20cm;
-        margin-top: 80px;
-    }
+h5 {
+    font-size: 20px;
+    color: white;
+}
 
-    #drawingarea::before {
-        content: "";
-        display: block;
-        padding-top: 100%;
-    }
+hr {
+    border-top: 1px solid var(--akzentfarbe2);
+}
 
-    .mouse {
-        cursor: pointer;
-    }
+#raster line {
+    stroke: #a39b86;
+    stroke-width: 1px;
+}
 
-    text {
-        fill: var(--akzentfarbe2);
-        font-size: 8px;
-        z-index: 99;
-    }
+.activeMode {
+    color: var(--akzentfarbe2) !important;
+    font-weight: bold;
+}
 
-    .glyphicon-trash {
-        background-color: transparent;
-    }
+#text {
+    font-family: var(--hausschrift);
+}
 
-    h5 {
-        font-size: 20px;
-        color: white;
-    }
-
-    hr {
-        border-top: 1px solid var(--akzentfarbe2);
-    }
-
-    #raster line {
-        stroke: #a39b86;
-        stroke-width: 1px;
-    }
-
-    /* === SIDENAV === */
+/* Adjusted height responsiveness */
+/*
+@media (max-height: 450px) {
     .sidenav {
-        width: 320px;
-        min-width: 300px;
-        background-color: var(--akzentfarbe1);
-        overflow-x: hidden;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        margin-top: 1rem;
-    }
-
-    .sidenav a,
-    .sidenav button {
-        display: block;
-        padding-top: 3px;
-        padding-bottom: 3px;
-        font-size: 20px;
-        background-color: var(--akzentfarbe1);
-        color: white;
-        border: none;
-        text-align: left;
-        text-decoration: none;
-        font-family: var(--hausschrift);
-    }
-
-    .sidenav a:hover,
-    .sidenav button:hover {
-        color: var(--akzentfarbe2);
-        cursor: pointer;
-    }
-
-    .sidenav button:focus {
-        outline: none;
-    }
-
-    .sidenav h5 {
-        color: var(--akzentfarbe2);
-    }
-
-    .activeMode {
-        color: var(--akzentfarbe2) !important;
-        font-weight: bold;
-    }
-
-    #text {
-        font-family: var(--hausschrift);
-    }
-
-    /* Adjusted height responsiveness */
-    @media (max-height: 450px) {
-        .sidenav {
-            padding-top: 15px;
-        }
-    }
-
-    @media (max-width: 1199px) {
-        .sidenav {
-            width: 200px;
-            float: right;
-        }
-    }
-
-    /* === Tooltip === */
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        font-family: var(--hausschrift);
-        z-index: 0;
-    }
-
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        position: absolute;
-        width: 120px;
-        background-color: var(--akzentfarbe2);
-        color: white;
-        font-size: 10pt;
-        text-align: center;
-        padding: 5px 0;
-        border-radius: 6px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    .disable-mode {
-        color: var(--akzentfarbe3) !important;
-    }
-
-    .disable-mode:hover {
-        cursor: not-allowed !important;
-    }
-
-    /* === Popup Analyze === */
-    .mm-popup__btn {
-        background: var(--akzentfarbe2);
-        border-color: var(--akzentfarbe2);
-        color: white;
-        font-family: var(--hausschrift);
-        font-size: 11pt;
-    }
-
-    .mm-popup__box__body {
-        font-size: 16pt;
-        color: var(--akzentfarbe2);
-    }
-
-    /* === Toggle Switch === */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-
-    .switch input {
-        display: none;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--hintergrundfarbe);
-        transition: 0.4s;
-        border-radius: 34px;
-    }
-
-    .slider::before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .slider {
-        background-color: var(--akzentfarbe2);
-    }
-
-    input:checked + .slider::before {
-        transform: translateX(26px);
-    }
-
-    /* === Lists & Comments === */
-    .list-group-item,
-    .comment {
-        background-color: var(--akzentfarbe1);
-        border: none;
-        color: white;
-        font-size: 1rem;
-    }
-
-    .list-group-item {
-        font-size: 20px;
-    }
-
-    .comment {
-        font-size: 14px;
-    }
-
-    .form-control {
-        padding: 3px;
-    }
-
-    .selector {
-        width: 20%;
-        padding: 0;
+        padding-top: 15px;
     }
 }
 
+@media (max-width: 1199px) {
+    .sidenav {
+        width: 200px;
+        float: right;
+    }
+}*/
 
+/* === Tooltip === */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    font-family: var(--hausschrift);
+    z-index: 0;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    position: absolute;
+    width: 120px;
+    background-color: var(--akzentfarbe2);
+    color: white;
+    font-size: 10pt;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.disable-mode {
+    color: var(--akzentfarbe3) !important;
+}
+
+.disable-mode:hover {
+    cursor: not-allowed !important;
+}
+
+/* === Popup Analyze === */
+.mm-popup__btn {
+    background: var(--akzentfarbe2);
+    border-color: var(--akzentfarbe2);
+    color: white;
+    font-family: var(--hausschrift);
+    font-size: 11pt;
+}
+
+.mm-popup__box__body {
+    font-size: 16pt;
+    color: var(--akzentfarbe2);
+}
+
+/* === Toggle Switch === */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--hintergrundfarbe);
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--akzentfarbe2);
+}
+
+input:checked + .slider::before {
+    transform: translateX(26px);
+}
+
+/* === Lists & Comments === */
+.list-group-item,
+.comment {
+    background-color: var(--akzentfarbe1);
+    border: none;
+    color: white;
+    font-size: 1rem;
+}
+
+.list-group-item {
+    font-size: 20px;
+}
+
+.comment {
+    font-size: 14px;
+}
+
+.form-control {
+    padding: 3px;
+}
+
+.selector {
+    width: 20%;
+    padding: 0;
+}
 /* Upload Button and Preview Container */
 .upload-button-container {
     display: flex;
@@ -462,6 +448,11 @@
     cursor: pointer;
     background-color: rgba(240, 137, 46, 0.05);
     transition: all 0.3s ease;
+}
+
+.upload-drop-zone.drag-active {
+  border-color: var(--akzentfarbe2);
+  background-color: rgba(240, 137, 46, 0.1);
 }
 
 .upload-drop-zone:hover {
@@ -531,4 +522,58 @@
 .modal.fade.show .modal-dialog {
     transform: scale(1);
     opacity: 1;
+}
+
+
+/* Floating drawer trigger button */
+.sidebar-drawer-trigger-draw-utils {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1050; /* above canvas, below modals */
+}
+
+.sidebar-drawer-trigger-control-utils {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1050; /* above canvas, below modals */
+}
+
+/* Optional: make it look like a handle */
+.sidebar-drawer-trigger-draw-utils .btn {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.sidebar-drawer-trigger-control-utils .btn {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.control-drawer .offcanvas-body,
+.control-drawer .offcanvas-header {
+    background-color: var(--akzentfarbe1);
+}
+
+.control-drawer .offcanvas-header {
+    color: var(--akzentfarbe2);
+}
+
+.control-drawer .drawer-item {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    font-size: 1.1rem;
+    font-family: var(--hausschrift);
+}
+
+.control-drawer .drawer-item:hover {
+    color: var(--akzentfarbe2);
+    cursor: pointer;
 }

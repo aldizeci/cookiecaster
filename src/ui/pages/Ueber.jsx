@@ -1,43 +1,50 @@
-import React from 'react';
-import {FormattedMessage} from 'react-intl';
-import {Container, Row, Col, Button} from 'react-bootstrap';
-import {Link} from 'react-router-dom';
+import React from "react";
+import { FormattedMessage } from "react-intl";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
 
 const Ueber = () => {
     return (
         <Container className="py-5">
-            <div className="p-5 mb-4 bg-light rounded-3">
-                <Row>
-                    <Col xs={12} sm={8} className="main-section">
-
-                        <h2>
-                            <FormattedMessage id="ueber.title"/>
+            <div className="p-5 bg-light rounded-3">
+                <Row className="justify-content-center">
+                    <Col xs={12} lg={8}>
+                        
+                        {/* Title */}
+                        <h2 className="mb-4">
+                            <FormattedMessage id="ueber.title" />
                         </h2>
 
-                        <p>
-                            <FormattedMessage id="ueber.text1"/>
-                            <br/><br/>
-                            <FormattedMessage id="ueber.text2"/>
-                            <br/><br/>
-                            <FormattedMessage id="ueber.text3"/>
-                            <br/><br/><br/>
-                            <FormattedMessage id="ueber.text4"/>
+                        {/* Text */}
+                        <p className="mb-4">
+                            <FormattedMessage id="ueber.text1" />
+                            <br /><br />
+                            <FormattedMessage id="ueber.text2" />
+                            <br /><br />
+                            <FormattedMessage id="ueber.text3" />
+                            <br /><br />
+                            <FormattedMessage id="ueber.text4" />
                         </p>
 
-                        <video
-                            controls
-                            width="100%"
-                            style={{borderRadius: '8px'}}
-                        >
-                            <source src="/cookiecaster/assets/Cookiecaster_Tutorial_2.1.mp4" type="video/mp4"/>
-                            Your browser does not support the video tag.
-                        </video>
+                        {/* Video */}
+                        <div className="mb-4">
+                            <video
+                                className="w-100 rounded"
+                                controls
+                            >
+                                <source
+                                    src="/cookiecaster/assets/Cookiecaster_Tutorial_2.1.mp4"
+                                    type="video/mp4"
+                                />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
 
-                        <br/><br/>
-
+                        {/* Back Button */}
                         <Link to="/start">
-                            <Button id="zurückButton" className="btn-lg btn-primary">
-                                <FormattedMessage id="export.backButton"/>
+                            <Button variant="primary" size="lg">
+                                <FormattedMessage id="export.backButton" />
                             </Button>
                         </Link>
 
