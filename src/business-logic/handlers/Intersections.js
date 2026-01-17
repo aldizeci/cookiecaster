@@ -38,7 +38,6 @@ export default function intersections(segments) {
         // console.log(`segment: ${event.segId}, type: ${event.type}`);
         if (event.type === 'start') {
             // console.log(`pos: (${event.pos.x}, ${event.pos.y}), vec: (${event.vec.x}, ${event.vec.y})`);
-            // eslint-disable-next-line
             map.forEach((value) => {
                 const i = intersect(value.pos, value.vec, event.pos, event.vec);
                 if (i !== undefined) intersections.push(i);

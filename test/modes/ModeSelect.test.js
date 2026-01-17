@@ -87,7 +87,6 @@ describe('ModeSelect (no jsdom)', () => {
 
     expect(d3.select).toHaveBeenCalledWith('#select');
     // activeMode true
-    const sel = d3.select.mock.results.find(r => r.value)?.value;
     // We can't easily pinpoint which select call is which without selector map,
     // but we CAN assert classed called for #select via d3.select calls.
     expect(d3.select).toHaveBeenCalledWith('#select');

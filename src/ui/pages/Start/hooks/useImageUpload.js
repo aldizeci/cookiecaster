@@ -92,6 +92,7 @@ export default function useImageUpload({setPictureUrl, setTemporaryUrl, toggleBa
             console.error(err);
             alert(formatMessage({id: "alert.uploadError"}));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [previewUrl, uploadMode, intl, toggleBackground, closeUpload]);
 
     return {

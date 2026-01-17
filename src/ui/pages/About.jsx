@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 const About = () => {
     const company = "Fachhochschule Nordwestschweiz FHNW";
-    const name = "Aldin Zecirevic, Sadik Hrnjica";
+    //const name = "Aldin Zecirevic, Sadik Hrnjica";
     const address = "Bahnhofstrasse 6";
     const city = "5210 Windisch";
     const email = "makerstudio.windisch@fhnw.ch";
