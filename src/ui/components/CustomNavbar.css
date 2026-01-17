@@ -15,6 +15,26 @@
     border-radius: 0;
 }
 
+/* --- FHNW Logo Schutzzone ---------------------------------- */
+/* Setze hier die gewünschte Logo-Höhe */
+.fhnw-logo-safezone {
+  --logo-h: 28px;      /* sichtbare Logo-Höhe */
+  --x: var(--logo-h); /* X = Schriftzug-Höhe */
+
+  padding:
+    calc(var(--x) * 0.5)  /* oben / unten = ½ X */
+    var(--x);             /* links / rechts = X */
+
+  display: inline-flex;
+  align-items: center;
+}
+
+.fhnw-logo {
+  height: var(--logo-h);
+  width: auto;
+  display: block;
+}
+
 /* Brand text */
 /* Base + visited */
 .custom-navbar .navbar-brand,

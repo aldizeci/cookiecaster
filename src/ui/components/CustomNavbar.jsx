@@ -34,11 +34,14 @@ export default function CustomNavbar() {
                 to="/"
                 className="d-flex align-items-center gap-3 me-auto"
             >
-                <Image
-                    src={`${import.meta.env.BASE_URL}assets/FHNW.png`}
+                <span className="fhnw-logo-safezone">
+                    <Image
+                    className="fhnw-logo"
+                    src={`${import.meta.env.BASE_URL}assets/FHNW.svg`}
                     alt="FHNW Logo"
-                    height={28}
                 />
+                </span>
+
                 <span>CookieCaster 3.0</span>
             </Navbar.Brand>
 
