@@ -205,6 +205,13 @@ input[type="file"].form-control:hover::file-selector-button {
 }
 
 .btn-primary {
-    background-color: var(--akzentfarbe2) !important;
-    border-color: var(--akzentfarbe2) !important;
+    background-color: var(--akzentfarbe2);
+    border-color: var(--akzentfarbe2);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.btn-primary:active {
+    background-color: var(--hintergrundfarbe);
+    border-color: var(--hintergrundfarbe);
 }

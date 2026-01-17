@@ -1,26 +1,92 @@
 # Releasing
-This page explains how releasing is done for CookieCaster. 
 
-Useful: Check [Branching](git-workflow.md), so the contributer knows how to work with git on this project and how branching works. 
+This document explains the release process for **CookieCaster**.  
+Releases are fully automated and follow a strict workflow to ensure stability and traceability.
 
-## Release new Version
-### 1. Create Release Branch
-When decided to release new version create `release/vx.y.z` branch (see [Branching](git-workflow.md#branching))
+Before creating a release, please make sure you are familiar with:
+- The contribution workflow and branching strategy described in  
+  [CONTRIBUTING.md](../CONTRIBUTING.md)
+- The CI/CD process used in this project (See [Git Workflow Ilustrated](architecture.md))
 
-### 2. Update VERSION.md
-In the release branch update `VERSION.md`in the root of the directory with the new version. Push the changes to GitHub. GitHub Actions will be triggered and some things will tested (see [CI/CD](git-workflow.md#cicd)).
+---
 
-### 3. Pull request
-Create a Pull Request to main and development so `VERSION.md`is correct in both branches. 
+## Releasing a New Version
 
-### 4. Review Pull Request
-Choose a Reviewer (TBD), which reviews the Pull Request like described [here](git-workflow.md#how-to-review).
+### 1. Create a Release Branch
 
-### 5. Merge to main
-When everything okay, merge the release to main and development. 
+When you decide to publish a new version, create a release branch from `development`:
 
-### 6. Autodeploy
-When merging from a release branch to main a GitHub Action will be triggered. This Action will Tag the main branch with the new version, create a CHANGELOG and deploy the changes to GitHub Pages in the `gh-pages` Branch. 
+`release/vx.y.z`
+
+
+The branching rules are described in detail here:  
+[Branching Concept](../CONTRIBUTING.md#branching-concept)
+
+---
+
+### 2. Update `VERSION.md`
+
+In the newly created release branch:
+
+1. Update the `VERSION.md` file in the project root with the new version number
+2. Commit and push the changes to GitHub
+
+This push will automatically trigger GitHub Actions which will:
+- Run all tests and quality checks (see [CI/CD](../CONTRIBUTING.md#cicd))
+- Automatically update the version in `package.json`
+
+> ⚠️ **Important:**  
+> Do not manually edit `package.json`. The version is managed entirely by CI/CD.
+
+---
+
+### 3. Open a Pull Request
+
+Create a pull request from the release branch to `development`.
+
+---
+
+### 4. Review the Pull Request
+
+Select a reviewer and ensure the pull request is reviewed according to:
+- [Pull Requests](../CONTRIBUTING.md#pull-requests)
+- [How to Review](../CONTRIBUTING.md#how-to-review)
+
+Before merging, verify that:
+- All CI pipelines are green
+- The version in `package.json` was updated correctly by GitHub Actions
+
+---
+
+### 5. Merge into `development`
+
+Once the pull request is approved and all checks pass, merge the release branch into `development`.
+
+---
+
+### 6. Merge `development` into `main`
+
+When the release is ready to go live, merge the `development` branch into `main`.
+
+This step triggers the final release workflow.
+
+---
+
+### 7. Automatic Deployment
+
+After merging `development` into `main`, GitHub Actions will automatically:
+
+- Create a Git tag for the new version
+- Generate or update the changelog
+- Create a GitHub Release
+- Deploy the application to GitHub Pages using the `gh-pages` branch
 
 > ⚠️ **Caution:**  
-> The autodeploy action will only trigger when merging from a `release/*` branch to main AND when the version in the `VERSION.md` isn't already tagged. 
+> The automatic deployment only runs when:
+> - The merge is from `development` into `main`, **and**
+> - The version in `VERSION.md` has not already been released (tagged)
+
+---
+
+Thank you for helping release CookieCaster 3.0  
+Your contributions ensure a reliable and transparent release process for everyone.

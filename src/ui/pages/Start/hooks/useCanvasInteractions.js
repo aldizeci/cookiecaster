@@ -25,6 +25,38 @@ export default function useCanvasInteractions({
                                                   analyzeGraph,
                                                   saveGraph
                                               }) {
+
+        const importFromFile = async () => {
+        try {
+            const project = await importCC3File();
+            if (!project) return;
+
+            const ctr = Controller.instance;
+
+            ctr.reset();
+
+            Graph.instance.fromJSON(
+                typeof project.graphJSON === "string"
+                    ? project.graphJSON
+                    : JSON.stringify(project.graphJSON)
+            );
+
+            SvgHandler.instance.updateMessage();
+
+            ctr.mode = new ctr.modi.MODE_SELECT();
+            ctr.mode.enable();
+
+            alert("Vorlage erfolgreich geladen!");
+        } catch {
+            /* empty */
+        }
+    };
+
+    const exportToFile = () => {
+        const data = Graph.instance.toJSON();
+        exportCC3File(data, "drawing");
+    };
+
     useEffect(() => {
             d3.selectAll("nav.navbar.navbar-default").attr("id", "startNavBar");
 
@@ -171,4 +203,9 @@ export default function useCanvasInteractions({
             };
         },
         [svgRef, analyze.status, analyzeGraph, saveGraph]);
+
+        return {
+            importFromFile,
+            exportToFile,
+        };
 }

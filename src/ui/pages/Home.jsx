@@ -1,77 +1,91 @@
-import React, {useEffect, useState} from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
-import "./Home.css";
 
-//const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 export default function Home() {
-    // Track window width
-    const [width, setWidth] = useState(window.innerWidth);
+   /* const [width, setWidth] = useState(window.innerWidth);
 
-    // Update on resize
     useEffect(() => {
-        function handleWindowSizeChange() {
-            setWidth(window.innerWidth);
-        }
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []); */
 
-        window.addEventListener("resize", handleWindowSizeChange);
-        return () => window.removeEventListener("resize", handleWindowSizeChange);
-    }, []);
+    //const isMobile = width <= 768;
 
-    // Device detection (mobile vs tablet/desktop)
-    const isMobile = width <= 768;
-
-    if (isMobile) {
+    // MOBILE VERSION
+    /*if (isMobile) {
         return (
             <Container className="mt-5">
-                <div className="p-5 mb-4 bg-light rounded-3">
-                    <Row>
-                        <Col xs={12} sm={8} className="main-section">
-                            <h2>
-                                <FormattedMessage id="home.device" defaultMessage="Please use a tablet or desktop device." />
-                            </h2>
-                        </Col>
-                    </Row>
+                <div className="p-5 bg-light rounded text-center">
+                    <h2>
+                        <FormattedMessage
+                            id="home.device"
+                            defaultMessage="Please use a tablet or desktop device."
+                        />
+                    </h2>
                 </div>
             </Container>
         );
-    }
+    } */
 
-    // Default layout for desktop/tablet
+    
     return (
-        <Container className="mt-5 home-page">
-            <div className="p-5 mb-4 bg-light rounded-3">
-                <Row>
-                    <Col xs={12} sm={8} className="main-section">
+        <Container className="mt-5">
+            { /* DESKTOP/TABLET VERSION */ }
+            <div className="p-5 bg-light rounded">
+                {/* Welcome section */}
+                <Row className="align-items-center">
+                    <Col md={8} className="mb-4 mb-md-0">
                         <h2>
-                            <FormattedMessage id="home.welcome" defaultMessage="Welcome to CookieCaster!" />
+                            <FormattedMessage
+                                id="home.welcome"
+                                defaultMessage="Welcome to CookieCaster!"
+                            />
                         </h2>
+
                         <p>
-                            <FormattedMessage id="home.start" defaultMessage="Get started by designing your cookie cutter." />
+                            <FormattedMessage
+                                id="home.start"
+                                defaultMessage="Get started by designing your cookie cutter."
+                            />
                         </p>
-                        <Link to="/start">
-                            <Button size="lg" variant="primary">
-                                <FormattedMessage id="home.startButton" defaultMessage="Start Drawing" />
+                        <Button as={Link} to="/start" size="lg" variant="primary">
+                                <FormattedMessage
+                                    id="home.startButton"
+                                    defaultMessage="Start Drawing"
+                                />
+                        </Button>
+
+                        {/* <Link to="/start">
+                            <Button variant="primary" size="lg">
+                                <FormattedMessage
+                                    id="home.startButton"
+                                    defaultMessage="Start Drawing"
+                                />
                             </Button>
-                        </Link>
+                        </Link> */}
                     </Col>
 
-                    <Col xs={12} sm={4} className="main-section text-center">
+                    {/* Right image */}
+                    <Col md={4} className="text-center">
                         <Image
-                            id="titelbild"
                             src={`${import.meta.env.BASE_URL}assets/Pfote.png`}
-                            fluid
                             alt="CookieCaster Paw Logo"
+                            fluid
                         />
                     </Col>
                 </Row>
 
+                {/* Help text */}
                 <Row className="mt-4">
-                    <Col xs={12} sm={8} className="main-section">
+                    <Col md={8}>
                         <p>
-                            <FormattedMessage id="home.needHelp" defaultMessage="Need help? Check the About or FAQ section." />
+                            <FormattedMessage
+                                id="home.needHelp"
+                                defaultMessage="Need help? Check the About or FAQ section."
+                            />
                         </p>
                     </Col>
                 </Row>

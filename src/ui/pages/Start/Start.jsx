@@ -1,7 +1,7 @@
 import './Start.css'
 import React, {useMemo, useRef, useState, useCallback} from "react";
 import {useIntl, FormattedMessage, defineMessages} from "react-intl";
-import Sidebar from "./components/Sidebar.jsx";
+import DrawSidebar from "./components/DrawSidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";
 import useGraphAnalysis from "./hooks/useGraphAnalysis";
@@ -9,11 +9,18 @@ import Canvas from "./components/Canvas.jsx";
 import useGraphStorage from "./hooks/useGraphStorage.js";
 import useImageUpload from "./hooks/useImageUpload.js";
 import useCanvasConfig from "./hooks/useCanvasConfig.js";
+import ControlSidebar from './components/ControlSidebar.jsx';
+import { Button } from "react-bootstrap";
+import Drawer from './components/Drawer.jsx';
+
 
 // ---------- component ----------
 export default function Start() {
     const intl = useIntl();
     const {formatMessage} = intl;
+
+    const [showDrawer, setShowDrawer] = useState(false);
+
 
     const msgs = useMemo(() => defineMessages({
         drawingarea: {id: "start.drawingarea"},
@@ -85,8 +92,12 @@ export default function Start() {
         setUploadMode,
         openUpload,
         selectFile,
+        handleDragOver,
+        handleDragLeave,
+        handleDrop,
+        isDragActive,
         confirmUpload,
-        closeUpload,
+        closeUpload
     } = useImageUpload({setPictureUrl, setTemporaryUrl, toggleBackground, intl});
 
     // ---- grid lines generation ----
@@ -101,19 +112,44 @@ export default function Start() {
             linesX.push(<line key={`rx-${i}`} y1="0" x1={x} y2={size} x2={x}/>);
         }
         return {linesY, linesX};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useCanvasInteractions({
+    const { importFromFile, exportToFile } = useCanvasInteractions({
         svgRef,
         analyze,
         analyzeGraph,
         saveGraph,
     });
 
+    const showDrawerIcon = () => {
+        if(!showDrawer){
+            return(
+                <div className="sidebar-drawer-trigger-control-utils d-xxl-none">
+                        <Button
+                            variant="primary"
+                            onClick={() => setShowDrawer(true)}
+                        >
+                            <i className="fas fa-chevron-right"></i>
+                        </Button>
+                </div>
+            )
+        }
+    }
+
     // ---- render ----
     return (
         <div className="start-root">
+            {
+                showDrawerIcon()
+            }
+            
+
             <div className="start-layout">
+                <div className="d-none d-xxl-block">
+                    <ControlSidebar />
+                </div>
+
                 <Canvas
                     svgRef={svgRef}
                     viewBox={viewBox}
@@ -125,18 +161,25 @@ export default function Start() {
                     showGrid={showGrid}
                 />
 
-                <Sidebar intl={intl}
-                         showGrid={showGrid}
-                         changeGrid={changeGrid}
-                         pictureUrl={pictureUrl}
-                         toggleBackground={toggleBackground}
-                         zoomIndex={zoomIndex}
-                         changeZoom={changeZoom}
-                         handleUploadClick={openUpload}
-                         fileInputRef={fileInputRef}
-                         handleFileSelected={selectFile}
-                         zoomLevels={zoomLevels}/>
+                <DrawSidebar intl={intl}
+                    showGrid={showGrid}
+                    changeGrid={changeGrid}
+                    pictureUrl={pictureUrl}
+                    toggleBackground={toggleBackground}
+                    zoomIndex={zoomIndex}
+                    changeZoom={changeZoom}
+                    handleUploadClick={openUpload}
+                    fileInputRef={fileInputRef}
+                    handleFileSelected={selectFile}
+                    zoomLevels={zoomLevels}/>
+
             </div>
+
+            <Drawer position="start" showDrawer={  showDrawer } setShowSidebar={setShowDrawer} onAnalyze={ analyzeGraph } 
+                onSave={saveGraph}
+                onLoadFromFile={importFromFile}
+                onExportToFile={exportToFile}
+                />
 
             {/* Upload Modal - OUTSIDE the layout to avoid z-index issues */}
             <UploadModal
@@ -148,7 +191,12 @@ export default function Start() {
                 setUploadMode={setUploadMode}
                 handleFileSelected={selectFile}
                 handleConfirmUpload={confirmUpload}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragLeave={handleDragLeave}
+                isDragActive={isDragActive}
             />
         </div>
+
     );
 }

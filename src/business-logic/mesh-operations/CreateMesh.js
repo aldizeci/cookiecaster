@@ -119,7 +119,7 @@ let createOuterVertices = (thickness, height, origin, inner) => {
     return verts;
 };
 
-let createInnerVertices = (thickness, height, origin, inner, cw) => {
+let createInnerVertices = (thickness, height, origin, inner) => {
     const verts = [[], [], [], []];
 
     let ts = [thickness];
