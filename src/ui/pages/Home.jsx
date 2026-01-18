@@ -1,6 +1,7 @@
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
+import GitHubReference from "../components/GitHubReference";
 
 
 export default function Home() {
@@ -78,6 +79,13 @@ export default function Home() {
                     </Col>
                 </Row>
 
+                {/* GitHub contribution call-to-action */}
+                <Row className="mt-4">
+                    <Col md={8}>
+                        <GitHubReference />
+                    </Col>
+                </Row>
+
                 {/* Help text */}
                 <Row className="mt-4">
                     <Col md={8}>
@@ -89,6 +97,8 @@ export default function Home() {
                         </p>
                     </Col>
                 </Row>
+
+                
             </div>
         </Container>
     );

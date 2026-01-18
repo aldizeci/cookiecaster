@@ -24,7 +24,7 @@ export default function CustomNavbar() {
 
     return (<Navbar
         collapseOnSelect
-        expand="md"
+        expand="lg"
         sticky="top"
         className="custom-navbar">
         <Container fluid className="px-3">
@@ -75,6 +75,17 @@ export default function CustomNavbar() {
 
                     <Nav.Link as={Link} to="/ueber">
                         <i className="fa-solid fa-question"></i>
+                    </Nav.Link>
+
+                    <Nav.Link
+                        as="a"
+                        href="https://github.com/fhnw-makerverse/cookiecaster"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="GitHub repository"
+                        className="d-flex align-items-center"
+                        >
+                        <img src={`${import.meta.env.BASE_URL}/assets/github.svg`} alt="" width={20} height={20} />
                     </Nav.Link>
 
                     <Nav.Link as={Link} to="/about">

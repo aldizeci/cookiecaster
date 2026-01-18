@@ -2,10 +2,15 @@
   "layout.device": "Gerät wird nicht unterstützt",
   "layout.querformat": "Bitte halte Dein Gerät im Querformat",
 
+  "githubreference.githubInvite": "Möchtest du dieses Projekt mitgestalten? Der Quellcode ist auf GitHub verfügbar, und wir freuen uns über Beiträge, Ideen und Feedback.",
+  "githubreference.opensourceButton": "Auf GitHub beitragen",
+
   "home.welcome": "Willkommen beim CookieCaster 3.0",
   "home.start": "Möchtest Du Deine eigene persönliche Keksform gestalten?",
   "home.startButton": "Los geht's!",
   "home.needHelp": "Bist Du neu hier? Klicke auf das Fragezeichensymbol oben rechts, um die wichtigsten Schritte zu lernen.",
+
+
 
   "customNavbar.draw": "Zeichnen",
   "customNavbar.gallery": "Galerie",
