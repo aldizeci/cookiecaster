@@ -2,6 +2,8 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import GitHubReference from "../components/GitHubReference";
+
 
 
 const Ueber = () => {
@@ -40,6 +42,12 @@ const Ueber = () => {
                                 Your browser does not support the video tag.
                             </video>
                         </div>
+
+                        {/* GitHub */}
+                        <div className="mb-4">
+                            <GitHubReference />
+                        </div>
+                    
 
                         {/* Back Button */}
                         <Link to="/start">
