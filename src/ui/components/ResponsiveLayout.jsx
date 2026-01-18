@@ -10,7 +10,7 @@ export default function ResponsiveLayout({children}){
                  <h2>
                     <FormattedMessage
                         id="layout.device"
-                        defaultMessage="Please use a tablet or desktop device."
+                        defaultMessage="Device is not supported"
                     />
                 </h2>
             </div>
