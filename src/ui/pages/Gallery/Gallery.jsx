@@ -5,9 +5,9 @@ import { exportCC3File } from "../../../utils/FileExport.js";
 import "./Gallery.css";
 
 // hooks
-import { useTemplates } from "hooks/useTemplates.js";
-import { useCustomItems } from "hooks/useCustomItems.js";
-import { useGallerySelection } from "hooks/useGallerySelection.js";
+import { useTemplates } from "./hooks/useTemplates.js";
+import { useCustomItems } from "./hooks/useCustomItems.js";
+import { useGallerySelection } from "./hooks/useGallerySelection.js";
 
 // Dynamischer Import aller JSON Templates im Ordner /templates
 const templateFiles = import.meta.glob("../../templates/*.json", { eager: true });
