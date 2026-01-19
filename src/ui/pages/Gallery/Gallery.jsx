@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import { exportCC3File } from "../../../utils/FileExport.js";
-import "./Gallery.css";
 
 // hooks
 import { useTemplates } from "./hooks/useTemplates.js";
@@ -10,7 +9,7 @@ import { useCustomItems } from "./hooks/useCustomItems.js";
 import { useGallerySelection } from "./hooks/useGallerySelection.js";
 
 // Dynamischer Import aller JSON Templates im Ordner /templates
-const templateFiles = import.meta.glob("../../templates/*.json", { eager: true });
+const templateFiles = import.meta.glob("/src/templates/*.json", { eager: true });
 
 export default function Gallery() {
     const templates = useTemplates(templateFiles);
@@ -20,7 +19,7 @@ export default function Gallery() {
     // --- Leerer Zustand ---
     if (templates.length === 0 && customItems.length === 0) {
         return (
-            <div className="gallery-empty text-center p-5">
+            <div className="text-center p-5">
                 <FormattedMessage
                     id="gallery.empty"
                     defaultMessage="Noch keine gespeicherten Formen"
@@ -34,8 +33,39 @@ export default function Gallery() {
         );
     }
 
+    const Card = ({ item, children }) => (
+        <div className="col-md-4 col-lg-3">
+            <div className="card shadow-sm h-100">
+                <div className="card-body text-center">
+                    <svg
+                        viewBox="0 0 200 200"
+                        role="button"
+                        tabIndex={0}
+                        className="w-100"
+                        style={{ height: 140 }}
+                        onClick={() => handleSelect(item)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") handleSelect(item);
+                        }}
+                    >
+                        <path
+                            d={item.svgPath || item.svg || ""}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        />
+                    </svg>
+
+                    <p className="mt-2 mb-2 fw-semibold">{item.name}</p>
+
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+
     return (
-        <div className="gallery-container">
+        <div className="container py-4 text-center">
             {/* === Templates === */}
             {templates.length > 0 && (
                 <>
@@ -43,30 +73,20 @@ export default function Gallery() {
                         <FormattedMessage id="gallery.templates" defaultMessage="Vorlagen" />
                     </h2>
 
-                    <div className="gallery-grid">
+                    <div className="row g-4 mt-2">
                         {templates.map((tpl) => (
-                            <div key={tpl.id} className="gallery-item">
-                                <svg
-                                    viewBox="0 0 200 200"
-                                    className="gallery-preview"
-                                    onClick={() => handleSelect(tpl)}
+                            <Card key={tpl.id} item={tpl}>
+                                <button
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        exportCC3File(tpl.graphJSON, tpl.name);
+                                    }}
+                                    type="button"
                                 >
-                                    <path d={tpl.svgPath || ""} />
-                                </svg>
-
-                                <div className="gallery-caption">
-                                    <p>{tpl.name}</p>
-                                    <button
-                                        className="btn btn-sm btn-secondary"
-                                        onClick={() => exportCC3File(tpl.graphJSON, tpl.name)}
-                                    >
-                                        <FormattedMessage
-                                            id="gallery.export"
-                                            defaultMessage="Exportieren"
-                                        />
-                                    </button>
-                                </div>
-                            </div>
+                                    <FormattedMessage id="gallery.export" defaultMessage="Exportieren" />
+                                </button>
+                            </Card>
                         ))}
                     </div>
                 </>
@@ -76,47 +96,36 @@ export default function Gallery() {
             {customItems.length > 0 && (
                 <>
                     <h2 className="mt-5">
-                        <FormattedMessage
-                            id="gallery.custom"
-                            defaultMessage="Eigene Formen"
-                        />
+                        <FormattedMessage id="gallery.custom" defaultMessage="Eigene Formen" />
                     </h2>
 
-                    <div className="gallery-grid">
+                    <div className="row g-4 mt-2">
                         {customItems.map((item) => (
-                            <div key={item.id} className="gallery-item">
-                                <svg
-                                    viewBox="0 0 200 200"
-                                    className="gallery-preview"
-                                    onClick={() => handleSelect(item)}
-                                >
-                                    <path d={item.svgPath || item.svg} />
-                                </svg>
-
-                                <div className="gallery-caption">
-                                    <p>{item.name}</p>
-
+                            <Card key={item.id} item={item}>
+                                <div className="d-flex justify-content-center gap-2 flex-wrap">
                                     <button
                                         className="btn btn-sm btn-danger"
-                                        onClick={() => deleteItem(item.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteItem(item.id);
+                                        }}
+                                        type="button"
                                     >
-                                        <FormattedMessage
-                                            id="gallery.delete"
-                                            defaultMessage="Löschen"
-                                        />
+                                        <FormattedMessage id="gallery.delete" defaultMessage="Löschen" />
                                     </button>
 
                                     <button
                                         className="btn btn-sm btn-secondary"
-                                        onClick={() => exportCC3File(item.graphJSON, item.name)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            exportCC3File(item.graphJSON, item.name);
+                                        }}
+                                        type="button"
                                     >
-                                        <FormattedMessage
-                                            id="gallery.export"
-                                            defaultMessage="Exportieren"
-                                        />
+                                        <FormattedMessage id="gallery.export" defaultMessage="Exportieren" />
                                     </button>
                                 </div>
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </>
