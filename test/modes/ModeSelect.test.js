@@ -3,30 +3,35 @@
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
 let ModeSelect;
-let svgh, selh;
+let svgh, selh, ctrl;
 let d3;
-
-const asIterable = (arr) => ({
-  [Symbol.iterator]: function* () { yield* arr; },
-});
-
-const makeSelection = () => ({
-  classed: jest.fn(() => undefined),
-});
 
 const loadFresh = async () => {
   jest.resetModules();
 
   // --- d3 mock ---
   const selections = new Map();
+  const makeSelection = () => {
+    const api = {
+      classed: jest.fn(() => api),
+      attr: jest.fn(() => api),
+      property: jest.fn(() => api),
+      on: jest.fn(() => api),
+      style: jest.fn(() => api),
+      text: jest.fn(() => api),
+    };
+    return api;
+  };
+
   d3 = {
     select: jest.fn((selector) => {
       if (!selections.has(selector)) selections.set(selector, makeSelection());
       return selections.get(selector);
     }),
   };
+  await jest.unstable_mockModule('d3', () => ({ __esModule: true, ...d3 }));
 
-  // --- SelectionHandler.instance mock ---
+  // --- SelectionHandler mock ---
   selh = {
     clear: jest.fn(),
     selectNode: jest.fn(),
@@ -37,11 +42,11 @@ const loadFresh = async () => {
     cancelRectSelection: jest.fn(),
     isRectActive: jest.fn(() => false),
     isAnySelected: jest.fn(() => false),
-    selectedNodes: asIterable([]),
-    selectedEdges: asIterable([]),
+    selectedNodes: [],
+    selectedEdges: [],
   };
 
-  // --- SvgHandler.instance mock ---
+  // --- SvgHandler mock ---
   svgh = {
     focus: { obj: undefined, type: undefined },
     updateNode: jest.fn(),
@@ -51,36 +56,31 @@ const loadFresh = async () => {
     setQEdgeVisibility: jest.fn(),
   };
 
-  await jest.unstable_mockModule('d3', () => ({ __esModule: true, ...d3 }));
-
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SelectionHandler.js', () => ({
-    __esModule: true,
-    default: class SelectionHandler {
-      static get instance() { return selh; }
-    },
-  }));
-
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler {
-      static get instance() { return svgh; }
-    },
-  }));
+  ctrl = { modi: { MODE_SELECT: 'MODE_SELECT' } };
 
   // AbstractMode is imported by ModeSelect; keep it real, but it imports d3 (already mocked)
   ({ default: ModeSelect } = await import('../../src/business-logic/modes/ModeSelect.js'));
 
-  return { selections };
+  const makeMode = () =>
+      new ModeSelect({
+        controller: () => ctrl,
+        svgHandler: svgh,
+        selectionHandler: selh,
+      });
+
+  return { selections, makeMode };
 };
+
+let makeMode;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  await loadFresh();
+  ({ makeMode } = await loadFresh());
 });
 
 describe('ModeSelect (no jsdom)', () => {
   test('enable: activates #select, clears selection, disables buttons, resets data', async () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
     m.enable();
@@ -104,7 +104,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseDown: when focus is node -> selectNode + stores original pos + q snapshot', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const edge1 = { q: { x: 1, y: 2 } };
@@ -126,7 +126,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseDown: when focus is edge -> selectEdge', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const edge = { id: 5 };
@@ -139,7 +139,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseDown: when focus is q -> selectEdge + stores edge q + shows q-edge', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const edge = { q: { x: 7, y: 8 } };
@@ -156,7 +156,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseDown: when no focus -> starts rectangle selection', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     svgh.focus = { obj: undefined, type: undefined };
@@ -168,7 +168,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseMove: when rect active -> moveRectSelection + updateMessage', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isRectActive.mockReturnValue(true);
@@ -181,7 +181,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseMove: when dragging node -> updates node.pos, updateNode, updates adjacent q + updateEdge, updateMessage', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const adja1 = { q: { x: 10, y: 10 } };
@@ -207,7 +207,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseMove: when dragging q-point -> updates edge.q, updateEdge, setQEdge, updateMessage', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const edge = { q: { x: 1, y: 2 } };
@@ -223,7 +223,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseUp: if edge drag active -> clears data.edge and hides q-edge', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const edge = { q: { x: 0, y: 0 } };
@@ -239,7 +239,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseUp: if node drag active -> clears data.node', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const node = { pos: { x: 0, y: 0 }, adjacent: [] };
@@ -253,7 +253,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseUp: if rect active -> ends rect selection', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isRectActive.mockReturnValue(true);
@@ -263,7 +263,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseUp: enables buttons when selection exists; mirror enabled when checkMirror returns true', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     // Force "selection exists"
@@ -280,8 +280,8 @@ describe('ModeSelect (no jsdom)', () => {
     const e1 = { from: { id: 1 }, to: { id: 3 } };
     const e2 = { from: { id: 3 }, to: { id: 2 } };
 
-    selh.selectedNodes = asIterable([t1, t2, mid]);
-    selh.selectedEdges = asIterable([e1, e2]);
+    selh.selectedNodes = [t1, t2, mid];
+    selh.selectedEdges = [e1, e2];
 
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
@@ -294,14 +294,14 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('checkMirror edge case: returns false if any selected node has adjacent.length === 0', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isAnySelected.mockReturnValue(true);
 
     const bad = { id: 1, adjacent: [] }; // triggers immediate false :contentReference[oaicite:3]{index=3}
-    selh.selectedNodes = asIterable([bad]);
-    selh.selectedEdges = asIterable([]);
+    selh.selectedNodes = [bad];
+    selh.selectedEdges = [];
 
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
@@ -313,15 +313,15 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('checkMirror edge case: returns false if number of tails (adjacent.length===1) is not 2', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isAnySelected.mockReturnValue(true);
 
     const t1 = { id: 1, adjacent: [{}] };      // 1 tail only
     const mid = { id: 2, adjacent: [{}, {}] }; // not tail
-    selh.selectedNodes = asIterable([t1, mid]);
-    selh.selectedEdges = asIterable([]);
+    selh.selectedNodes = [t1, mid];
+    selh.selectedEdges = [];
 
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
@@ -333,7 +333,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('checkMirror edge case: returns false when selection is not one connected component (size !== 1)', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isAnySelected.mockReturnValue(true);
@@ -343,8 +343,8 @@ describe('ModeSelect (no jsdom)', () => {
     const t2 = { id: 2, adjacent: [{}] };
     const mid = { id: 3, adjacent: [{}, {}] };
 
-    selh.selectedNodes = asIterable([t1, t2, mid]);
-    selh.selectedEdges = asIterable([]); // no unions
+    selh.selectedNodes = [t1, t2, mid];
+    selh.selectedEdges = []; // no unions
 
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
@@ -356,7 +356,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onMouseUp: disables buttons when nothing is selected', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     selh.isAnySelected.mockReturnValue(false);
@@ -371,7 +371,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('onEscape: clears selection and disables buttons', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
@@ -385,7 +385,7 @@ describe('ModeSelect (no jsdom)', () => {
   });
 
   test('disable: deactivates #select and cancels rect selection', () => {
-    const m = new ModeSelect();
+    const m = makeMode();
     m.enable();
 
     m.disable();

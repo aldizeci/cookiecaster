@@ -77,21 +77,11 @@ async function loadFreshModule({ touch = false } = {}) {
   globalThis.window = touch ? { ontouchstart: () => {} } : {};
   globalThis.navigator = { maxTouchPoints: touch ? 5 : 0 };
 
-  // Graph.instance stub used by updateMessage() :contentReference[oaicite:3]{index=3}
+  // Graph stub used by updateMessage() :contentReference[oaicite:3]{index=3}
   graphStub = {
     forEachNode: jest.fn(),
     forEachEdge: jest.fn(),
   };
-
-  // Mock Graph module (default export with static getter instance)
-  await jest.unstable_mockModule('../../src/entities/graph/Graph.js', () => ({
-    __esModule: true,
-    default: class Graph {
-      static get instance() {
-        return graphStub;
-      }
-    },
-  }));
 
   // Mock d3 module (select/selectAll)
   d3Mock = {
@@ -112,21 +102,9 @@ beforeEach(() => {
 });
 
 describe('SvgHandler (no jsdom)', () => {
-  test('constructor guard: cannot instantiate directly', async () => {
-    await loadFreshModule();
-    expect(() => new SvgHandler()).toThrow(/Cannot instantiate directly/i);
-  });
-
-  test('instance is singleton', async () => {
-    await loadFreshModule();
-    const a = SvgHandler.instance;
-    const b = SvgHandler.instance;
-    expect(a).toBe(b);
-  });
-
   test('touch vs mouse events: _e uses pointer events on touch devices', async () => {
     await loadFreshModule({ touch: true });
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
     // enter/leave chosen from isTouch branch :contentReference[oaicite:4]{index=4}
     expect(h._e.enter).toBe('pointerover');
     expect(h._e.leave).toBe('pointerout');
@@ -134,14 +112,14 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('touch vs mouse events: _e uses mouse events on non-touch devices', async () => {
     await loadFreshModule({ touch: false });
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
     expect(h._e.enter).toBe('mouseenter');
     expect(h._e.leave).toBe('mouseleave');
   });
 
   test('getters return constants and zoom level', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     expect(h.getRasterSpace()).toBe(6);
     expect(h.getDrawingAreaSize()).toBe(240);
@@ -151,7 +129,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('setZoomLevel updates _zoomLevel and calls updateMessage()', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     const spy = jest.spyOn(h, 'updateMessage');
     h.setZoomLevel(2);
@@ -162,7 +140,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('move edge helpers set correct attributes', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     h.resetMoveEdge({ x: 1, y: 2 });
     expect(d3Mock.select).toHaveBeenCalledWith('#moveEdge');
@@ -183,7 +161,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('rect selection helpers set d and visibility', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     h.setRectSelection({ x: 1, y: 2 }, { x: 4, y: 6 });
     // rect() path: Mx y l w 0 l 0 h l -w 0 z :contentReference[oaicite:5]{index=5}
@@ -197,7 +175,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('addNode/updateNode/selectNode/removeNode', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     const node = { id: 7, pos: { x: 10, y: 20 } };
 
@@ -240,7 +218,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('q-edge visibility + setQEdge', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     h.setQEdgeVisibility(true);
     expect(d3Mock.selectAll).toHaveBeenCalledWith('.qEdge');
@@ -269,7 +247,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('addEdge/updateEdge/removeEdge/selectEdge including hover branches', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     const edge = {
       id: 3,
@@ -353,7 +331,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('warnings: setCritNodes/setCritSeg/setIntersections + clearWarnings', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     const warningsSel = getSel('#warnings');
 
@@ -372,7 +350,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('getActZoomValue returns correct zoom factor', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     h.setZoomLevel(3);
     expect(h.getActZoomValue()).toBe(1.5);
@@ -380,7 +358,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('updateMessage: empty graph produces empty message text; non-empty produces Δx/Δy', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     // Case A: empty graph (no callbacks invoked) => delta negative => mesg1/2 remain "" :contentReference[oaicite:7]{index=7}
     graphStub.forEachNode.mockImplementation(() => {});
@@ -416,7 +394,7 @@ describe('SvgHandler (no jsdom)', () => {
 
   test('clear: clears warnings, resets ids/focus, clears nodes/edges, calls updateMessage', async () => {
     await loadFreshModule();
-    const h = SvgHandler.instance;
+    const h = new SvgHandler(() => graphStub);
 
     // modify state first
     h.nodeID = 5;

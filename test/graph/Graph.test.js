@@ -47,16 +47,6 @@ describe('Graph (singleton)', () => {
       })),
     }));
 
-    // Mock SvgHandler singleton
-    jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-      __esModule: true,
-      default: class SvgHandler {
-        static get instance() {
-          return svgh;
-        }
-      },
-    }));
-
     // Mock Node
     jest.doMock('../../src/entities/graph/Node.js', () => ({
       __esModule: true,
@@ -103,31 +93,23 @@ describe('Graph (singleton)', () => {
     const Node = (await import('../../src/entities/graph/Node.js')).default;
     const Edge = (await import('../../src/entities/graph/Edge.js')).default;
 
-    return { Graph, validateGraph, analyzeGraph, SvgHandler, Node, Edge, svgh };
+    const g = new Graph(() => svgh);
+
+    return { Graph, g, validateGraph, analyzeGraph, Node, Edge, svgh };
   };
 
-  test('instance returns a singleton (same object each call)', async () => {
-    const { Graph } = await loadFreshGraph();
-    const a = Graph.instance;
-    const b = Graph.instance;
-    expect(a).toBe(b);
-  });
-
-  test('cannot instantiate Graph directly (constructor guard)', async () => {
-    const { Graph } = await loadFreshGraph();
-    expect(() => new Graph()).toThrow(/Cannot instantiate directly/i);
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   test('starts empty', async () => {
-    const { Graph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g } = await loadFreshGraph();
     expect(g.nodeSize).toBe(0);
     expect(g.edgeSize).toBe(0);
   });
 
   test('addNode: stores node and calls SvgHandler.addNode', async () => {
-    const { Graph, Node, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, svgh } = await loadFreshGraph();
 
     const n = new Node(1, { x: 10, y: 20 });
     g.addNode(n);
@@ -140,16 +122,14 @@ describe('Graph (singleton)', () => {
   });
 
   test('hasNode/getNode: returns false/undefined for missing id', async () => {
-    const { Graph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g } = await loadFreshGraph();
 
     expect(g.hasNode('nope')).toBe(false);
     expect(g.getNode('nope')).toBeUndefined();
   });
 
   test('forEachNode iterates over values (in insertion order of Map)', async () => {
-    const { Graph, Node } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g , Node} = await loadFreshGraph();
 
     const n1 = new Node(1, { x: 0, y: 0 });
     const n2 = new Node(2, { x: 1, y: 1 });
@@ -162,8 +142,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('addEdge: stores edge and calls SvgHandler.addEdge', async () => {
-    const { Graph, Node, Edge, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge, svgh } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 10, y: 10 });
@@ -182,16 +161,14 @@ describe('Graph (singleton)', () => {
   });
 
   test('hasEdge/getEdge: returns false/undefined for missing id', async () => {
-    const { Graph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g } = await loadFreshGraph();
 
     expect(g.hasEdge(123)).toBe(false);
     expect(g.getEdge(123)).toBeUndefined();
   });
 
   test('forEachEdge iterates over values', async () => {
-    const { Graph, Node, Edge } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 1, y: 1 });
@@ -209,8 +186,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('removeEdge: calls SvgHandler.removeEdge, unregisters from adjacent nodes, deletes from Map', async () => {
-    const { Graph, Node, Edge, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge, svgh } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 1, y: 1 });
@@ -238,8 +214,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('removeNode: removes all adjacent edges (using clone), calls SvgHandler.removeNode, deletes node', async () => {
-    const { Graph, Node, Edge, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge, svgh } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 1, y: 1 });
@@ -274,8 +249,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('clear: calls SvgHandler.clear and empties nodes + edges', async () => {
-    const { Graph, Node, Edge, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge, svgh } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 1, y: 1 });
@@ -294,8 +268,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('validate delegates to validateGraph(graph)', async () => {
-    const { Graph, validateGraph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, validateGraph } = await loadFreshGraph();
 
     const result = g.validate();
 
@@ -305,8 +278,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('analyze delegates to analyzeGraph(graph, data, crit)', async () => {
-    const { Graph, analyzeGraph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, analyzeGraph } = await loadFreshGraph();
 
     const data = { foo: 'bar' };
     const crit = { threshold: 3 };
@@ -318,8 +290,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('toJSON produces non-cyclic JSON with nodes and edges', async () => {
-    const { Graph, Node, Edge } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge } = await loadFreshGraph();
 
     const a = new Node(1, { x: 1, y: 2 });
     const b = new Node(2, { x: 3, y: 4 });
@@ -341,8 +312,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('fromJSON: clears existing graph, loads nodes/edges, sets SvgHandler nodeID/edgeID', async () => {
-    const { Graph, Node, Edge, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge, svgh } = await loadFreshGraph();
 
     // Pre-fill graph to ensure clear() occurs
     const a = new Node(1, { x: 0, y: 0 });
@@ -373,15 +343,13 @@ describe('Graph (singleton)', () => {
   });
 
   test('fromJSON edge case: invalid JSON throws', async () => {
-    const { Graph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g } = await loadFreshGraph();
 
     expect(() => g.fromJSON('not-json')).toThrow();
   });
 
   test('backup/restore: restore returns to exact previous JSON snapshot', async () => {
-    const { Graph, Node, Edge } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node, Edge } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     const b = new Node(2, { x: 1, y: 1 });
@@ -404,8 +372,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('fromSvg: open path (end != origin) creates new final node', async () => {
-    const { Graph, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, svgh } = await loadFreshGraph();
 
     // ensure deterministic IDs
     svgh.nodeID = 0;
@@ -440,8 +407,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('fromSvg: closed path (end == origin) does NOT create new final node; edge points back to origin', async () => {
-    const { Graph, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, svgh } = await loadFreshGraph();
 
     svgh.nodeID = 100;
     svgh.edgeID = 200;
@@ -465,8 +431,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('fromSvg: multi-segment path creates intermediate nodes and edges', async () => {
-    const { Graph, svgh } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, svgh } = await loadFreshGraph();
 
     svgh.nodeID = 0;
     svgh.edgeID = 0;
@@ -498,8 +463,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('edge cases: removing a node with empty adjacent does not call removeEdge', async () => {
-    const { Graph, Node } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g, Node } = await loadFreshGraph();
 
     const a = new Node(1, { x: 0, y: 0 });
     g.addNode(a);
@@ -512,8 +476,7 @@ describe('Graph (singleton)', () => {
   });
 
   test('edge cases: toJSON on empty graph returns nodes/edges empty arrays', async () => {
-    const { Graph } = await loadFreshGraph();
-    const g = Graph.instance;
+    const { g } = await loadFreshGraph();
 
     const obj = JSON.parse(g.toJSON());
     expect(obj).toEqual({ nodes: [], edges: [] });

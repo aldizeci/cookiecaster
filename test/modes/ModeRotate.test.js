@@ -16,10 +16,6 @@ const loadFresh = async () => {
   await jest.unstable_mockModule('d3', () => ({ __esModule: true, ...d3 }));
 
   svgh = { updateNode: jest.fn(), updateEdge: jest.fn(), updateMessage: jest.fn() };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler { static get instance() { return svgh; } },
-  }));
 
   // ModeRotate uses Array.from(selh.selectedNodes/selectedEdges) AND iterates selectedNodes/edges/affectedEdges with for..of :contentReference[oaicite:5]{index=5}
   selh = {
@@ -27,39 +23,39 @@ const loadFresh = async () => {
     selectedEdges: asIterable([]),
     affectedEdges: asIterable([]),
   };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SelectionHandler.js', () => ({
-    __esModule: true,
-    default: class SelectionHandler { static get instance() { return selh; } },
-  }));
 
   ctrl = { modi: { MODE_SELECT: 'MODE_SELECT' } };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/Controller.js', () => ({
-    __esModule: true,
-    default: class Controller { static get instance() { return ctrl; } },
-  }));
 
   ({ default: ModeRotate } = await import('../../src/business-logic/modes/ModeRotate.js'));
+
+  const makeMode = () =>
+      new ModeRotate({
+        controller: () => ctrl,
+        svgHandler: svgh,
+        selectionHandler: selh,
+      });
+
+  return { makeMode };
 };
+
+let makeMode;
 
 beforeEach(async () => {
   jest.clearAllMocks();
   jest.spyOn(console, 'log').mockImplementation(() => {});
-  await loadFresh();
+  ({ makeMode } = await loadFresh());
 });
-
-
-
 
 describe('ModeRotate (no jsdom)', () => {
   test('enable: activates rotate and initializes data', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
     expect(d3.select).toHaveBeenCalledWith('#rotate');
     expect(m.data).toEqual({ pivot: null, vec: null, nodePos: {}, qPos: {} });
   });
 
   test('onMouseDown: logs and returns if nothing selected', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
 
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -73,7 +69,7 @@ describe('ModeRotate (no jsdom)', () => {
   });
 
   test('onMouseDown: computes pivot from selected nodes, stores nodePos and qPos (selected + affected)', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
 
     const n1 = { id: 1, pos: { x: 0, y: 0 } };
@@ -96,7 +92,7 @@ describe('ModeRotate (no jsdom)', () => {
   });
 
   test('onMouseMove: no-op if vec is null', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
     m.onMouseMove({ x: 1, y: 1 });
     expect(svgh.updateNode).not.toHaveBeenCalled();
@@ -105,7 +101,7 @@ describe('ModeRotate (no jsdom)', () => {
   });
 
   test('onMouseMove: rotates selected nodes + edges, affected edges use half-angle; updates message', () => {
-  const m = new ModeRotate();
+    const m = makeMode();
   m.enable();
 
   // Pivot should be at (0,0) because it averages selected node positions.
@@ -145,7 +141,7 @@ describe('ModeRotate (no jsdom)', () => {
 
 
   test('onMouseUp clears vec', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
     // simulate set vec
     m.data.vec = { x: 1, y: 1 };
@@ -154,12 +150,12 @@ describe('ModeRotate (no jsdom)', () => {
   });
 
   test('onEscape returns MODE_SELECT', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     expect(m.onEscape()).toBe('MODE_SELECT');
   });
 
   test('disable deactivates rotate', () => {
-    const m = new ModeRotate();
+    const m = makeMode();
     m.enable();
     m.disable();
     expect(d3.select).toHaveBeenCalledWith('#rotate');

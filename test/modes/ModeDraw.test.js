@@ -23,31 +23,16 @@ const loadFresh = async () => {
     setMoveEdgeTo: jest.fn(),
     updateMessage: jest.fn(),
   };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler { static get instance() { return svgh; } },
-  }));
 
   // Graph mock
   graph = { addNode: jest.fn(), addEdge: jest.fn() };
-  await jest.unstable_mockModule('../../src/entities/graph/Graph.js', () => ({
-    __esModule: true,
-    default: class Graph { static get instance() { return graph; } },
-  }));
 
   // Controller mock
   ctrl = { modi: { MODE_SELECT: 'MODE_SELECT' } };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/Controller.js', () => ({
-    __esModule: true,
-    default: class Controller { static get instance() { return ctrl; } },
-  }));
+  const controllerGetter = () => ctrl;
 
   // SelectionHandler mock
   selh = { clear: jest.fn() };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SelectionHandler.js', () => ({
-    __esModule: true,
-    default: class SelectionHandler { static get instance() { return selh; } },
-  }));
 
   // Node/Edge mocks
   NodeMock = class Node { constructor(id, pos) { this.id = id; this.pos = pos; this.adjacent = []; } };
@@ -64,16 +49,28 @@ const loadFresh = async () => {
   await jest.unstable_mockModule('../../src/entities/graph/Edge.js', () => ({ __esModule: true, default: EdgeMock }));
 
   ({ default: ModeDraw } = await import('../../src/business-logic/modes/ModeDraw.js'));
+
+  const makeMode = () =>
+      new ModeDraw({
+        controller: controllerGetter,
+        svgHandler: svgh,
+        selectionHandler: selh,
+        graph,
+      });
+
+  return { makeMode };
 };
+
+let makeMode;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  await loadFresh();
+  ({makeMode} = await loadFresh());
 });
 
 describe('ModeDraw (no jsdom)', () => {
   test('enable: activates draw, disables buttons, clears selection', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     const spyEnableButtons = jest.spyOn(m, 'enableButtons');
 
     m.enable();
@@ -84,7 +81,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('prev setter calls resetMoveEdge when set to node', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     const node = new NodeMock(1, { x: 1, y: 2 });
     m.prev = node;
     expect(svgh.resetMoveEdge).toHaveBeenCalledWith(node.pos);
@@ -92,7 +89,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseDown: when prev undefined and focus is undefined -> creates node, sets prev, shows move edge', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     svgh.focus = { obj: undefined, type: undefined };
@@ -109,7 +106,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseDown: when prev undefined and focus is node with degree < 2 -> sets prev and shows move edge', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     const existing = new NodeMock(5, { x: 1, y: 1 });
@@ -125,7 +122,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseDown: when prev exists and click empty space -> adds new node and edge from prev, updates prev', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     // create prev
@@ -146,7 +143,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseDown: when prev exists and click different node with degree < 2 -> creates edge and may transition if node reaches degree 2', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     const a = new NodeMock(1, { x: 0, y: 0 });
@@ -167,7 +164,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseDown edge cases: clicking node with degree === 2 returns MODE_SELECT; clicking same node returns MODE_SELECT', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     const a = new NodeMock(1, { x: 0, y: 0 });
@@ -186,7 +183,7 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onMouseMove: when prev exists uses focus node pos if hovering a node, else uses cursor point', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     const prev = new NodeMock(1, { x: 0, y: 0 });
@@ -206,12 +203,12 @@ describe('ModeDraw (no jsdom)', () => {
   });
 
   test('onEscape returns MODE_SELECT', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     expect(m.onEscape()).toBe('MODE_SELECT');
   });
 
   test('disable: deactivates draw, clears prev, hides move edge', () => {
-    const m = new ModeDraw();
+    const m = makeMode();
     m.enable();
 
     m.prev = new NodeMock(1, { x: 1, y: 1 });

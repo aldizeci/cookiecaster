@@ -1,6 +1,4 @@
-// useGraphStorage.test.js (ESM, Node env, NO jsdom)
-
-import { describe, test, expect, jest, beforeEach } from '@jest/globals';
+import { describe, test, expect, jest, beforeEach, afterEach } from "@jest/globals";
 
 let useGraphStorage;
 
@@ -29,6 +27,9 @@ function makeStorage(initial = {}) {
 let graphStub;
 let svghStub;
 
+let nowSpy;
+let isoSpy;
+
 async function loadFresh({ drawingsJSON } = {}) {
   jest.resetModules();
   jest.clearAllMocks();
@@ -36,21 +37,24 @@ async function loadFresh({ drawingsJSON } = {}) {
 
   // globals
   globalThis.localStorage = makeStorage(
-    drawingsJSON !== undefined ? { drawings: JSON.stringify(drawingsJSON) } : {}
+      drawingsJSON !== undefined ? { drawings: JSON.stringify(drawingsJSON) } : {}
   );
 
+  // window mock (no jsdom)
   globalThis.window = globalThis.window || {};
   globalThis.window.prompt = jest.fn();
   globalThis.window.alert = jest.fn();
 
   // deterministic time
-  jest.spyOn(Date, 'now').mockReturnValue(1700000000000);
-  const isoSpy = jest.spyOn(Date.prototype, 'toISOString').mockReturnValue('2025-01-01T00:00:00.000Z');
+  nowSpy = jest.spyOn(Date, "now").mockReturnValue(1700000000000);
+  isoSpy = jest
+      .spyOn(Date.prototype, "toISOString")
+      .mockReturnValue("2025-01-01T00:00:00.000Z");
 
   // stubs
   graphStub = {
     toJSON: jest.fn(() => ({ g: 1 })),
-    validate: jest.fn(() => ({ forms: [{ path: 'M0 0' }, { path: 'M1 1' }] })),
+    validate: jest.fn(() => ({ forms: [{ path: "M0 0" }, { path: "M1 1" }] })),
     fromJSON: jest.fn(),
     fromSvg: jest.fn(),
   };
@@ -60,129 +64,145 @@ async function loadFresh({ drawingsJSON } = {}) {
   };
 
   // mocks
-  await jest.unstable_mockModule('react', () => ({
+  await jest.unstable_mockModule("react", () => ({
     __esModule: true,
     useCallback: reactMock.useCallback,
     useEffect: reactMock.useEffect,
   }));
 
-  await jest.unstable_mockModule('../../src/entities/graph/Graph.js', () => ({
+  // ✅ IMPORTANT: mock ServicesProvider hook used by useGraphStorage
+  await jest.unstable_mockModule(
+      "../../src/business-logic/services/ServicesProvider.jsx",
+      () => ({
+        __esModule: true,
+        useServices: () => ({ graph: graphStub, svgHandler: svghStub }),
+      })
+  );
+
+  // (Optional) You can remove these if not needed by the hook;
+  // keeping is fine if other code imports them.
+  await jest.unstable_mockModule("../../src/entities/graph/Graph.js", () => ({
     __esModule: true,
     default: class Graph {
       static get instance() {
         return graphStub;
       }
-    }
+    },
   }));
 
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler {
-      static get instance() {
-        return svghStub;
-      }
-    }
-  }));
+  await jest.unstable_mockModule(
+      "../../src/business-logic/handlers/SvgHandler.js",
+      () => ({
+        __esModule: true,
+        default: class SvgHandler {
+          static get instance() {
+            return svghStub;
+          }
+        },
+      })
+  );
 
-  ({ default: useGraphStorage } = await import('../../src/ui/pages/Start/hooks/useGraphStorage.js'));
-
-  return { isoSpy };
+  ({ default: useGraphStorage } = await import(
+      "../../src/ui/pages/Start/hooks/useGraphStorage.js"
+      ));
 }
 
 const formatMessage = (x) => `FMT:${x}`;
 const msgs = {
-  enterName: 'enterName',
-  exampleName: 'exampleName',
-  noName: 'noName',
-  save: 'save',
-  noSave: 'noSave',
+  enterName: "enterName",
+  exampleName: "exampleName",
+  noName: "noName",
+  save: "save",
+  noSave: "noSave",
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('useGraphStorage (no jsdom)', () => {
-  test('saveGraph: prompts for name; if cancelled (null) => alerts noName and does not save', async () => {
+afterEach(() => {
+  nowSpy?.mockRestore?.();
+  isoSpy?.mockRestore?.();
+});
+
+describe("useGraphStorage (no jsdom)", () => {
+  test("saveGraph: prompts for name; if cancelled (null) => alerts noName and does not save", async () => {
     await loadFresh();
     window.prompt.mockReturnValue(null);
 
     const { saveGraph } = useGraphStorage(formatMessage, msgs);
     saveGraph();
 
-    expect(window.alert).toHaveBeenCalledWith('FMT:noName');
+    expect(window.alert).toHaveBeenCalledWith("FMT:noName");
     expect(localStorage.setItem).not.toHaveBeenCalled();
   });
 
-  test('saveGraph: blank/whitespace name => alerts noName and does not save', async () => {
+  test("saveGraph: blank/whitespace name => alerts noName and does not save", async () => {
     await loadFresh();
-    window.prompt.mockReturnValue('   ');
+    window.prompt.mockReturnValue("   ");
 
     const { saveGraph } = useGraphStorage(formatMessage, msgs);
     saveGraph();
 
-    expect(window.alert).toHaveBeenCalledWith('FMT:noName');
+    expect(window.alert).toHaveBeenCalledWith("FMT:noName");
     expect(localStorage.setItem).not.toHaveBeenCalled();
   });
 
-  test('saveGraph: success writes payload (id, trimmed name, graphJSON, svgPath, saved=true, timestamp) and alerts save', async () => {
-    await loadFresh({ drawingsJSON: [{ id: 'old', saved: true }] });
+  test("saveGraph: success writes payload and alerts save", async () => {
+    await loadFresh({ drawingsJSON: [{ id: "old", saved: true }] });
 
-    window.prompt.mockReturnValue('  My Drawing  ');
+    window.prompt.mockReturnValue("  My Drawing  ");
 
     const { saveGraph } = useGraphStorage(formatMessage, msgs);
     saveGraph();
 
-    // validate used to compute svgPath from forms paths joined with space :contentReference[oaicite:2]{index=2}
     expect(graphStub.validate).toHaveBeenCalledTimes(1);
 
     expect(localStorage.setItem).toHaveBeenCalledTimes(1);
     const [key, value] = localStorage.setItem.mock.calls[0];
-    expect(key).toBe('drawings');
+    expect(key).toBe("drawings");
 
     const saved = JSON.parse(value);
     expect(saved).toHaveLength(2);
 
     const payload = saved[1];
-    expect(payload.id).toBe('drawing-1700000000000');
-    expect(payload.name).toBe('My Drawing');
+    expect(payload.id).toBe("drawing-1700000000000");
+    expect(payload.name).toBe("My Drawing");
     expect(payload.graphJSON).toEqual({ g: 1 });
-    expect(payload.svgPath).toBe('M0 0 M1 1');
+    expect(payload.svgPath).toBe("M0 0 M1 1");
     expect(payload.saved).toBe(true);
-    expect(payload.timestamp).toBe('2025-01-01T00:00:00.000Z');
+    expect(payload.timestamp).toBe("2025-01-01T00:00:00.000Z");
 
-    expect(window.alert).toHaveBeenCalledWith('FMT:save');
+    expect(window.alert).toHaveBeenCalledWith("FMT:save");
   });
 
   test('saveGraph edge case: Graph.validate returns undefined => svgPath becomes "" and still saves', async () => {
     await loadFresh({ drawingsJSON: [] });
 
     graphStub.validate.mockReturnValue(undefined);
-    window.prompt.mockReturnValue('Name');
+    window.prompt.mockReturnValue("Name");
 
     const { saveGraph } = useGraphStorage(formatMessage, msgs);
     saveGraph();
 
     const saved = JSON.parse(localStorage.setItem.mock.calls[0][1]);
-    expect(saved[0].svgPath).toBe('');
-    expect(window.alert).toHaveBeenCalledWith('FMT:save');
+    expect(saved[0].svgPath).toBe("");
+    expect(window.alert).toHaveBeenCalledWith("FMT:save");
   });
 
-  test('edge case: invalid localStorage.drawings JSON throws during mount (current behavior)', async () => {
-  await loadFresh();
+  test("edge case: invalid localStorage.drawings JSON throws during mount (current behavior)", async () => {
+    await loadFresh();
 
-  // Make getAllDrawings() explode inside the useEffect on mount :contentReference[oaicite:1]{index=1}
-  localStorage.getItem.mockImplementation((k) => (k === 'drawings' ? 'not-json' : null));
+    localStorage.getItem.mockImplementation((k) =>
+        k === "drawings" ? "not-json" : null
+    );
 
-  // Because getAllDrawings is not wrapped in try/catch in useEffect,
-  // the hook throws when mounted.
-  expect(() => useGraphStorage(formatMessage, msgs)).toThrow(SyntaxError);
-});
+    expect(() => useGraphStorage(formatMessage, msgs)).toThrow(SyntaxError);
+  });
 
-
-  test('useEffect auto-restore: no unsaved drawing => does nothing', async () => {
+  test("useEffect auto-restore: no unsaved drawing => does nothing", async () => {
     await loadFresh({
-      drawingsJSON: [{ id: 'a', saved: true, graphJSON: { a: 1 } }],
+      drawingsJSON: [{ id: "a", saved: true, graphJSON: { a: 1 } }],
     });
 
     useGraphStorage(formatMessage, msgs);
@@ -192,24 +212,24 @@ describe('useGraphStorage (no jsdom)', () => {
     expect(svghStub.updateMessage).not.toHaveBeenCalled();
   });
 
-  test('useEffect auto-restore: unsaved drawing with graphJSON object => stringifies and calls Graph.fromJSON, then updateMessage', async () => {
+  test("useEffect auto-restore: unsaved drawing with graphJSON object => stringifies and calls Graph.fromJSON, then updateMessage", async () => {
     await loadFresh({
-      drawingsJSON: [{ id: 'temp', saved: false, graphJSON: { foo: 1 } }],
+      drawingsJSON: [{ id: "temp", saved: false, graphJSON: { foo: 1 } }],
     });
 
     useGraphStorage(formatMessage, msgs);
 
     expect(graphStub.fromJSON).toHaveBeenCalledTimes(1);
     const arg = graphStub.fromJSON.mock.calls[0][0];
-    expect(typeof arg).toBe('string');
+    expect(typeof arg).toBe("string");
     expect(arg).toContain('"foo":1');
 
     expect(svghStub.updateMessage).toHaveBeenCalledTimes(1);
   });
 
-  test('useEffect auto-restore: unsaved drawing with graphJSON string => passes through to Graph.fromJSON', async () => {
+  test("useEffect auto-restore: unsaved drawing with graphJSON string => passes through to Graph.fromJSON", async () => {
     await loadFresh({
-      drawingsJSON: [{ id: 'temp', saved: false, graphJSON: '{"x":1}' }],
+      drawingsJSON: [{ id: "temp", saved: false, graphJSON: '{"x":1}' }],
     });
 
     useGraphStorage(formatMessage, msgs);
@@ -218,33 +238,32 @@ describe('useGraphStorage (no jsdom)', () => {
     expect(svghStub.updateMessage).toHaveBeenCalledTimes(1);
   });
 
-  test('useEffect auto-restore: unsaved drawing with NO graphJSON but svgPath => calls Graph.fromSvg([svgPath])', async () => {
+  test("useEffect auto-restore: unsaved drawing with NO graphJSON but svgPath => calls Graph.fromSvg([svgPath])", async () => {
     await loadFresh({
-      drawingsJSON: [{ id: 'temp', saved: false, graphJSON: null, svgPath: 'M0 0' }],
+      drawingsJSON: [{ id: "temp", saved: false, graphJSON: null, svgPath: "M0 0" }],
     });
 
     useGraphStorage(formatMessage, msgs);
 
-    expect(graphStub.fromSvg).toHaveBeenCalledWith(['M0 0']);
+    expect(graphStub.fromSvg).toHaveBeenCalledWith(["M0 0"]);
     expect(svghStub.updateMessage).toHaveBeenCalledTimes(1);
   });
 
-  test('useEffect edge case: restore throws => warns and does not throw', async () => {
+  test("useEffect edge case: restore throws => warns and does not throw", async () => {
     await loadFresh({
-      drawingsJSON: [{ id: 'temp', saved: false, graphJSON: '{"x":1}' }],
+      drawingsJSON: [{ id: "temp", saved: false, graphJSON: '{"x":1}' }],
     });
 
     graphStub.fromJSON.mockImplementation(() => {
-      throw new Error('boom');
+      throw new Error("boom");
     });
 
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     expect(() => useGraphStorage(formatMessage, msgs)).not.toThrow();
     expect(warnSpy).toHaveBeenCalled();
     warnSpy.mockRestore();
 
-    // updateMessage should not be called if restore throws before reaching it
     expect(svghStub.updateMessage).not.toHaveBeenCalled();
   });
 });
