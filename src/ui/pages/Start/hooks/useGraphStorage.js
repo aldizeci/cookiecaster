@@ -4,10 +4,12 @@ import {useServices} from "../../../../business-logic/services/ServicesProvider.
 export default function useGraphStorage(formatMessage, msgs) {
     const {graph, svgHandler} = useServices();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const getAllDrawings = () => {
         return JSON.parse(localStorage.getItem("drawings")) || [];
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const saveAllDrawings = (drawings) => {
         localStorage.setItem("drawings", JSON.stringify(drawings));
     };
