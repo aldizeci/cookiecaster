@@ -1,7 +1,6 @@
 // useCanvasConfig.test.js (ESM, Node env, NO jsdom)
 
-import { describe, test, expect, jest, beforeEach } from '@jest/globals';
-
+import { describe, test, expect, jest, beforeEach } from "@jest/globals";
 
 let useCanvasConfig;
 
@@ -23,12 +22,12 @@ function makeReactMock() {
 
     useState: jest.fn((init) => {
       stateCall += 1;
-      const value = typeof init === 'function' ? init() : init;
+      const value = typeof init === "function" ? init() : init;
 
       if (stateCall === 1) return [value, setters.setShowGrid]; // showGrid
       if (stateCall === 2) return [value, setters.setZoomIndex]; // zoomIndex
 
-      throw new Error('Unexpected extra useState call');
+      throw new Error("Unexpected extra useState call");
     }),
 
     useMemo: jest.fn((fn) => fn()),
@@ -36,10 +35,17 @@ function makeReactMock() {
   };
 }
 
-async function loadFresh({ grid = true, zoomLevel = 3, size = 240, zoomLevels = [1.0, 1.2, 1.5], raster = 6 } = {}) {
+async function loadFresh({
+                           grid = true,
+                           zoomLevel = 3,
+                           size = 240,
+                           zoomLevels = [1.0, 1.2, 1.5],
+                           raster = 6,
+                         } = {}) {
   jest.resetModules();
+  jest.clearAllMocks();
 
-  // set stubs based on test inputs
+  // stubs based on test inputs
   handler = {
     getZoomLevel: jest.fn(() => zoomLevel),
     getDrawingAreaSize: jest.fn(() => size),
@@ -53,35 +59,26 @@ async function loadFresh({ grid = true, zoomLevel = 3, size = 240, zoomLevels = 
   const reactMock = makeReactMock();
 
   // Mock react hooks
-  await jest.unstable_mockModule('react', () => ({
+  await jest.unstable_mockModule("react", () => ({
     __esModule: true,
     useState: reactMock.useState,
     useMemo: reactMock.useMemo,
     useCallback: reactMock.useCallback,
   }));
 
-  // Mock SvgHandler.instance
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler {
-      static get instance() {
-        return handler;
-      }
-    },
-  }));
-
-  // Mock Controller.instance
-  await jest.unstable_mockModule('../../src/business-logic/handlers/Controller.js', () => ({
-    __esModule: true,
-    default: class Controller {
-      static get instance() {
-        return controller;
-      }
-    },
-  }));
+  // ✅ IMPORTANT: hook uses useServices(), not .instance singletons
+  await jest.unstable_mockModule(
+      "../../src/business-logic/services/ServicesProvider.jsx",
+      () => ({
+        __esModule: true,
+        useServices: () => ({ svgHandler: handler, controller }),
+      })
+  );
 
   // Import after mocks are in place
-  ({ default: useCanvasConfig } = await import('../../src/ui/pages/Start/hooks/useCanvasConfig.js'));
+  ({ default: useCanvasConfig } = await import(
+      "../../src/ui/pages/Start/hooks/useCanvasConfig.js"
+      ));
 
   return { reactMock };
 }
@@ -90,8 +87,8 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('useCanvasConfig (no jsdom)', () => {
-  test('initial values: showGrid comes from Controller.instance.grid; zoomIndex initializes from handler.getZoomLevel()-1', async () => {
+describe("useCanvasConfig (no jsdom)", () => {
+  test("initial values: showGrid comes from controller.grid; zoomIndex initializes from handler.getZoomLevel()-1", async () => {
     const { reactMock } = await loadFresh({ grid: false, zoomLevel: 3, size: 240 });
 
     const cfg = useCanvasConfig();
@@ -100,8 +97,8 @@ describe('useCanvasConfig (no jsdom)', () => {
     expect(cfg.zoomIndex).toBe(2);
 
     expect(cfg.size).toBe(240);
-    expect(cfg.viewBox).toBe('0 0 240 240');
-    expect(cfg.translate).toBe('translate(120,120)');
+    expect(cfg.viewBox).toBe("0 0 240 240");
+    expect(cfg.translate).toBe("translate(120,120)");
     expect(cfg.zoomLevels).toEqual([1.0, 1.2, 1.5]);
     expect(cfg.raster).toBe(6);
 
@@ -110,7 +107,7 @@ describe('useCanvasConfig (no jsdom)', () => {
     expect(reactMock.useCallback).toHaveBeenCalledTimes(2);
   });
 
-  test('changeGrid: updates Controller.instance.grid and calls setShowGrid', async () => {
+  test("changeGrid: updates controller.grid and calls setShowGrid", async () => {
     const { reactMock } = await loadFresh({ grid: true });
 
     const cfg = useCanvasConfig();
@@ -124,53 +121,52 @@ describe('useCanvasConfig (no jsdom)', () => {
     expect(reactMock.__setters.setShowGrid).toHaveBeenCalledWith(true);
   });
 
-  test('changeZoom: parses idx base-10, calls handler.setZoomLevel(zoom+1) and sets zoomIndex to zoom', async () => {
+  test("changeZoom: parses idx base-10, calls handler.setZoomLevel(zoom+1) and sets zoomIndex to zoom", async () => {
     const { reactMock } = await loadFresh({ zoomLevel: 1 });
 
     const cfg = useCanvasConfig();
 
-    cfg.changeZoom('0');
+    cfg.changeZoom("0");
     expect(handler.setZoomLevel).toHaveBeenCalledWith(1);
     expect(reactMock.__setters.setZoomIndex).toHaveBeenCalledWith(0);
 
-    cfg.changeZoom('2');
+    cfg.changeZoom("2");
     expect(handler.setZoomLevel).toHaveBeenCalledWith(3);
     expect(reactMock.__setters.setZoomIndex).toHaveBeenCalledWith(2);
   });
 
-  test('edge case: changeZoom whitespace/leading zeros', async () => {
+  test("edge case: changeZoom whitespace/leading zeros", async () => {
     const { reactMock } = await loadFresh();
 
     const cfg = useCanvasConfig();
 
-    cfg.changeZoom(' 01 ');
-    // parseInt(' 01 ', 10) = 1
+    cfg.changeZoom(" 01 ");
     expect(handler.setZoomLevel).toHaveBeenCalledWith(2);
     expect(reactMock.__setters.setZoomIndex).toHaveBeenCalledWith(1);
   });
 
-  test('edge case: changeZoom non-numeric propagates NaN (documents current behavior)', async () => {
+  test("edge case: changeZoom non-numeric propagates NaN (documents current behavior)", async () => {
     const { reactMock } = await loadFresh();
 
     const cfg = useCanvasConfig();
 
-    cfg.changeZoom('abc');
+    cfg.changeZoom("abc");
     expect(handler.setZoomLevel).toHaveBeenCalledWith(NaN);
     expect(reactMock.__setters.setZoomIndex).toHaveBeenCalledWith(NaN);
   });
 
-  test('edge case: getZoomLevel returns 0 => zoomIndex initializes to -1', async () => {
+  test("edge case: getZoomLevel returns 0 => zoomIndex initializes to -1", async () => {
     await loadFresh({ zoomLevel: 0 });
 
     const cfg = useCanvasConfig();
     expect(cfg.zoomIndex).toBe(-1);
   });
 
-  test('edge case: size 0 => viewBox and translate are zeroed', async () => {
+  test("edge case: size 0 => viewBox and translate are zeroed", async () => {
     await loadFresh({ size: 0 });
 
     const cfg = useCanvasConfig();
-    expect(cfg.viewBox).toBe('0 0 0 0');
-    expect(cfg.translate).toBe('translate(0,0)');
+    expect(cfg.viewBox).toBe("0 0 0 0");
+    expect(cfg.translate).toBe("translate(0,0)");
   });
 });
