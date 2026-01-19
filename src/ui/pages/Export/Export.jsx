@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
-import createMesh from "../../business-logic/mesh-operations/CreateMesh.js";
-import {useServices} from "../../business-logic/services/ServicesProvider.jsx";
-import { meshToBinarySTL, downloadBinaryStl } from "../../utils/ExportToBinarySTL.js";
+import createMesh from "../../../business-logic/mesh-operations/CreateMesh.js";
+import {useServices} from "../../../business-logic/services/ServicesProvider.jsx";
+import { meshToBinarySTL, downloadBinaryStl } from "../../../utils/ExportToBinarySTL.js";
 import "./Export.css";
 
 // --------------------------------------------------------

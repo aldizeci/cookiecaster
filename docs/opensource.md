@@ -11,7 +11,7 @@ Here I my referencing Open Source Projects:
 
 # Findings
 ## Documentation
-- An About Section where the purpose of the Application is explained
+- An Imprint Section where the purpose of the Application is explained
 - An Overview of the features
 - Refrence or Explanation how to install the application or where it runs
 - Optional: How to setup for Local Dev
@@ -55,7 +55,7 @@ Here I my referencing Open Source Projects:
 - Define License
 - Document Local Development
 - Requirements
-- About, Installation, Feature Section
+- Imprint, Installation, Feature Section
 - How to handle security
 - Add Build & Deploy Pipeline Badge
 - Add latest Tag badge
