@@ -25,6 +25,35 @@ export default function useCanvasInteractions({
                                               }) {
     const {controller: ctr, graph: graphSvc, svgHandler: svgh} = useServices();
 
+    const importFromFile = async () => {
+        try {
+            const project = await importCC3File();
+            if (!project) return;
+
+            ctr.reset();
+
+            graphSvc.fromJSON(
+                typeof project.graphJSON === "string"
+                    ? project.graphJSON
+                    : JSON.stringify(project.graphJSON)
+            );
+
+            svgh.updateMessage();
+
+            ctr.mode = new ctr.modi.MODE_SELECT();
+            ctr.mode.enable();
+
+            alert("Vorlage erfolgreich geladen!");
+        } catch {
+            /* empty */
+        }
+    };
+
+    const exportToFile = () => {
+        const data = graphSvc.toJSON();
+        exportCC3File(data, "drawing");
+    };
+
     useEffect(() => {
             d3.selectAll("nav.navbar.navbar-default").attr("id", "startNavBar");
 
@@ -169,6 +198,7 @@ export default function useCanvasInteractions({
                     .on(".pointermove", null)
                     .on(".pointerup", null);
             };
-        },
-        [svgRef, analyze.status, analyzeGraph, saveGraph, ctr, graphSvc, svgh]);
+        },[svgRef, analyze.status, analyzeGraph, saveGraph, ctr, graphSvc, svgh]);
+
+    return { importFromFile, exportToFile };
 }
