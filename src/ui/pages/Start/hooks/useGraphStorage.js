@@ -1,8 +1,8 @@
-import { useCallback, useEffect } from "react";
-import Graph from "../../../../entities/graph/Graph";
-import SvgHandler from "../../../../business-logic/handlers/SvgHandler";
+import {useCallback, useEffect} from "react";
+import {useServices} from "../../../../business-logic/services/ServicesProvider.jsx";
 
 export default function useGraphStorage(formatMessage, msgs) {
+    const {graph, svgHandler} = useServices();
 
     const getAllDrawings = () => {
         return JSON.parse(localStorage.getItem("drawings")) || [];
@@ -13,9 +13,8 @@ export default function useGraphStorage(formatMessage, msgs) {
     };
 
     const saveGraph = useCallback(() => {
-        const graph = Graph.instance;
         const jsonData = graph.toJSON();
-        const forms = Graph.instance.validate()?.forms || [];
+        const forms = graph.validate()?.forms || [];
         const svgPath = forms.map((f) => f.path).join(" ");
 
         const name = window.prompt(formatMessage(msgs.enterName), formatMessage(msgs.exampleName));
@@ -43,7 +42,7 @@ export default function useGraphStorage(formatMessage, msgs) {
             console.error(err);
             window.alert(formatMessage(msgs.noSave));
         }
-    }, [formatMessage, msgs]);
+    }, [formatMessage, msgs, graph]);
 
     // Auto-restore unsaved drawing on mount
     useEffect(() => {
@@ -56,16 +55,16 @@ export default function useGraphStorage(formatMessage, msgs) {
                 : JSON.stringify(temp.graphJSON);
 
             if (temp.graphJSON) {
-                Graph.instance.fromJSON(json);
+                graph.fromJSON(json);
             } else if (temp.svgPath) {
-                Graph.instance.fromSvg([temp.svgPath]);
+                graph.fromSvg([temp.svgPath]);
             }
 
-            SvgHandler.instance.updateMessage();
+            svgHandler.updateMessage();
         } catch (err) {
             console.warn("Failed to restore autosave:", err);
         }
-    }, []);
+    }, [graph, svgHandler, getAllDrawings, saveAllDrawings]);
 
-    return { saveGraph };
+    return {saveGraph};
 }

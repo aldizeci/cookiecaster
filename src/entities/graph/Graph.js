@@ -2,29 +2,12 @@ import Node from './Node.js'
 import Edge from './Edge.js'
 import validateGraph from '../../business-logic/graph-operations/Validation.js'
 import analyzeGraph from '../../business-logic/graph-operations/Analysis.js'
-import SvgHandler from '../../business-logic/handlers/SvgHandler.js'
-
-let _singleton = Symbol();
 
 export default class Graph {
-    constructor(singletonToken) {
-        if (_singleton !== singletonToken)
-            throw new Error('Cannot instantiate directly.');
-
+    constructor(getSvgHandler) {
+        this._getSvgHandler = getSvgHandler;
         this._nodes = new Map();
         this._edges = new Map();
-    }
-
-    /**
-     * Static accessor
-     *
-     * @returns {Graph}
-     */
-    static get instance() {
-        if (!this[_singleton])
-            this[_singleton] = new Graph(_singleton);
-
-        return this[_singleton]
     }
 
     backup() {
@@ -58,7 +41,7 @@ export default class Graph {
      * @param {Node} node - node id
      */
     addNode(node) {
-        SvgHandler.instance.addNode(node);
+        this._getSvgHandler().addNode(node);
         this._nodes.set(node.id, node);
     };
 
@@ -81,7 +64,7 @@ export default class Graph {
         adja.forEach(edge => {
             this.removeEdge(edge);
         });
-        SvgHandler.instance.removeNode(node);
+        this._getSvgHandler().removeNode(node);
         this._nodes.delete(node.id);
     };
 
@@ -117,7 +100,7 @@ export default class Graph {
      * @param {Edge} edge - edge
      */
     addEdge(edge) {
-        SvgHandler.instance.addEdge(edge);
+        this._getSvgHandler().addEdge(edge);
         this._edges.set(edge.id, edge);
     };
 
@@ -136,7 +119,7 @@ export default class Graph {
      * @param {Edge} edge - edge
      */
     removeEdge(edge) {
-        SvgHandler.instance.removeEdge(edge);
+        this._getSvgHandler().removeEdge(edge);
         edge.removeFromAdjacentNode();
         this._edges.delete(edge.id);
     };
@@ -153,7 +136,7 @@ export default class Graph {
      * Clears the complete graph
      */
     clear() {
-        SvgHandler.instance.clear();
+        this._getSvgHandler().clear();
         this._nodes.clear();
         this._edges.clear();
     };
@@ -162,7 +145,8 @@ export default class Graph {
     validate() {
         return validateGraph(this);
     }
-    analyze(data, crit){
+
+    analyze(data, crit) {
         return analyzeGraph(this, data, crit);
     }
 
@@ -208,21 +192,19 @@ export default class Graph {
                 eid = edge.id;
             }
         });
-        const svgh = SvgHandler.instance;
-        svgh.nodeID = nid + 1;
-        svgh.edgeID = eid + 1;
+        this._getSvgHandler().nodeID = nid + 1;
+        this._getSvgHandler().edgeID = eid + 1;
     }
 
     fromSvg(forms) {
         this.clear();
-        const svgh = SvgHandler.instance;
         for (let j = 0; j < forms.length; j++) {
             const segments = forms[j].split(' Q ');
             const n = segments.length - 1;
             let segment = segments[0];
             let valStr = segment.split(' ');
             let pos = {x: Number.parseFloat(valStr[0]), y: Number.parseFloat(valStr[1])};
-            const origin = new Node(svgh.nodeID++, pos);
+            const origin = new Node(this._getSvgHandler().nodeID++, pos);
             let from = origin;
             let q = undefined;
             let to = undefined;
@@ -234,9 +216,9 @@ export default class Graph {
                 valStr = segment.split(' ');
                 pos = {x: Number.parseFloat(valStr[2]), y: Number.parseFloat(valStr[3])};
                 q = {x: Number.parseFloat(valStr[0]), y: Number.parseFloat(valStr[1])};
-                to = new Node(svgh.nodeID++, pos);
+                to = new Node(this._getSvgHandler().nodeID++, pos);
                 this.addNode(to);
-                edge = new Edge(svgh.edgeID++, from, to, q);
+                edge = new Edge(this._getSvgHandler().edgeID++, from, to, q);
                 this.addEdge(edge);
                 from = to;
             }
@@ -248,12 +230,12 @@ export default class Graph {
             const ey = Number.parseFloat(valStr[3]);
             if (origin.pos.x === ex && origin.pos.y === ey) {
                 //closed path
-                edge = new Edge(svgh.edgeID++, from, origin, q);
+                edge = new Edge(this._getSvgHandler().edgeID++, from, origin, q);
             } else {
                 //not closed path
-                to = new Node(svgh.nodeID++, {x: ex, y: ey});
+                to = new Node(this._getSvgHandler().nodeID++, {x: ex, y: ey});
                 this.addNode(to);
-                edge = new Edge(svgh.edgeID++, from, to, q);
+                edge = new Edge(this._getSvgHandler().edgeID++, from, to, q);
             }
             this.addEdge(edge);
         }

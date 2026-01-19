@@ -1,11 +1,8 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
-
 import createMesh from "../../business-logic/mesh-operations/CreateMesh.js";
-import Graph from "../../entities/graph/Graph.js";
-import SvgHandler from "../../business-logic/handlers/SvgHandler.js";
-
+import {useServices} from "../../business-logic/services/ServicesProvider.jsx";
 import { meshToBinarySTL, downloadBinaryStl } from "../../utils/ExportToBinarySTL.js";
 import "./Export.css";
 
@@ -29,15 +26,15 @@ function pointInPolygon(point, vs) {
     return inside;
 }
 
-function validateGraph() {
-    const zoom = SvgHandler.instance.getActZoomValue();
-    Graph.instance.backup();
+function validateGraph(graph, svgHandler) {
+    const zoom = svgHandler.getActZoomValue();
+    graph.backup();
 
-    Graph.instance.forEachNode(n => { n.pos.x /= zoom; n.pos.y /= zoom; });
-    Graph.instance.forEachEdge(e => { e.q.x /= zoom; e.q.y /= zoom; });
+    graph.forEachNode(n => { n.pos.x /= zoom; n.pos.y /= zoom; });
+    graph.forEachEdge(e => { e.q.x /= zoom; e.q.y /= zoom; });
 
-    const data = Graph.instance.validate();
-    Graph.instance.restore();
+    const data = graph.validate();
+    graph.restore();
 
     data.valid = false;
 
@@ -69,7 +66,9 @@ function validateGraph() {
 // Component
 // --------------------------------------------------------
 export default function Export() {
-    const data = useMemo(() => validateGraph(), []);
+    const {graph, svgHandler} = useServices();
+
+    const data = useMemo(() => validateGraph(graph, svgHandler), [graph, svgHandler]);
     const [filename, setFilename] = useState("cookie");
     const [thickness, setThickness] = useState(1.5);
     const [height, setHeight] = useState(12);

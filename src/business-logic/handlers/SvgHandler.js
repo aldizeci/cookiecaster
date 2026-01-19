@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import Graph from "../../entities/graph/Graph.js";
 
 /**
  * @author Sadik Hrnjica
@@ -11,9 +10,6 @@ const DRAWING_AREA_GRID_RASTER_SPACE = 6;
 const DRAWING_AREA_SIZE = 240;
 const ZOOM_LEVELS = [1.0, 1.2, 1.5, 2.0, 3.0];
 
-
-let _singleton = Symbol();
-
 let rect = (p1, p2) => {
     const w = p2.x - p1.x;
     const h = p2.y - p1.y;
@@ -21,8 +17,8 @@ let rect = (p1, p2) => {
 };
 
 export default class SvgHandler {
-    constructor(singletonToken) {
-        if (_singleton !== singletonToken) throw new Error("Cannot instantiate directly.");
+    constructor(getGraph) {
+        this._getGraph = getGraph;
         this._radius = 3;
         this.focus = { obj: undefined, type: "" };
         this._zoomLevel = 1;
@@ -34,16 +30,6 @@ export default class SvgHandler {
             enter: isTouch ? "pointerover" : "mouseenter",
             leave: isTouch ? "pointerout" : "mouseleave",
         };
-    }
-
-    /**
-     * Static accessor
-     *
-     * @returns {SvgHandler}
-     */
-    static get instance() {
-        if (!this[_singleton]) this[_singleton] = new SvgHandler(_singleton);
-        return this[_singleton];
     }
 
     getRasterSpace() { return DRAWING_AREA_GRID_RASTER_SPACE; }
@@ -286,18 +272,17 @@ export default class SvgHandler {
     }
 
     updateMessage() {
-        const graph = Graph.instance;
         let minX = DRAWING_AREA_SIZE;
         let maxX = 0;
         let minY = DRAWING_AREA_SIZE;
         let maxY = 0;
-        graph.forEachNode(node => {
+        this._getGraph().forEachNode(node => {
             minX = (node.pos.x < minX) ? node.pos.x : minX;
             maxX = (node.pos.x > maxX) ? node.pos.x : maxX;
             minY = (node.pos.y < minY) ? node.pos.y : minY;
             maxY = (node.pos.y > maxY) ? node.pos.y : maxY;
         });
-        graph.forEachEdge(edge => {
+        this._getGraph().forEachEdge(edge => {
             let xmin = 0.5*(edge.to.pos.x + edge.q.x)
             minX = (xmin < minX )? xmin : minX;
             let xmax = 0.5*(edge.to.pos.x + edge.q.x)
