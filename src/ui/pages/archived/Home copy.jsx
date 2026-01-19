@@ -71,7 +71,7 @@ export default function Home() {
                 <Row className="mt-4">
                     <Col xs={12} sm={8} className="main-section">
                         <p>
-                            <FormattedMessage id="home.needHelp" defaultMessage="Need help? Check the About or FAQ section." />
+                            <FormattedMessage id="home.needHelp" defaultMessage="Need help? Check the Imprint or FAQ section." />
                         </p>
                     </Col>
                 </Row>

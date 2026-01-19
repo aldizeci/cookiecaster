@@ -2,11 +2,11 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import GitHubReference from "../components/GitHubReference";
+import GitHubReference from "../../components/GitHubReference.jsx";
 
 
 
-const Ueber = () => {
+const About = () => {
     return (
         <Container className="py-5">
             <div className="p-5 bg-light rounded-3">
@@ -63,4 +63,4 @@ const Ueber = () => {
     );
 };
 
-export default Ueber;
+export default About;

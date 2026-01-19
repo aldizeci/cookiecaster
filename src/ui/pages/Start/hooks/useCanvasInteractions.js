@@ -1,10 +1,8 @@
 import {useEffect} from "react";
 import * as d3 from "d3";
-import Graph from "../../../../entities/graph/Graph.js";
-import Controller from "../../../../business-logic/handlers/Controller.js";
-import SvgHandler from "../../../../business-logic/handlers/SvgHandler.js";
 import {importCC3File} from "../../../../utils/FileImport.js";
 import {exportCC3File} from "../../../../utils/FileExport.js";
+import {useServices} from "../../../../business-logic/services/ServicesProvider.jsx";
 
 function getAllDrawings() {
     return JSON.parse(localStorage.getItem("drawings")) || [];
@@ -25,23 +23,22 @@ export default function useCanvasInteractions({
                                                   analyzeGraph,
                                                   saveGraph
                                               }) {
+    const {controller: ctr, graph: graphSvc, svgHandler: svgh} = useServices();
 
-        const importFromFile = async () => {
+    const importFromFile = async () => {
         try {
             const project = await importCC3File();
             if (!project) return;
 
-            const ctr = Controller.instance;
-
             ctr.reset();
 
-            Graph.instance.fromJSON(
+            graphSvc.fromJSON(
                 typeof project.graphJSON === "string"
                     ? project.graphJSON
                     : JSON.stringify(project.graphJSON)
             );
 
-            SvgHandler.instance.updateMessage();
+            svgh.updateMessage();
 
             ctr.mode = new ctr.modi.MODE_SELECT();
             ctr.mode.enable();
@@ -53,14 +50,13 @@ export default function useCanvasInteractions({
     };
 
     const exportToFile = () => {
-        const data = Graph.instance.toJSON();
+        const data = graphSvc.toJSON();
         exportCC3File(data, "drawing");
     };
 
     useEffect(() => {
             d3.selectAll("nav.navbar.navbar-default").attr("id", "startNavBar");
 
-            const ctr = Controller.instance;
             const svgSel = d3.select(svgRef.current);
             const svgNode = svgSel.node();
 
@@ -86,8 +82,8 @@ export default function useCanvasInteractions({
                     }
 
                     if (graphData) {
-                        Graph.instance.fromJSON(graphData);
-                        SvgHandler.instance.redraw();
+                        graphSvc.fromJSON(graphData);
+                        svgh.redraw();
                     }
                 } catch { /* empty */
                 } finally {
@@ -99,20 +95,21 @@ export default function useCanvasInteractions({
 
             // --- Pointer events ---
             const onDown = (evt) => {
-                if (analyze.status) SvgHandler.instance.clearWarnings();
+                if (analyze.status) svgh.clearWarnings();
                 d3.select("#layer").remove();
                 ctr.mouseDown(pointerPos(evt));
             };
+
             const onMove = (evt) => ctr.mouseMove(pointerPos(evt));
+
             const onUp = () => {
                 ctr.mouseUp();
                 try {
-                    const graph = Graph.instance;
                     const list = getAllDrawings().filter(d => d.saved);
                     list.push({
                         id: "temp-autosave",
                         name: "Temporär",
-                        graphJSON: graph.toJSON(),
+                        graphJSON: graphSvc.toJSON(),
                         saved: false,
                         timestamp: new Date().toISOString(),
                     });
@@ -170,13 +167,13 @@ export default function useCanvasInteractions({
                     document.querySelector("#reset")?.click();
                     await new Promise(r => setTimeout(r, 50));
 
-                    Graph.instance.fromJSON(
+                    graphSvc.fromJSON(
                         typeof project.graphJSON === "string"
                             ? project.graphJSON
                             : JSON.stringify(project.graphJSON)
                     );
 
-                    SvgHandler.instance.updateMessage();
+                    svgh.updateMessage();
                     ctr.mode = ctr.modi.MODE_SELECT;
                     ctr.mode.enable();
                     alert("Vorlage erfolgreich geladen!");
@@ -185,7 +182,7 @@ export default function useCanvasInteractions({
             });
 
             d3.select("#exportToFile").on("click", () => {
-                const data = Graph.instance.toJSON();
+                const data = graphSvc.toJSON();
                 exportCC3File(data, "drawing");
             });
 
@@ -201,11 +198,7 @@ export default function useCanvasInteractions({
                     .on(".pointermove", null)
                     .on(".pointerup", null);
             };
-        },
-        [svgRef, analyze.status, analyzeGraph, saveGraph]);
+        },[svgRef, analyze.status, analyzeGraph, saveGraph, ctr, graphSvc, svgh]);
 
-        return {
-            importFromFile,
-            exportToFile,
-        };
+    return { importFromFile, exportToFile };
 }

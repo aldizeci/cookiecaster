@@ -1,21 +1,15 @@
-/**
- * @author Claudio
- * @date 29.04.2018
- * @version 1.0
- */
-
 import * as d3 from "d3";
 import AbstractMode from "./AbstractMode.js";
 import Node from '../../entities/graph/Node.js'
 import Edge from '../../entities/graph/Edge.js'
-import SvgHandler from '../handlers/SvgHandler.js'
-import Graph from "../../entities/graph/Graph.js";
-import Controller from "../handlers/Controller.js";
-import SelectionHandler from "../handlers/SelectionHandler.js";
 
 export default class ModeDraw extends AbstractMode {
-    constructor() {
+    constructor({controller, svgHandler, selectionHandler, graph}) {
         super();
+        this._controller = controller;
+        this._svgHandler = svgHandler;
+        this._selectionHandler = selectionHandler;
+        this._graph = graph;
         this._prev = undefined;
     }
 
@@ -26,78 +20,74 @@ export default class ModeDraw extends AbstractMode {
     set prev(value) {
         this._prev = value;
         if (value !== undefined) {
-            SvgHandler.instance.resetMoveEdge(value.pos);
+            this._svgHandler.resetMoveEdge(value.pos);
         }
     }
 
     enable() {
         d3.select("#draw").classed("activeMode", true);
         this.enableButtons({move: false, rotate: false, copy: false, mirror: false, erase: false});
-        SelectionHandler.instance.clear();
+        this._selectionHandler.clear();
     }
 
     onMouseDown(point) {
-        const svgh = SvgHandler.instance;
-        const focus = svgh.focus;
-        const graph = Graph.instance;
+        const focus = this._svgHandler.focus;
         if (this.prev !== undefined) {
             if (focus.obj !== undefined && focus.type === "node") {
                 if (focus.obj !== this.prev) {
                     const an = focus.obj.adjacent.length;
                     if (an < 2) {
-                        const eid = svgh.edgeID++;
+                        const eid = this._svgHandler.edgeID++;
                         const edge = new Edge(eid, this.prev, focus.obj);
-                        graph.addEdge(edge);
+                        this._graph.addEdge(edge);
                         this.prev = focus.obj;
                         if (focus.obj.adjacent.length === 2) {
-                            return Controller.instance.modi.MODE_SELECT;
+                            return this._controller().modi.MODE_SELECT;
                         }
                         this.prev = focus.obj;
                     } else if (an === 2) {
-                        return Controller.instance.modi.MODE_SELECT;
+                        return this._controller().modi.MODE_SELECT;
                     }
                 } else {
-                    return Controller.instance.modi.MODE_SELECT;
+                    return this._controller().modi.MODE_SELECT;
                 }
             } else if (focus.obj === undefined) {
-                const eid = svgh.edgeID++;
-                const nid = svgh.nodeID++;
+                const eid = this._svgHandler.edgeID++;
+                const nid = this._svgHandler.nodeID++;
                 const node = new Node(nid, point);
-                graph.addNode(node);
+                this._graph.addNode(node);
                 const edge = new Edge(eid, this.prev, node);
-                graph.addEdge(edge);
+                this._graph.addEdge(edge);
                 this.prev = node;
             }
         } else {
             if (focus.obj !== undefined && focus.type === "node" && focus.obj.adjacent.length < 2) {
                 this.prev = focus.obj;
-                SvgHandler.instance.setMoveEdgeVisible(true);
+                this._svgHandler.setMoveEdgeVisible(true);
             } else if (focus.obj === undefined) {
-                const nid = svgh.nodeID++;
+                const nid = this._svgHandler.nodeID++;
                 const node = new Node(nid, point);
-                graph.addNode(node);
+                this._graph.addNode(node);
                 this.prev = node;
-                SvgHandler.instance.setMoveEdgeVisible(true);
+                this._svgHandler.setMoveEdgeVisible(true);
             }
         }
-        svgh.updateMessage();
+        this._svgHandler.updateMessage();
     }
 
     onMouseMove(point) {
-        const svgh = SvgHandler.instance;
-        const focus = svgh.focus;
+        const focus = this._svgHandler.focus;
         if (this.prev !== undefined)
-            svgh.setMoveEdgeTo(focus.obj !== undefined && focus.type === "node" ? focus.obj.pos : point);
+            this._svgHandler.setMoveEdgeTo(focus.obj !== undefined && focus.type === "node" ? focus.obj.pos : point);
     }
 
     onEscape() {
-        return Controller.instance.modi.MODE_SELECT;
+        return this._controller().modi.MODE_SELECT;
     }
 
     disable() {
         d3.select("#draw").classed("activeMode", false);
         this.prev = undefined;
-        SvgHandler.instance.setMoveEdgeVisible(false);
+        this._svgHandler.setMoveEdgeVisible(false);
     }
-
 }

@@ -67,14 +67,14 @@ This page defines all useful metrics about Cookiecaster 2.0 and Cookiecaster 3.0
 | api/Map.js | 102 | 0 | - Map | - size<br>- hasKey<br>- put<br>- putIfAbsent<br>- get<br>- remove<br>- clear<br>- forEach<br>- keys<br>- values | N/A | 43 | Own written Map for CookieCaster |
 | api/SelectionHandler.js | 195 | 3 | - SelectionHandler | - singleEdge<br>- instance<br>- isAnySelected<br>- isNodeSelected<br>- selectedNodes<br>- isEdgeSelected<br>- selectedEdges<br>- isEdgeAffected<br>- affectedEdges<br>- selectNode<br>- selectEdge<br>- startRectSelection<br>- moveRectSelection<br>- endRectSelection<br>- cancelRectSelection<br>- isRectActive<br>- clear | N/A | 32 | How to handle Selects |
 | api/SvgHandler.js | 372 | 3 | - SvgHandler | - get<br>- instance<br>- getRasterSpace<br>- getDrawingAreaSize<br>- resetMoveEdge<br>- setMoveEdgeTo<br>- setMoveEdgeVisible<br>- setRectSelection<br>- setRectSelectionVisible<br>- addNode<br>- updateNode<br>- selectNode<br>- removeNode<br>- setQEdgeVisibility<br>- setQEdge<br>- addEdge<br>- updateEdge<br>- removeEdge<br>- selectEdge<br>- setCritNodes<br>- setCritSeg<br>- setIntersections<br>- setZoomLevel<br>- getZoomLevels<br>- getZoomLevel<br>- getActZoomValue<br>- updateMessage<br>- clearWarnings<br>- clear | - rect | 53 | Manages SVG rendering of nodes, edges, selections, and warnings in a graph, including zoom and interactive updates |
-| components/About.jsx | 78 | 3 | - About | - render | N/A | 0 | Appearence of About Page |
+| components/Imprint.jsx | 78 | 3 | - Imprint | - render | N/A | 0 | Appearence of Imprint Page |
 | components/CustomNavBar.jsx | 58 | 5 | - CustomNavbar | - render | N/A | 0 | Appearance Custom Navigaation Bar |
 | components/Error.jsx | 21 | 4 | - Error | - render | N/A | 0 | Appearance Error Page |
 | components/Export.jsx | 155 | 11 | - Export | - handleChangeSize<br>- handleChangeThickness<br>- handleChangeHeight<br>- handleChangeFilename<br>- createMesh<br>- render | - validateGraph | 0 | Handle Export Page |
 | components/Gallery.jsx | 84 | 9 | - Gallery | - handleSelect<br>- render<br>- componentnDidMount | N/A | 5 | Handle Gallery Page |
 | componentes/Home.jsx | 48 | 6 | - Home | - render | N/A | 0 | Handle Home Page |
 | components/Start.jsx | 646 | 17 | - Start | - changeGrid<br>- changeBackground<br>- loadProfile<br>- saveGraph<br>- imageHandler<br>- cropImage<br>- analyzeGraph<br>- createLinesY<br>- createLinesX<br>- render<br>- handleChange<br>- changeZoom<br>- componentDidMount | - validateGraph | 26 | Handle Start Page |
-| components/Ueber.jsx | 40 | 6 | - Ueber | - render | N/A | 0 | Handler Ueber Page |
+| components/About.jsx | 40 | 6 | - About | - render | N/A | 0 | Handler About Page |
 | components/Templates/Dropdown.jsx | 33 | 3 | - Dropdown | - handleSelect<br>- render | N/A | 0 | Template for Dropdown Menues |
 | components/Templates/SwitchButton.jsx | 33 | 3 | - SwitchButton | - change<br>- render | N/A | 0 | Template for Switch Buttons |
 
