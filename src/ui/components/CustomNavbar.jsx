@@ -89,7 +89,7 @@ export default function CustomNavbar() {
                     </Nav.Link>
 
                     <Nav.Link as={Link} to="/about">
-                        <FormattedMessage id="customNavbar.about" defaultMessage="About"/>
+                        <FormattedMessage id="customNavbar.about" defaultMessage="Imprint"/>
                     </Nav.Link>
                 </Nav>
             </Navbar.Collapse>

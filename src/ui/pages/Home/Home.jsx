@@ -1,7 +1,7 @@
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Image, Button } from "react-bootstrap";
-import GitHubReference from "../components/GitHubReference";
+import GitHubReference from "../../components/GitHubReference.jsx";
 
 
 export default function Home() {
@@ -92,7 +92,7 @@ export default function Home() {
                         <p>
                             <FormattedMessage
                                 id="home.needHelp"
-                                defaultMessage="Need help? Check the About or FAQ section."
+                                defaultMessage="Need help? Check the Imprint or FAQ section."
                             />
                         </p>
                     </Col>
