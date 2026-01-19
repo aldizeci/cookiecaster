@@ -164,6 +164,9 @@ describe('Controller (no jsdom) - DI', () => {
   test('mode setter: same mode does nothing; changing mode calls disable/enable', () => {
     const c = makeController();
 
+    // draw.enable was called during setModes() initialization
+    jest.clearAllMocks();
+
     // initial mode is draw
     expect(c.mode).toBe(c.modi.MODE_DRAW);
 
@@ -444,6 +447,9 @@ describe('Controller (no jsdom) - DI', () => {
 
   test('escape: transitions based on mode.onEscape()', () => {
     const c = makeController();
+
+    // clear init side-effects (draw.enable from setModes)
+    jest.clearAllMocks();
 
     // switch to rotate
     c.mode = c.modi.MODE_ROTATE;
