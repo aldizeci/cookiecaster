@@ -1,4 +1,4 @@
-// Controller.test.js (ESM, Node env, NO jsdom)
+// Controller.test.js (ESM, Node env, NO jsdom) — DI version
 
 import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
@@ -6,8 +6,10 @@ let Controller;
 
 // --- shared stubs (reset each test via loadFresh) ---
 let graphStub, svghStub, selhStub;
-let ModeDraw, ModeSelect, ModeMove, ModeRotate; // mocked classes
 let NodeMock, EdgeMock;
+
+// modes are plain objects now (DI), not constructed via ModeDraw/ModeSelect modules
+let draw, select, move, rotate;
 
 function makeMode(name) {
   return {
@@ -21,35 +23,31 @@ function makeMode(name) {
   };
 }
 
+// Mirror iterates selectedNodes twice => must be re-iterable
 const asIterable = (arr) => ({
   [Symbol.iterator]: function* () {
     yield* arr;
   },
 });
 
-async function loadFresh() {
-  jest.resetModules();
-
-  // --- Graph.instance stub ---
+function makeStubs() {
+  // Graph stub
   graphStub = {
     nodeSize: 0,
-    addNode: jest.fn(() => { graphStub.nodeSize += 1; }),
+    addNode: jest.fn(() => {
+      graphStub.nodeSize += 1;
+    }),
     addEdge: jest.fn(),
-    removeNode: jest.fn(() => { graphStub.nodeSize = Math.max(0, graphStub.nodeSize - 1); }),
+    removeNode: jest.fn(() => {
+      graphStub.nodeSize = Math.max(0, graphStub.nodeSize - 1);
+    }),
     removeEdge: jest.fn(),
-    clear: jest.fn(() => { graphStub.nodeSize = 0; }),
+    clear: jest.fn(() => {
+      graphStub.nodeSize = 0;
+    }),
   };
 
-  await jest.unstable_mockModule('../../src/entities/graph/Graph.js', () => ({
-    __esModule: true,
-    default: class Graph {
-      static get instance() {
-        return graphStub;
-      }
-    },
-  }));
-
-  // --- SvgHandler.instance stub ---
+  // SvgHandler stub
   svghStub = {
     nodeID: 0,
     edgeID: 0,
@@ -61,16 +59,7 @@ async function loadFresh() {
     selectEdge: jest.fn(),
   };
 
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler {
-      static get instance() {
-        return svghStub;
-      }
-    },
-  }));
-
-  // --- SelectionHandler.instance stub ---
+  // SelectionHandler stub
   selhStub = {
     _nodes: new Map(),
     _edges: new Map(),
@@ -85,16 +74,17 @@ async function loadFresh() {
     }),
   };
 
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SelectionHandler.js', () => ({
-    __esModule: true,
-    default: class SelectionHandler {
-      static get instance() {
-        return selhStub;
-      }
-    },
-  }));
+  // Mode objects (DI)
+  draw = makeMode('draw');
+  select = makeMode('select');
+  move = makeMode('move');
+  rotate = makeMode('rotate');
+}
 
-  // --- Node / Edge mocks used by Controller.copy/mirror ---
+async function loadFresh() {
+  jest.resetModules();
+
+  // Node / Edge mocks are STILL imported by Controller (copy/mirror)
   NodeMock = class Node {
     constructor(id, pos) {
       this.id = id;
@@ -120,55 +110,48 @@ async function loadFresh() {
     default: EdgeMock,
   }));
 
-  // --- Mode mocks (Controller constructs them) ---
-  const draw = makeMode('draw');
-  const select = makeMode('select');
-  const move = makeMode('move');
-  const rotate = makeMode('rotate');
-
-  ModeDraw = class { constructor() { return draw; } };
-  ModeSelect = class { constructor() { return select; } };
-  ModeMove = class { constructor() { return move; } };
-  ModeRotate = class { constructor() { return rotate; } };
-
-  await jest.unstable_mockModule('../../src/business-logic/modes/ModeDraw.js', () => ({
-    __esModule: true,
-    default: ModeDraw,
-  }));
-  await jest.unstable_mockModule('../../src/business-logic/modes/ModeSelect.js', () => ({
-    __esModule: true,
-    default: ModeSelect,
-  }));
-  await jest.unstable_mockModule('../../src/business-logic/modes/ModeMove.js', () => ({
-    __esModule: true,
-    default: ModeMove,
-  }));
-  await jest.unstable_mockModule('../../src/business-logic/modes/ModeRotate.js', () => ({
-    __esModule: true,
-    default: ModeRotate,
-  }));
-
   ({ default: Controller } = await import('../../src/business-logic/handlers/Controller.js'));
+}
 
-  return { draw, select, move, rotate };
+function makeController() {
+  const c = new Controller({
+    svgHandler: svghStub,
+    selectionHandler: selhStub,
+    graph: graphStub,
+  });
+
+  // inject modes
+  c.setModes({
+    MODE_DRAW: draw,
+    MODE_SELECT: select,
+    MODE_MOVE: move,
+    MODE_ROTATE: rotate,
+  });
+
+  return c;
 }
 
 beforeEach(async () => {
   jest.clearAllMocks();
+  makeStubs();
   await loadFresh();
 });
 
-describe('Controller (no jsdom)', () => {
-  test('singleton + constructor guard', async () => {
-    const a = Controller.instance;
-    const b = Controller.instance;
-    expect(a).toBe(b);
+describe('Controller (no jsdom) - DI', () => {
+  test('constructor stores dependencies + initial state', () => {
+    const c = makeController();
 
-    expect(() => new Controller()).toThrow(/Use Controller\.instance/i);
+    expect(c.svgHandler).toBe(svghStub);
+    expect(c.selectionHandler).toBe(selhStub);
+    expect(c.graph).toBe(graphStub);
+
+    // setModes sets initial mode to draw (only if _mode not set)
+    expect(c.mode).toBe(c.modi.MODE_DRAW);
+    expect(c.grid).toBe(true);
   });
 
   test('grid getter/setter coerces to boolean', () => {
-    const c = Controller.instance;
+    const c = makeController();
     expect(c.grid).toBe(true);
 
     c.grid = 0;
@@ -178,9 +161,8 @@ describe('Controller (no jsdom)', () => {
     expect(c.grid).toBe(true);
   });
 
-  test('mode setter: same mode does nothing; changing mode calls disable/enable', async () => {
-    const { draw, select } = await loadFresh();
-    const c = Controller.instance;
+  test('mode setter: same mode does nothing; changing mode calls disable/enable', () => {
+    const c = makeController();
 
     // initial mode is draw
     expect(c.mode).toBe(c.modi.MODE_DRAW);
@@ -198,7 +180,7 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('fixAndSnapPoint: snaps to grid and clamps to boundaries', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     // rasterSpace=6 => snap threshold = 3; drawingArea=240 => clamp to [6, 234]
     const p = { x: 1, y: 999 }; // outside both ends
@@ -216,7 +198,7 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('fixAndSnapPoint: when grid is off, only clamps (no snapping)', () => {
-    const c = Controller.instance;
+    const c = makeController();
     c.grid = false;
 
     const p = { x: 10, y: 10 };
@@ -226,8 +208,8 @@ describe('Controller (no jsdom)', () => {
     expect(p).toEqual({ x: 10, y: 10 });
   });
 
-  test('mouseDown/mouseMove: snaps unless rectangle selection active', async () => {
-    const c = Controller.instance;
+  test('mouseDown/mouseMove: snaps unless rectangle selection active', () => {
+    const c = makeController();
 
     // force rect inactive
     selhStub.isRectActive.mockReturnValue(false);
@@ -250,9 +232,8 @@ describe('Controller (no jsdom)', () => {
     expect(spyFix).toHaveBeenCalledTimes(2);
   });
 
-  test('_transition: changes mode only when nextMode is not undefined', async () => {
-    const { draw, select } = await loadFresh();
-    const c = Controller.instance;
+  test('_transition: changes mode only when nextMode is not undefined', () => {
+    const c = makeController();
 
     // current is draw; call transition with undefined => no changes
     c._transition(undefined);
@@ -265,9 +246,8 @@ describe('Controller (no jsdom)', () => {
     expect(select.enable).toHaveBeenCalledTimes(1);
   });
 
-  test('mouseUp calls onMouseUp and transitions if mode returns a new one', async () => {
-    const { draw, move } = await loadFresh();
-    const c = Controller.instance;
+  test('mouseUp calls onMouseUp and transitions if mode returns a new one', () => {
+    const c = makeController();
 
     // make current mode return MODE_MOVE on mouseUp
     draw.onMouseUp.mockReturnValue(c.modi.MODE_MOVE);
@@ -279,9 +259,8 @@ describe('Controller (no jsdom)', () => {
     expect(c.mode).toBe(c.modi.MODE_MOVE);
   });
 
-  test('reset: clears Graph and SvgHandler and sets mode to draw', async () => {
-    const { draw } = await loadFresh();
-    const c = Controller.instance;
+  test('reset: clears Graph and SvgHandler and sets mode to draw', () => {
+    const c = makeController();
 
     // set different mode first
     c.mode = c.modi.MODE_SELECT;
@@ -293,19 +272,18 @@ describe('Controller (no jsdom)', () => {
     expect(c.mode).toBe(c.modi.MODE_DRAW);
   });
 
-  test('erase: removes selectedEdges always; when singleEdge=false also removes affectedEdges + selectedNodes; sets mode based on graph.nodeSize', async () => {
-    const c = Controller.instance;
+  test('erase: removes selectedEdges always; when singleEdge=false also removes affectedEdges + selectedNodes; sets mode based on graph.nodeSize', () => {
+    const c = makeController();
 
     const n1 = { id: 1, adjacent: [] };
     const e1 = { id: 10 };
     const e2 = { id: 11 };
 
-    // selectedEdges yields [e1]
-    selhStub.selectedEdges = (function* () { yield e1; })();
-    // affectedEdges yields [{edge:e2}]
-    selhStub.affectedEdges = (function* () { yield { edge: e2, mod: n1 }; })();
-    // selectedNodes yields [n1]
-    selhStub.selectedNodes = (function* () { yield n1; })();
+    // IMPORTANT: Controller iterates `for (const edge of this.selectionHandler.selectedEdges)`
+    // so these should be iterables, not "already-run" generators
+    selhStub.selectedEdges = asIterable([e1]);
+    selhStub.affectedEdges = asIterable([{ edge: e2, mod: n1 }]);
+    selhStub.selectedNodes = asIterable([n1]);
     selhStub.singleEdge = false;
 
     graphStub.nodeSize = 5;
@@ -323,15 +301,15 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('erase edge case: singleEdge=true skips affectedEdges + selectedNodes; sets draw mode if graph empty', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     const n1 = { id: 1, adjacent: [] };
     const e1 = { id: 10 };
     const e2 = { id: 11 };
 
-    selhStub.selectedEdges = (function* () { yield e1; })();
-    selhStub.affectedEdges = (function* () { yield { edge: e2, mod: n1 }; })();
-    selhStub.selectedNodes = (function* () { yield n1; })();
+    selhStub.selectedEdges = asIterable([e1]);
+    selhStub.affectedEdges = asIterable([{ edge: e2, mod: n1 }]);
+    selhStub.selectedNodes = asIterable([n1]);
     selhStub.singleEdge = true;
 
     graphStub.nodeSize = 0;
@@ -346,11 +324,11 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('copy: logs and returns if nothing selected', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     // empty iterables
-    selhStub.selectedNodes = (function* () {})();
-    selhStub.selectedEdges = (function* () {})();
+    selhStub.selectedNodes = asIterable([]);
+    selhStub.selectedEdges = asIterable([]);
 
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     c.copy();
@@ -359,7 +337,7 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('copy: copies nodes with offset; copies edges only when both endpoints were copied; sets mode to MOVE', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     // rasterSpace=6 => dx=dy=30
     svghStub.nodeID = 100;
@@ -372,8 +350,8 @@ describe('Controller (no jsdom)', () => {
     const eGood = { id: 7, from: a, to: b, q: { x: 20, y: 30 } };
     const eSkip = { id: 8, from: a, to: cNodeNotSelected, q: { x: 1, y: 1 } };
 
-    selhStub.selectedNodes = (function* () { yield a; yield b; })();
-    selhStub.selectedEdges = (function* () { yield eGood; yield eSkip; })();
+    selhStub.selectedNodes = asIterable([a, b]);
+    selhStub.selectedEdges = asIterable([eGood, eSkip]);
 
     c.copy();
 
@@ -397,11 +375,11 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('mirror: early returns when a selected node has adjacent.length === 0', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     const n = { id: 1, pos: { x: 0, y: 0 }, adjacent: [] };
-    selhStub.selectedNodes = (function* () { yield n; })();
-    selhStub.selectedEdges = (function* () {})();
+    selhStub.selectedNodes = asIterable([n]);
+    selhStub.selectedEdges = asIterable([]);
 
     svghStub.nodeID = 0;
     svghStub.edgeID = 0;
@@ -414,12 +392,12 @@ describe('Controller (no jsdom)', () => {
   });
 
   test('mirror: early returns when tails.length !== 2', () => {
-    const c = Controller.instance;
+    const c = makeController();
 
     const tail = { id: 1, pos: { x: 0, y: 0 }, adjacent: [{}] }; // degree 1 tail
     const mid = { id: 2, pos: { x: 10, y: 0 }, adjacent: [{}, {}] }; // degree 2 (not tail)
-    selhStub.selectedNodes = (function* () { yield tail; yield mid; })();
-    selhStub.selectedEdges = (function* () {})();
+    selhStub.selectedNodes = asIterable([tail, mid]);
+    selhStub.selectedEdges = asIterable([]);
 
     c.mirror();
 
@@ -427,50 +405,49 @@ describe('Controller (no jsdom)', () => {
     expect(graphStub.addEdge).not.toHaveBeenCalled();
   });
 
-test('mirror: success mirrors non-tail nodes and edges; clears selection; sets mode SELECT', () => {
-  const c = Controller.instance;
+  test('mirror: success mirrors non-tail nodes and edges; clears selection; sets mode SELECT', () => {
+    const c = makeController();
 
-  svghStub.nodeID = 10;
-  svghStub.edgeID = 20;
+    svghStub.nodeID = 10;
+    svghStub.edgeID = 20;
 
-  // Two tails (degree 1) define mirror axis:
-  const t1 = { id: 1, pos: { x: 0, y: 0 }, adjacent: [{}] };
-  const t2 = { id: 2, pos: { x: 10, y: 0 }, adjacent: [{}] };
+    // Two tails (degree 1) define mirror axis:
+    const t1 = { id: 1, pos: { x: 0, y: 0 }, adjacent: [{}] };
+    const t2 = { id: 2, pos: { x: 10, y: 0 }, adjacent: [{}] };
 
-  // Node to mirror (degree 2 so it isn't a tail)
-  const n = { id: 3, pos: { x: 5, y: 4 }, adjacent: [{}, {}] };
+    // Node to mirror (degree 2 so it isn't a tail)
+    const n = { id: 3, pos: { x: 5, y: 4 }, adjacent: [{}, {}] };
 
-  // Edge whose endpoints exist in cNodes after mirroring:
-  const e = { id: 7, from: t1, to: n, q: { x: 5, y: 2 } };
+    // Edge whose endpoints exist in cNodes after mirroring:
+    const e = { id: 7, from: t1, to: n, q: { x: 5, y: 2 } };
 
-  // ✅ IMPORTANT: make these re-iterable (Controller.mirror() iterates selectedNodes twice)
-  selhStub.selectedNodes = asIterable([t1, t2, n]);
-  selhStub.selectedEdges = asIterable([e]);
+    // IMPORTANT: selectedNodes must be re-iterable (mirror loops twice)
+    selhStub.selectedNodes = asIterable([t1, t2, n]);
+    selhStub.selectedEdges = asIterable([e]);
 
-  c.mirror();
+    c.mirror();
 
-  // One new node created (mirror of n); tails not duplicated
-  expect(graphStub.addNode).toHaveBeenCalledTimes(1);
+    // One new node created (mirror of n); tails not duplicated
+    expect(graphStub.addNode).toHaveBeenCalledTimes(1);
 
-  // One mirrored edge created
-  expect(graphStub.addEdge).toHaveBeenCalledTimes(1);
+    // One mirrored edge created
+    expect(graphStub.addEdge).toHaveBeenCalledTimes(1);
 
-  expect(selhStub.clear).toHaveBeenCalledTimes(1);
-  expect(svghStub.updateMessage).toHaveBeenCalledTimes(1);
-  expect(c.mode).toBe(c.modi.MODE_SELECT);
+    expect(selhStub.clear).toHaveBeenCalledTimes(1);
+    expect(svghStub.updateMessage).toHaveBeenCalledTimes(1);
+    expect(c.mode).toBe(c.modi.MODE_SELECT);
 
-  // IDs advanced
-  expect(svghStub.nodeID).toBe(11);
-  expect(svghStub.edgeID).toBe(21);
-});
+    // IDs advanced
+    expect(svghStub.nodeID).toBe(11);
+    expect(svghStub.edgeID).toBe(21);
+  });
 
-
-  test('escape: transitions based on mode.onEscape()', async () => {
-    const { draw, rotate } = await loadFresh();
-    const c = Controller.instance;
+  test('escape: transitions based on mode.onEscape()', () => {
+    const c = makeController();
 
     // switch to rotate
     c.mode = c.modi.MODE_ROTATE;
+
     // make rotate escape return draw
     rotate.onEscape.mockReturnValue(c.modi.MODE_DRAW);
 

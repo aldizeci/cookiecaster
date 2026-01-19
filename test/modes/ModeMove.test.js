@@ -14,10 +14,6 @@ const loadFresh = async () => {
 
   // SvgHandler mock
   svgh = { updateNode: jest.fn(), updateEdge: jest.fn(), updateMessage: jest.fn() };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SvgHandler.js', () => ({
-    __esModule: true,
-    default: class SvgHandler { static get instance() { return svgh; } },
-  }));
 
   // SelectionHandler mock (ModeMove uses .forEach on selectedNodes/Edges/AffectedEdges) :contentReference[oaicite:3]{index=3}
   selh = {
@@ -25,29 +21,32 @@ const loadFresh = async () => {
     selectedEdges: [],
     affectedEdges: [],
   };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/SelectionHandler.js', () => ({
-    __esModule: true,
-    default: class SelectionHandler { static get instance() { return selh; } },
-  }));
 
   // Controller mock for onEscape
   ctrl = { modi: { MODE_SELECT: 'MODE_SELECT' } };
-  await jest.unstable_mockModule('../../src/business-logic/handlers/Controller.js', () => ({
-    __esModule: true,
-    default: class Controller { static get instance() { return ctrl; } },
-  }));
 
   ({ default: ModeMove } = await import('../../src/business-logic/modes/ModeMove.js'));
+
+  const makeMode = () =>
+      new ModeMove({
+        controller: () => ctrl,
+        svgHandler: svgh,
+        selectionHandler: selh,
+      });
+
+  return { makeMode };
 };
+
+let makeMode;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  await loadFresh();
+  ({makeMode} = await loadFresh());
 });
 
 describe('ModeMove (no jsdom)', () => {
   test('enable: activates button + initializes data', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
 
     expect(d3.select).toHaveBeenCalledWith('#move');
@@ -55,7 +54,7 @@ describe('ModeMove (no jsdom)', () => {
   });
 
   test('onMouseDown: stores cursor, node positions, edge q positions including affectedEdges', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
 
     const n1 = { id: 1, pos: { x: 1, y: 2 } };
@@ -77,7 +76,7 @@ describe('ModeMove (no jsdom)', () => {
   });
 
   test('onMouseMove: when cursor undefined does nothing', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
 
     m.onMouseMove({ x: 1, y: 1 });
@@ -87,7 +86,7 @@ describe('ModeMove (no jsdom)', () => {
   });
 
   test('onMouseMove: translates selected nodes/edges by dx,dy and affected edges by dx/2,dy/2', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
 
     const n1 = { id: 1, pos: { x: 1, y: 2 } };
@@ -118,7 +117,7 @@ describe('ModeMove (no jsdom)', () => {
   });
 
   test('onMouseUp: clears cursor', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
     m.onMouseDown({ x: 1, y: 1 });
     expect(m.data.cursor).toBeDefined();
@@ -127,12 +126,12 @@ describe('ModeMove (no jsdom)', () => {
   });
 
   test('onEscape returns MODE_SELECT', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     expect(m.onEscape()).toBe('MODE_SELECT');
   });
 
   test('disable deactivates button', () => {
-    const m = new ModeMove();
+    const m = makeMode();
     m.enable();
     m.disable();
     expect(d3.select).toHaveBeenCalledWith('#move');
