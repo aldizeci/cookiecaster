@@ -21,7 +21,7 @@ export default function GitHubReference(){
                 <img src={`${import.meta.env.BASE_URL}/assets/github.svg`} alt="" width={18} height={18} />
 
                 <FormattedMessage
-                    id="githubreference.githubButton"
+                    id="githubreference.opensourceButton"
                     defaultMessage="Contribute on GitHub"
                 />
             </Button>

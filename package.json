@@ -2,7 +2,7 @@
   "name": "cookiecaster3.0",
   "homepage": "https://github.com/fhnw-makerverse/cookiecaster",
   "private": true,
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,9 @@
     "docs": "jsdoc -c jsdoc.json"
   },
   "jest": {
-    "setupFiles": ["<rootDir>/test/jest.setup.js"],
+    "setupFiles": [
+      "<rootDir>/test/jest.setup.js"
+    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.js",
