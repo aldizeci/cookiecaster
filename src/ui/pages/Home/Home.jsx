@@ -35,9 +35,9 @@ export default function Home() {
     return (
         <Container className="mt-5">
             { /* DESKTOP/TABLET VERSION */ }
-            <div className="p-5 bg-light rounded">
+            <div className="p-5 rounded">
                 {/* Welcome section */}
-                <Row className="align-items-center">
+                <Row>
                     <Col md={8} className="mb-4 mb-md-0">
                         <h2>
                             <FormattedMessage
