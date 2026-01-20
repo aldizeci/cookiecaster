@@ -3,8 +3,16 @@
    Same design, modern structure
    ============================================================ */
 
+@font-face {
+    font-family: "IndieFlowerLocal";
+    src: url("/assets/fonts/IndieFlower-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
-    --hausschrift: "Indie Flower", cursive;
+    --hausschrift: "IndieFlowerLocal", cursive;
     --hintergrundfarbe: #f2c496;
     --akzentfarbe1: #f0892e;
     --akzentfarbe2: #8c5a37;
