@@ -12,7 +12,7 @@ const Imprint = () => {
 
     return (
         <Container className="py-5">
-            <div className="p-5 mb-4 bg-light rounded-3">
+            <div className="p-5 mb-4 rounded-3">
 
                 <Row>
                     <Col xs={12} sm={8} className="main-section">

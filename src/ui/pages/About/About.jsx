@@ -9,7 +9,7 @@ import GitHubReference from "../../components/GitHubReference.jsx";
 const About = () => {
     return (
         <Container className="py-5">
-            <div className="p-5 bg-light rounded-3">
+            <div className="p-5 rounded-3">
                 <Row className="justify-content-center">
                     <Col xs={12} lg={8}>
                         
