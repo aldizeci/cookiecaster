@@ -221,5 +221,5 @@ input[type="file"].form-control:hover::file-selector-button {
 .btn-primary:focus-visible,
 .btn-primary:active {
     background-color: var(--hintergrundfarbe);
-    border-color: var(--hintergrundfarbe);
+    border-color: var(--akzentfarbe2);
 }
