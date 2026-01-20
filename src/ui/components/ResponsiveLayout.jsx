@@ -6,7 +6,7 @@ export default function ResponsiveLayout({children}){
     return(
         <>
             { /* MOBILE VERSION */ }
-            <div className="p-5 bg-light rounded text-center d-block d-md-none">
+            <div className="p-5 rounded text-center d-block d-md-none">
                  <h2>
                     <FormattedMessage
                         id="layout.device"
@@ -16,7 +16,7 @@ export default function ResponsiveLayout({children}){
             </div>
 
             {/* Querformat */}
-            <div className="p-5 bg-light d-none d-md-block d-lg-none">
+            <div className="p-5 rounded text-center d-none d-md-block d-lg-none">
                 <h2>
                     <FormattedMessage
                         id="layout.querformat"
