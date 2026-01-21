@@ -39,14 +39,22 @@ export default function Home() {
                 {/* Welcome section */}
                 <Row>
                     <Col md={8} className="mb-4 mb-md-0">
-                        <h2>
+                        <h1>
                             <FormattedMessage
                                 id="home.welcome"
                                 defaultMessage="Welcome to CookieCaster!"
                             />
-                        </h2>
+                        </h1>
 
-                        <p>
+                        {/* Help text */}
+                        <p className="fs-5">
+                            <FormattedMessage
+                                id="home.needHelp"
+                                defaultMessage="Need help? Check the Imprint or FAQ section."
+                            />
+                        </p>
+
+                        <p className="fs-5">
                             <FormattedMessage
                                 id="home.start"
                                 defaultMessage="Get started by designing your cookie cutter."
@@ -85,20 +93,6 @@ export default function Home() {
                         <GitHubReference />
                     </Col>
                 </Row>
-
-                {/* Help text */}
-                <Row className="mt-4">
-                    <Col md={8}>
-                        <p>
-                            <FormattedMessage
-                                id="home.needHelp"
-                                defaultMessage="Need help? Check the Imprint or FAQ section."
-                            />
-                        </p>
-                    </Col>
-                </Row>
-
-                
             </div>
         </Container>
     );

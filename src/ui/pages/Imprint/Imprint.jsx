@@ -8,11 +8,11 @@ const Imprint = () => {
     //const name = "Aldin Zecirevic, Sadik Hrnjica";
     const address = "Bahnhofstrasse 6";
     const city = "5210 Windisch";
-    const email = "makerstudio.windisch@fhnw.ch";
+    const email = "makerverse.windisch@fhnw.ch";
 
     return (
         <Container className="py-5">
-            <div className="p-5 mb-4 rounded-3">
+            <div className="p-5 mb-4 rounded-3 fs-4">
 
                 <Row>
                     <Col xs={12} sm={8} className="main-section">

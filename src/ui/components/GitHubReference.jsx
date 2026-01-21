@@ -4,7 +4,7 @@ import {Button} from "react-bootstrap";
 export default function GitHubReference(){
     return (
         <div>
-            <p>
+            <p className="fs-5">
                 <FormattedMessage
                     id="githubreference.githubInvite"
                     defaultMessage="Would you like to help shape this project? The source code is available on GitHub, and we welcome contributions, ideas, and feedback."
