@@ -1,4 +1,3 @@
-```md
 # Releasing
 
 This document describes the release process for **CookieCaster**.  
