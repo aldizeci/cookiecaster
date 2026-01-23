@@ -2,13 +2,13 @@
   "layout.device": "Gerät wird nicht unterstützt",
   "layout.querformat": "Bitte halte Dein Gerät im Querformat",
 
-  "githubreference.githubInvite": "Möchtest du dieses Projekt mitgestalten? Der Quellcode ist auf GitHub verfügbar, und wir freuen uns über Beiträge, Ideen und Feedback.",
+  "githubreference.githubInvite": "Wir freuen uns über Beiträge, Ideen und Feedback an makerverse.windisch@fhnw.ch. Möchtest du dieses Projekt mitgestalten? Der Quellcode ist auf GitHub verfügbar.",
   "githubreference.opensourceButton": "Auf GitHub beitragen",
 
-  "home.welcome": "Willkommen beim CookieCaster 3.0",
-  "home.start": "Möchtest Du Deine eigene persönliche Keksform gestalten?",
+  "home.welcome": "Willkommen bei CookieCaster 3.0",
+  "home.start": "Möchtest du deine eigene persönliche Keksform gestalten?",
   "home.startButton": "Los geht's!",
-  "home.needHelp": "Bist Du neu hier? Klicke auf das Fragezeichensymbol oben rechts, um die wichtigsten Schritte zu lernen.",
+  "home.needHelp": "Bist du neu hier? Klicke oben rechts auf das Fragezeichensymbol, um die wichtigsten Schritte zu lernen.",
 
 
 
@@ -45,7 +45,7 @@
   "start.export": "Export 3D",
   "start.backgroundImage": "Hintergrundbild anzeigen",
 
-  "export.settings": "Bitte nehme vor dem Export die gewünschten Einstellungen vor.",
+  "export.settings": "Bitte nimm vor dem Export die gewünschten Einstellungen vor.",
   "export.fileName": "Dateiname",
   "export.height": "Wandhöhe",
   "export.wallThickness": "Wandstärke",
@@ -63,7 +63,7 @@
 
   "ueber.title": "Was kann der CookieCaster 3.0?",
   "ueber.text1": "Mit dem Cookiecaster 3.0 kannst Du Deine ganz persönliche Keksform gestalten.",
-  "ueber.text2": "Mit den vielen Funktionen, wie zum Beispiel drehen und spiegeln, sind Deinen Fantasien keine Grenzen gesetzt. Speichere Deine Form, um sie später in der Galerie wieder zu finden oder exportiere sie,um sie auf einem 3D-Drucker auszudrucken.",
+  "ueber.text2": "Mit dem CookieCaster kannst du deine ganz persönliche Keksform gestalten. Dank der vielen Funktionen, wie zum Beispiel Drehen und Spiegeln, sind deiner Fantasie keine Grenzen gesetzt. Speichere deine Form, um sie später in der Galerie wiederzufinden, oder exportiere sie, um sie auf einem 3D-Drucker auszudrucken.",
   "ueber.text3": "Und jetzt viel Spass beim Ausprobieren!",
   "ueber.text4": "Hier noch ein kurzes Anleitungsvideo:",
 
@@ -77,11 +77,11 @@
   "alert.noSave": "Deine Ausstechform konnte nicht gespeichert werden. Sie erhält möglicherweise undruckbare Stellen.",
   "alert.exampleName": "z.B. Stern",
   "alert.noName": "Gib einen Namen ein.",
-  "alert.enterName": "Gibt Deiner Form einen Namen",
+  "alert.enterName": "Gib Deiner Form einen Namen",
   "alert.saveButton": "Speichern",
   "alert.cancelButton": "Abbrechen",
   "alert.empty": "Der Editor ist leer. Bitte zeichne Deine Ausstechform.",
-  "alert.morethan2forms": "Der Editor hat mehr als 2 Formen. Für den Export dürfen nur 1 oder 2 Formen existieren.",
+  "alert.morethan2forms": "Der Editor enthält mehr als zwei Formen. Für den Export dürfen maximal eine oder zwei Formen vorhanden sein.",
   "alert.open1": "Deine Ausstechform ist nicht geschlossene. Sie muss vor dem Export geschlossen werden.",
   "alert.open2":"Deine Ausstechform hat nicht geschlossene Formen. Diese müssen vor dem Export geschlossen werden.",
   "alert.validate": "Kantenüberschneidung(en) gefunden. Siehe rot markierte Stelle(n).",
@@ -89,14 +89,14 @@
   "alert.export": "Du kannst Deine Ausstechform exportieren. Sie ist druckbar.",
   "alert.useful": "Achtung: Entweder Deine Form hat zu spitze Winkel oder die innere Form ist zu nahe an der äusseren Form. Siehe rot markierte Stellen. Beachte, dass beides fürs Backen nicht geeinet ist.",
   "alert.service": "Service nicht verfügbar",
-  "alert.notAllowedExport": "Export nicht möglich, da keine Form vorhanden oder sie nicht druckbar ist. Bitte klicke im Editor auf Überprüfen.",
-  "alert.imageUploadTitle": "Bild setzen",
-  "alert.imageUploadDescription": "Wollen Sie das Bild skalieren oder verkleinern?",
-  "alert.shrink": "Ganzes Bild sichtbar",
-  "alert.scale": "Hintergrund ausfüllen",
-  "alert.enterFile": "Bitte wählen Sie zuerst ein Bild aus",
+  "alert.notAllowedExport": "Ein Export ist nicht möglich, da keine Form vorhanden ist oder diese nicht druckbar ist. Bitte klicke im Editor auf „Überprüfen”.",
+  "alert.imageUploadTitle": "Bild verwenden",
+  "alert.imageUploadDescription": "Bild darstellen:",
+  "alert.shrink": "in der Orginalgrösse",
+  "alert.scale": "an die Grösse anpassen",
+  "alert.enterFile": "Bitte wähle zuerst ein Bild aus",
   "alert.back": "Zurück",
   "alert.upload": "Bild hochladen",
-  "alert.imageUploadText": "Wählen Sie ein Bild aus Ihrer Galerie aus (Drag & Drop)"
+  "alert.imageUploadText": "Wähle mit Drag & Drop ein Bild aus"
   
 }
