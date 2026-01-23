@@ -1,0 +1,163 @@
+name: Daily Release
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Weekly on Sundays at midnight
+
+permissions:
+  contents: write
+
+jobs:
+    release:
+        name: Create Release Tag and Notes (if new commits exist)
+        runs-on: ubuntu-latest
+        outputs:
+            did_release: ${{ steps.result.outputs.did_release }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0  # Fetch all history for tags
+                ref: main
+
+            - name: Get latest tag (if any)
+              id: latest_tag
+              shell: bash
+              run: |
+                # Returns the most recent reachable tag; if none exists, leave empty
+                TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+                echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+            - name: Check for commits since latest tag
+              id: has_commits
+              shell: bash
+              run: |
+                LATEST_TAG="${{ steps.latest_tag.outputs.tag }}"
+
+                if [ -z "$LATEST_TAG" ]; then
+                  # No tags yet -> treat as "has commits" to allow first release
+                  echo "count=1" >> "$GITHUB_OUTPUT"
+                  echo "has_commits=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
+
+                COUNT="$(git rev-list "${LATEST_TAG}..HEAD" --count)"
+                echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+                if [ "$COUNT" -gt 0 ]; then
+                  echo "has_commits=true" >> "$GITHUB_OUTPUT"
+                else
+                  echo "has_commits=false" >> "$GITHUB_OUTPUT"
+                fi
+          
+            - name: Bump patch version
+              id: version
+              if: steps.has_commits.outputs.has_commits == 'true'
+              shell: bash
+              run: |
+                LATEST_TAG="${{ steps.latest_tag.outputs.tag }}"
+
+                if [ -z "$LATEST_TAG" ]; then
+                  NEW_VERSION="0.0.1"
+                else
+                  VERSION="${LATEST_TAG#v}"
+                  IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+                  PATCH=$((PATCH + 1))
+                  NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+                fi
+
+                echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+                echo "tag=v$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Check if tag already exists
+              id: check_tag
+              if: steps.has_commits.outputs.has_commits == 'true'
+              shell: bash
+              run: |
+                if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+                  echo "tag_exists=true" >> "$GITHUB_OUTPUT"
+                else
+                  echo "tag_exists=false" >> "$GITHUB_OUTPUT"
+                fi
+
+            - name: Bump version in package.json and VERSION.md
+              if: steps.has_commits.outputs.has_commits == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+              run: |
+                git config user.name "cookiecaster+actions"
+                git config user.email "cookiecaster+actions@github.com"
+                npm version ${{ steps.version.outputs.version }} -m "chore(release): ${{ steps.version.outputs.tag }}"
+                echo ${{ steps.version.outputs.version }} > VERSION.md
+                git add VERSION.md
+                git commit -m "chore(release): update VERSION.md to ${{ steps.version.outputs.version }}"
+                git push
+
+            - name: Create tag and push
+              if: steps.has_commits.outputs.has_commits == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+              shell: bash
+              run: |
+                git config user.name "cookiecaster+actions"
+                git config user.email "cookiecaster+actions@github.com"
+
+                git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+                git push origin "${{ steps.version.outputs.tag }}"
+        
+            - name: Generate Release Notes
+              id: release_notes
+              if: steps.has_commits.outputs.has_commits == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+              uses: softprops/action-gh-release@v2
+              with:
+                tag_name: ${{ steps.version.outputs.version }}
+                generate_release_notes: true
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Set result output
+              id: result
+              run: |
+                if [ "${{ steps.release_notes.outcome }}" = "success" ]; then
+                    echo "did_release=true" >> $GITHUB_OUTPUT
+                else
+                    echo "did_release=false" >> $GITHUB_OUTPUT
+                fi
+
+    deploy_gh_pages:
+        runs-on: ubuntu-latest
+        needs: release
+        if: needs.release.outputs.did_release == 'true'
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+
+            - name: Install dependencies
+              run: |
+                rm -rf node_modules package-lock.json
+                npm install
+
+            - name: Build project
+              run: |
+                START_TIME=$(date +%s)
+                npm run build
+                END_TIME=$(date +%s)
+                BUILD_TIME=$((END_TIME - START_TIME))
+                echo "Build completed in ${BUILD_TIME} seconds"
+                echo "${BUILD_TIME}" > build-time.txt
+
+            - name: Deploy to GitHub Pages
+              run: | 
+                git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+                npm run deploy -- -u "github-actions-bot <cookiecaster+actions@github.com>"
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: build-artifacts
+                path: |
+                    dist/
+                    build-time.txt

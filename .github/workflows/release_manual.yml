@@ -1,11 +1,11 @@
-name: Release New Version
+name: Manual Release New Version
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'VERSION.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 3.0.0)'
+        required: true
 
 permissions:
   contents: write
@@ -26,7 +26,7 @@ jobs:
             - name: Check if version tag exists
               id: check_tag
               run: |
-                VERSION_TAG="v$(cat VERSION.md | tr -d ' \n')"
+                VERSION_TAG="v$(${{ github.event.inputs.version }})"
                 if git rev-parse "$VERSION_TAG" >/dev/null 2>&1; then
                   echo "tag_exists=true" >> $GITHUB_OUTPUT
                 else
@@ -46,26 +46,32 @@ jobs:
                   echo "is_greater=false" >> $GITHUB_OUTPUT
                 fi
 
+            - name: Bump version in package.json and VERSION.md
+              if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_version.outputs.is_greater == 'true'
+              run: |
+                git config user.name "cookiecaster+actions"
+                git config user.email "cookiecaster+actions@github.com"
+                npm version ${{ github.event.inputs.version }} -m "chore(release): v${{ github.event.inputs.version }}"
+                echo ${{ github.event.inputs.version }} > VERSION.md
+                git add VERSION.md
+                git commit -m "chore(release): update VERSION.md to ${{ github.event.inputs.version }}"
+                git push
+
             - name: Create Tag and Push
               if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_version.outputs.is_greater == 'true'
               run: |
                 git config user.name "cookiecaster+actions"
                 git config user.email "cookiecaster+actions@github.com"
-                NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
+                NEW_VERSION=${{ github.event.inputs.version }}
                 git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
                 git push origin "v$NEW_VERSION"
-            - name: Read version
-              id: version
-              run: |
-                NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
-                echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
         
             - name: Generate Release Notes
               id: release_notes
               if: steps.check_tag.outputs.tag_exists == 'false' && steps.check_version.outputs.is_greater == 'true'
               uses: softprops/action-gh-release@v2
               with:
-                tag_name: ${{ steps.version.outputs.version }}
+                tag_name: v${{ github.event.inputs.version }}
                 generate_release_notes: true
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,10 +5,19 @@
 CookieCaster 3.0 is a freely available web application that allows users to draw their own personalized cookie cutters in order to print them later with a 3D printer. It provides validation of the cutter shape and recommends suitable print values (such as wall thickness and height) to prevent designs that would be unsuitable or unstable for 3D printing.
 
 - **CookieCaster 3.0**: [fhnw-makerverse.github.io](https://fhnw-makerverse.github.io/cookiecaster/)
+- **CookieCaster 3.0 Tutorial**: [fhnw-makerverse.github.io/#/ueber](https://fhnw-makerverse.github.io/cookiecaster/#/ueber)
+
+> **Note for Maintainers**
+>
+> If you are responsible for maintaining this repository, please make sure to review the
+> [Maintainer Instructions](./docs/maintainer.md) and the
+> [CONTRIBUTING guide](./CONTRIBUTING.md) before performing releases, merging pull requests,
+> or modifying CI/CD-related configurations.
 
 ## Diagrams
  
 All diagrams are drawn with [draw.io](https://draw.io). You can find the diagrams in `docs/diagrams/diagrams_cookiecaster.drawio.xml`. Import it in draw.io to edit them.
+
 
 ## Features
 - Draw personalized cookie cutter shapes directly in the browser
@@ -108,6 +117,8 @@ For more information see [here](./docs/storage-concept.md)
 Contributions are very welcome!
 Please read the contribution guidelines before getting started:
 - [CONTRIBUTING](./CONTRIBUTING.md).
+
+For a step by step instruction look [here](./CONTRIBUTING.md#start-contributing)
 
 ## Support & Issues
 If you encounter a bug or have a feature request, please open a GitHub Issue.
