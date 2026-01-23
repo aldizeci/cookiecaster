@@ -57,7 +57,7 @@ export default function DrawSidebar({
                 </div>
                 <div className="selector m-0 flex-shrink-0">
                     <select
-                        className="form-select form-select-sm"
+                        className="form-select form-select-sm fs-5"
                         aria-label="Zoom"
                         value={zoomIndex}
                         onChange={(e) => changeZoom(e.target.value)}
