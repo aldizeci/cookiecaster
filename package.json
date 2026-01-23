@@ -2,7 +2,7 @@
   "name": "cookiecaster3.0",
   "homepage": "https://github.com/fhnw-makerverse/cookiecaster",
   "private": true,
-  "version": "0.6.3",
+  "version": "0.6.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
