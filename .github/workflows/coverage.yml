@@ -3,10 +3,9 @@ name: Code Coverage Report
 on:
   push:
     branches:
-      - development
+      - main
   pull_request:
     branches:
-      - development
       - main
 
 
