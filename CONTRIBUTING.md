@@ -271,7 +271,11 @@ The following steps are performed automatically:
 - Deploy GitHub Pages automatically when changes are present.
 
 
-#### Automated Release Process
+#### Automated Release Process (Disabled)
+
+> **Note for Maintainers**
+>
+> At the moment this doesn't run, because there are restrictions for scheduled actions in the GitHub Organization
 
 If no release is triggered manually, the system automatically checks for new commits since the latest tag and creates a **minor release** if changes are detected.  
 For larger or breaking changes, please trigger a manual release as described in [Manual Releasing](#manual-releasing).

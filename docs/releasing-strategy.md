@@ -50,6 +50,9 @@ Once triggered, GitHub Actions will automatically:
 > The manual release workflow will only run if the provided version has not already been released.
 
 ---
+> **Note for Maintainers**
+>
+> At the moment this doesn't run, because there are restrictions for scheduled actions in the GitHub Organization
 
 ## Automatic Releasing
 
