@@ -26,7 +26,7 @@ jobs:
             - name: Check if version tag exists
               id: check_tag
               run: |
-                VERSION_TAG="v$(${{ github.event.inputs.version }})"
+                VERSION_TAG="v${{ github.event.inputs.version }}"
                 if git rev-parse "$VERSION_TAG" >/dev/null 2>&1; then
                   echo "tag_exists=true" >> $GITHUB_OUTPUT
                 else
