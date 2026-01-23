@@ -12,6 +12,13 @@ This guide explains **how to contribute**, **how branching works**, and **how re
 - [Branching Concept](#branching-concept)
   - [Important Branches](#important-branches)
   - [Branch Naming](#branch-naming)
+- [Start Contributing](#start-contributing)
+  - [Forking](#forking)
+  - [Start Branch](#start-branch)
+  - [Commit Notes](#commit-notes)
+  - [Create Pull Request](#create-pull-request)
+  - [Rebase a Branch](#rebase-a-branch)
+  - [Testing your Code](#testing-your-code)
 - [CI/CD](#cicd)
   - [Developing](#developing)
   - [Releasing](#releasing)
@@ -21,7 +28,6 @@ This guide explains **how to contribute**, **how branching works**, and **how re
 - [React Projet Structure](#react-project-structure)
   - [Directory Structure](#directory-structure)
   - [React Components Structure](#react-components-structure)
-- [Creating a Branch](#creating-a-branch)
 - [Commits](#commits)
 - [Pull Requests](#pull-requests)
 - [Testing](#testing)
@@ -39,13 +45,14 @@ Before you start working on something new, please:
 
 ### Contribution Workflow (High-Level)
 
-1. Create a branch from `development`
-2. Implement your changes
-3. Write tests if you add new functionality
-4. Commit with clear, descriptive messages
-5. Open a pull request back to `development`
-6. Notify makerverse.windisch@fhnw.ch by email with a link to your pull request
-7. Address review feedback if needed
+1. Fork this repository to your profile/organization with all repositories included
+2. Create a branch from `main`
+3. Implement your changes
+4. Write tests if you add new functionality
+5. Commit with clear, descriptive messages
+6. Open a pull request back to this project in the `main` Branch
+7. Notify makerverse.windisch@fhnw.ch by email with a link to your pull request
+8. Address review feedback if needed
 
 ---
 
@@ -56,8 +63,7 @@ Before you start working on something new, please:
 #### `main`
 - Contains **production-ready code**
 - Runs on **GitHub Pages**
-- ❌ No direct pushes allowed
-- Only updated via merges from `development`
+- Only updated via merges from `forks` of this repository
 
 #### `gh-pages`
 - Contains only the generated files required for GitHub Pages
@@ -65,17 +71,11 @@ Before you start working on something new, please:
 - ❌ No manual changes allowed
 - Generated using `yarn deploy`
 
-#### `development`
-- Main working branch for ongoing development
-- Always ahead of `main`
-- All features, fixes, and improvements are merged here first
-- Release branches are created from this branch
-
 ---
 
 ### Branch Naming
 
-All contribution branches must be created **from `development`** and follow this naming convention:
+All contribution branches must be created **from the `main` branch** in your fork and follow this naming convention:
 
 | Branch Prefix   | Purpose                               | Example                  |
 |-----------------|----------------------------------------|--------------------------|
@@ -84,6 +84,159 @@ All contribution branches must be created **from `development`** and follow this
 | `docs/*`        | Documentation changes                  | `docs/metrics`           |
 | `chore/*`       | Maintenance or CI/CD changes           | `chore/add-ci-tests`     |
 | `release/*`     | Prepare a new production release       | `release/v1.0.3`         |
+
+Following this convention helps clearly communicate the purpose of a branch and, when applicable, link it to a specific bug or feature. Each branch should focus on a single concern only, such as fixing one bug or implementing one feature.
+
+---
+
+## Start Contributing
+
+### Forking
+
+[Fork the project](https://docs.github.com/de/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) to your GitHub account and clone the repository.  
+Cloning the `main` branch is sufficient.
+
+```shell
+git clone git@github.com:aldizeci/cookiecaster.git
+cd cookiecaster
+```
+
+Add the original repository as a remote named `upstream`:
+
+```shell
+git clone git@github.com:aldizeci/cookiecaster.git
+cd cookiecaster
+```
+
+Add a new remote `upstream` with this repository as value.
+```shell
+git remote add upstream https://github.com/fhnw-makerverse/cookiecaster.git
+```
+
+You can now pull updates from the upstream repository into your local `main` branch:
+
+```shell
+git fetch --all
+git pull upstream HEAD
+```
+
+Please continue to learn about [branches](#branching-concept).
+
+### Start Branch
+Create a new branch from `main` using the appropriate naming convention:
+
+```shell
+git checkout -b feature/sharing-feature
+```
+
+Implement your changes for the CookieCaster project on this branch.
+You can now work on your feature, fix, or documentation update in this branch.
+
+To start the local development server:
+
+```shell
+yarn run dev
+```
+
+### Commit Notes
+
+See [Commits](#commits) commit message guidelines.
+
+### Create Pull Request
+
+Before opening a pull request, update your local main branch and rebase your feature branch on top of it.
+
+```shell
+git checkout main
+git pull upstream HEAD
+
+git switch feature/sharing-feature
+git rebase main
+```
+
+After resolving any conflicts, push the branch to your fork.
+Note that force-pushing may be required after rebasing—use with care.
+
+**New branch on the remote:**
+```shell
+git push --set-upstream origin feature/sharing-feature
+```
+
+**Existing branch on the remote:**
+```shell
+git push -f origin feature/sharing-feature
+```
+
+Nagivate to your GitHub repository and create a PR there.
+
+The pull request should have a clear, descriptive title and reference any related issues (e.g. Fixes #123) if applicable. This allows issues to be closed automatically once the pull request is merge.
+
+See details [here](#pull-requests)
+
+### Rebase a Branch
+
+If your pull request is not based on the latest upstream `main`, you may be asked to rebase it.
+
+First, update your local `main` branch:
+
+```bash
+git checkout main
+git fetch --all
+git pull upstream HEAD
+```
+
+Then rebase your working branch on top of `main`:
+
+```bash
+git checkout feature/sharing-feature
+git rebase main
+```
+
+If conflicts occur, Git will pause the rebase and indicate the affected files.
+
+```
+git status
+
+  both modified: path/to/conflict.jsx
+```
+
+Edit the file(s), resolve the conflicts (search for `>>>` markers), then continue the rebase:
+
+```bash
+git add path/to/conflict.jsx
+git rebase --continue
+```
+
+After a successful rebase, push the updated history to your fork:
+
+```bash
+git push -f origin feature/sharing-feature
+```
+
+If you prefer a safer approach, perform the rebase on a temporary backup branch and replace your working branch afterward:
+
+```bash
+git checkout feature/sharing-feature
+git checkout -b feature/sharing-feature-rebase
+
+git rebase main
+
+git branch -D feature/sharing-feature
+git checkout -b feature/sharing-feature
+
+git push -f origin feature/sharing-feature
+```
+
+### Testing Your Code
+
+Verify that your changes do not break existing functionality by running the test suite:
+
+```shell
+npm run test
+```
+
+Please add or update tests as needed.
+A minimum code coverage of **80%** is required. See [Testing](#testing) for details.
 
 ---
 
@@ -95,7 +248,7 @@ CookieCaster uses GitHub Actions to ensure code quality and stability.
 
 ### Developing
 
-On every **pull request** to `development` or `main`:
+For every pull request targeting `main` in the upstream, the following automated checks are executed:
 
 - All tests are executed
 - Code style and quality checks run
@@ -217,27 +370,6 @@ The following diagram illustrates how components inside the `ui` folder are orga
 
 ---
 
-## Creating a Branch
-
-Before starting any work, create a new branch from `development` using the naming rules defined in  
-[Branch Naming](./CONTRIBUTING.md#branch-naming)
-
-```shell
-git fetch --all
-git pull
-git checkout -b feature/new-page
-```
-
-You can now work on your feature, fix, or documentation update in this branch.
-
-To start the local development server:
-
-```shell
-yarn run dev
-```
-
----
-
 ## Commits
 
 When your work is complete, commit your changes with clear and meaningful commit messages.
@@ -277,7 +409,8 @@ Once your work is finished:
 1. Push your branch to GitHub
 2. Open a pull request targeting the development branch
 3. Select a reviewer
-4. Address all review comments and requested improvements
+4. Notify makerverse.windisch@fhnw.ch by email with a link to your pull request
+5. Address all review comments and requested improvements
 
 Pull requests are reviewed according to
 [How to Review](./CONTRIBUTING.md#pull-requests)
