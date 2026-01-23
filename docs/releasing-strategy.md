@@ -75,4 +75,3 @@ For larger or breaking changes, please use the **manual releasing** process desc
 
 Thank you for helping release **CookieCaster 3.0**.  
 Your contributions ensure a reliable and transparent release process for everyone.
-```
