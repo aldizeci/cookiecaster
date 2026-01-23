@@ -38,7 +38,7 @@ jobs:
               run: |
                 LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
                 LATEST_VERSION=${LATEST_TAG#v}
-                NEW_VERSION=$(cat VERSION.md | tr -d ' \n')
+                NEW_VERSION=${{ github.event.inputs.version }}
                 
                 if [ "$(printf '%s\n%s\n' "$NEW_VERSION" "$LATEST_VERSION" | sort -V | head -n1)" = "$LATEST_VERSION" ] && [ "$NEW_VERSION" != "$LATEST_VERSION" ]; then
                   echo "is_greater=true" >> $GITHUB_OUTPUT
