@@ -3,7 +3,7 @@
   "layout.device": "Device is not supported",
   "layout.querformat": "Please use a tablet or desktop device.",
 
-  "githubreference.githubInvite": "Would you like to help shape this project? The source code is available on GitHub, and we welcome contributions, ideas, and feedback.",
+  "githubreference.githubInvite": "We welcome contributions, ideas, and feedback at makerverse.windisch@fhnw.ch. Would you like to help shape this project? The source code is available on GitHub.",
   "githubreference.opensourceButton": "Contribute on GitHub",
 
   "home.welcome": "Welcome to CookieCaster 3.0",
@@ -68,7 +68,7 @@
 
   "ueber.title": "What is the CookieCaster 3.0 able to do?",
   "ueber.text1": "With the Cookiecaster 3.0 you can create your own personal cookie cutter.",
-  "ueber.text2": "With a lot of functions like mirror and rotate you have no limits while designing. Save your shape to find it later in the gallery or export your cookie cutter to print it out onto a 3D-Printer.",
+  "ueber.text2": "With CookieCaster, you can design your very own custom cookie cutter. Thanks to the many features, such as rotating and mirroring, there are no limits to your creativity. Save your design to find it later in the gallery, or export it to print it on a 3D printer.",
   "ueber.text3": "And know have fun!",
   "ueber.text4": "A short tutorial:",
 
@@ -86,7 +86,7 @@
   "alert.saveButton": "Save",
   "alert.cancelButton": "Cancel",
   "alert.empty": "The editor is empty. Please draw your cookie cutter.",
-  "alert.morethan2forms": "Your editor shows more than 2 forms. To export you may only have 1 or 2 forms.",
+  "alert.morethan2forms": "“The editor contains more than two shapes. Only one or two shapes are allowed for export.”",
   "alert.open1": "Your cookie cutter is not closed. Please close before export.",
   "alert.open2":"Your cookie cutter has not closed forms. Please close all of them before export.",
   "alert.validate": "Edge intersections found. See red marked areas.",
@@ -94,13 +94,13 @@
   "alert.export": "You can export your cookie cutter.",
   "alert.useful": "Attention: Peak angle(s) or slots found. See red marked areas. Note, that too peaked angles and slots are not useful for baking.",
   "alert.service": "service is not available",
-  "alert.notAllowedExport": "Export is not possible, because your cookie cutter is not printable. Please click onto analyze.",
+  "alert.notAllowedExport": "An export is not possible, because your cookie cutter doesn't exist or is not printable. Please click onto 'analyze' in the editor.",
   "alert.imageUploadTitle": "Set image",
-  "alert.imageUploadDescription": "Shrink or scale image?",
-  "alert.shrink": "Whole picture visible",
-  "alert.scale": "Fill background",
+  "alert.imageUploadDescription": "Display image:",
+  "alert.shrink": "Original size",
+  "alert.scale": "Fit to size",
   "alert.enterFile": "Please select a picture first",
   "alert.back": "Back",
   "alert.upload": "Upload Picture",
-  "alert.imageUploadText": "Choose a picture from your gallery (Drag & Drop)"
+  "alert.imageUploadText": "Select an image using drag & drop."
 }

@@ -59,7 +59,7 @@ export default function UploadModal({
                 />
 
                 <div className="mt-4">
-                    <strong><FormattedMessage id="alert.scale" /></strong>
+                    <strong><FormattedMessage id="alert.imageUploadDescription" /></strong>
                     <div className="form-check">
                         <input
                             type="radio"

@@ -19,7 +19,7 @@ const About = () => {
                         </h2>
 
                         {/* Text */}
-                        <p className="mb-4">
+                        <p className="mb-4 fs-5">
                             <FormattedMessage id="ueber.text1" />
                             <br /><br />
                             <FormattedMessage id="ueber.text2" />
