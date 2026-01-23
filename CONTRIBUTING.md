@@ -83,7 +83,6 @@ All contribution branches must be created **from the `main` branch** in your for
 | `fix/*`         | Bug fixes                              | `fix/drawing-curves`     |
 | `docs/*`        | Documentation changes                  | `docs/metrics`           |
 | `chore/*`       | Maintenance or CI/CD changes           | `chore/add-ci-tests`     |
-| `release/*`     | Prepare a new production release       | `release/v1.0.3`         |
 
 Following this convention helps clearly communicate the purpose of a branch and, when applicable, link it to a specific bug or feature. Each branch should focus on a single concern only, such as fixing one bug or implementing one feature.
 
@@ -95,13 +94,6 @@ Following this convention helps clearly communicate the purpose of a branch and,
 
 [Fork the project](https://docs.github.com/de/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) to your GitHub account and clone the repository.  
 Cloning the `main` branch is sufficient.
-
-```shell
-git clone git@github.com:aldizeci/cookiecaster.git
-cd cookiecaster
-```
-
-Add the original repository as a remote named `upstream`:
 
 ```shell
 git clone git@github.com:aldizeci/cookiecaster.git
@@ -265,18 +257,31 @@ Here is a more [detailed](docs/releasing-strategy.md) version of the releasing.
 
 The release process is fully automated using CI/CD.
 
-1. A `release/vx.y.z` branch is created from `development`
-2. `VERSION.md` is updated with the new version number
-3. The update to `VERSION.md` triggers a GitHub Action which:
-   - Updates the version in `package.json`
-4. A pull request is opened to `development`
-5. **Before merging the pull request**, verify that:
-   - The GitHub Action has successfully updated `package.json`
-   - All tests and checks have passed
-6. The pull request is merged into `development`
-7. `development` is merged into `main`
-8. A Git tag and GitHub Release are created automatically
-9. GitHub Pages are deployed automatically
+#### Manual Releasing
+
+To create a release with a specific version number, a dedicated GitHub Action can be triggered manually.  
+You only need to provide the version number, which must be greater than the latest existing tag and must not already exist. This process should be used for releases that include significant fixes or new features.
+
+The following steps are performed automatically:
+
+- Verify that the specified Git tag does not already exist.
+- Verify that the provided version number is greater than the latest release.
+- Update the version in `package.json` and `VERSION.md`.
+- Create a new Git tag and the corresponding GitHub Release.
+- Deploy GitHub Pages automatically when changes are present.
+
+
+#### Automated Release Process
+
+If no release is triggered manually, the system automatically checks for new commits since the latest tag and creates a **minor release** if changes are detected.  
+For larger or breaking changes, please trigger a manual release as described in [Manual Releasing](#manual-releasing).
+
+1. The release pipeline runs daily at **19:00**.
+2. The pipeline checks whether new commits have been added since the latest Git tag.
+3. If changes are detected:
+   - The version is updated in `package.json` and `VERSION.md`.
+   - A new Git tag and a corresponding GitHub Release are created automatically.
+4. GitHub Pages are deployed automatically when changes are present.
 
 ---
 
@@ -297,29 +302,22 @@ If all checks pass, the pull request may be merged.
 
 ## Merging to Main
 
-### `development` → `main`
+### `fork` → `main`
 
-- Only merges from `development` to `main` are allowed
-- If `VERSION.md` **is not changed**:
-  - No new release is created
-- If `VERSION.md` **is changed**:
-  - A new release and deployment are triggered
+- Only merges from a fork into `main` are permitted.
+- The release process is handled automatically and runs on a scheduled basis (daily).
+- Changes to `VERSION.md` are **not required** for automated releases.
 
----
+Release behavior:
 
-## Merging Releases
+- If no significant changes are detected, no release is created.
+- If new commits are detected since the latest tag:
+  - A new release is created automatically.
+  - The version is incremented according to the automated release strategy.
+  - Deployment is triggered automatically.
 
-### `release/*` → `development`
+For significant or breaking changes, please use the [Manual Releasing](#manual-releasing) process.
 
-Use release branches **only** when publishing a new version.
-
-Steps:
-1. Create a branch: `release/vx.y.z` from `development`
-2. Update `VERSION.md` with the new version number
-3. Open a pull request to `development`
-4. **Before merging**, verify that the GitHub Action has correctly updated the version in `package.json`
-5. If the version update and all checks are successful, merge the pull request into `development`
-6. Afterward, proceed with merging `development` into `main`
 
 ---
 
@@ -362,6 +360,7 @@ The following diagram illustrates how components inside the `ui` folder are orga
 **Guidelines:**
 
 - Each page inside `ui/pages` has its own directory
+- The main page component, which composes and orchestrates all page-specific subcomponents, is located at the root of each directory inside `ui/pages`
 - Page-specific components are stored in a `components` subfolder
 - Page-specific hooks are stored in a `hooks` subfolder
 - Reusable components shared across multiple pages belong in `ui/components`
