@@ -65,7 +65,6 @@ jobs:
                   npm version "$TARGET_VERSION" -m "chore(release): v$TARGET_VERSION"
                 fi
 
-                npm version ${{ github.event.inputs.version }} -m "chore(release): v${{ github.event.inputs.version }}"
                 echo ${{ github.event.inputs.version }} > VERSION.md
                 git add VERSION.md
                 git commit -m "chore(release): update VERSION.md to ${{ github.event.inputs.version }}"
