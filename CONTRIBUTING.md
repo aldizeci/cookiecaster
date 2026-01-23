@@ -44,7 +44,8 @@ Before you start working on something new, please:
 3. Write tests if you add new functionality
 4. Commit with clear, descriptive messages
 5. Open a pull request back to `development`
-6. Address review feedback if needed
+6. Notify makerverse.windisch@fhnw.ch by email with a link to your pull request
+7. Address review feedback if needed
 
 ---
 
