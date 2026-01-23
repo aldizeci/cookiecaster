@@ -23,6 +23,10 @@ jobs:
                 fetch-depth: 0  # Fetch all history for tags
                 ref: main
 
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 24
+
             - name: Check if version tag exists
               id: check_tag
               run: |
@@ -51,6 +55,16 @@ jobs:
               run: |
                 git config user.name "cookiecaster+actions"
                 git config user.email "cookiecaster+actions@github.com"
+
+                CURRENT_VERSION=$(node -p "require('./package.json').version")
+                TARGET_VERSION="${{ github.event.inputs.version }}"
+
+                if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+                  echo "package.json already at $TARGET_VERSION, skipping npm version"
+                else
+                  npm version "$TARGET_VERSION" -m "chore(release): v$TARGET_VERSION"
+                fi
+
                 npm version ${{ github.event.inputs.version }} -m "chore(release): v${{ github.event.inputs.version }}"
                 echo ${{ github.event.inputs.version }} > VERSION.md
                 git add VERSION.md
