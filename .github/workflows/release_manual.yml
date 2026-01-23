@@ -61,6 +61,7 @@ jobs:
 
                 if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
                   echo "package.json already at $TARGET_VERSION, skipping npm version"
+                  exit 0
                 else
                   npm version "$TARGET_VERSION" -m "chore(release): v$TARGET_VERSION"
                 fi
