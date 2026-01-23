@@ -4,7 +4,7 @@
 import { jest } from "@jest/globals";
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 
 // IMPORTANT: ESM-safe module mocking
 const mockNavigate = jest.fn();

@@ -5,7 +5,7 @@
 import { jest } from "@jest/globals";
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 
 // Import AFTER environment is set
 import { useCustomItems } from "../../src/ui/pages/Gallery/hooks/useCustomItems.js"; // adjust path if needed

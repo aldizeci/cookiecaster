@@ -3,12 +3,7 @@ name: Code Coverage Report
 on:
   push:
     branches:
-      - development
-  pull_request:
-    branches:
-      - development
       - main
-
 
 permissions:
   contents: write
