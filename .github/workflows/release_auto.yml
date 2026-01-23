@@ -1,6 +1,7 @@
 name: Daily Release
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 * * * *'  # Weekly on Sundays at midnight
 
@@ -85,7 +86,17 @@ jobs:
               run: |
                 git config user.name "cookiecaster+actions"
                 git config user.email "cookiecaster+actions@github.com"
-                npm version ${{ steps.version.outputs.version }} -m "chore(release): ${{ steps.version.outputs.tag }}"
+
+                CURRENT_VERSION=$(node -p "require('./package.json').version")
+                TARGET_VERSION="${{ steps.version.outputs.version }}"
+
+                if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+                  echo "package.json already at $TARGET_VERSION, skipping npm version"
+                  exit 0
+                else
+                  npm version "$TARGET_VERSION" -m "chore(release): v$TARGET_VERSION"
+                fi
+
                 echo ${{ steps.version.outputs.version }} > VERSION.md
                 git add VERSION.md
                 git commit -m "chore(release): update VERSION.md to ${{ steps.version.outputs.version }}"
@@ -97,6 +108,8 @@ jobs:
               run: |
                 git config user.name "cookiecaster+actions"
                 git config user.email "cookiecaster+actions@github.com"
+
+                git tag -d "${{ steps.version.outputs.tag }}" 2>/dev/null || true
 
                 git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
                 git push origin "${{ steps.version.outputs.tag }}"
