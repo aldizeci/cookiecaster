@@ -294,6 +294,8 @@ For larger or breaking changes, please trigger a manual release as described in 
 Before merging a pull request, reviewers should:
 
 - Ensure all CI pipelines are green
+- Ensure proper Unit Tests are written
+- Ensure Code Coverage is `>= 80%` with `npm run test`
 - Clone the branch locally
 - Run `yarn run dev`
 - Verify the application works as expected
@@ -312,7 +314,7 @@ If all checks pass, the pull request may be merged.
 - The release process is handled automatically and runs on a scheduled basis (daily).
 - Changes to `VERSION.md` are **not required** for automated releases.
 
-Release behavior:
+### Release behavior:
 
 - If no significant changes are detected, no release is created.
 - If new commits are detected since the latest tag:
