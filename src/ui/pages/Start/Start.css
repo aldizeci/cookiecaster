@@ -45,10 +45,6 @@
 
 #drawingarea::before {
     display: none;
-    /*
-    content: "";
-    display: block;
-    padding-top: 100%;*/
 }
 
 
@@ -56,11 +52,8 @@
 
 /* === SIDENAV === */
 .sidenav {
-   /* width: clamp(300px, 25vw, 320px); */
     width: 350px;
     min-width: 350px;
-    /*min-width: 0px;*/
-    /*min-width: 0;*/
     background-color: var(--akzentfarbe1);
     color: white;
     padding: 1.5rem 1rem;
@@ -104,8 +97,6 @@
 }
 
 /* Sidenav styling */
-
-
 /* Headline in side panel */
 .sidenav h5 {
     font-size: 20px;
@@ -117,61 +108,6 @@
 .standard-font{
     font-size: 20px;
 }
-
-/* Responsive adjustment for smaller widths */
-/*@media (max-width: 1400px) {
-    .start-layout {
-        flex-direction: column;
-        align-items: center;
-        gap: 2rem;
-    }
-
-    .canvas-wrap {
-        justify-content: center;
-    }
-
-    #drawingarea {
-        width: 90vw;
-        height: 90vw;
-    }
-
-    .sidenav {
-        width: 90%;
-        margin-top: 1rem;
-        position: static;
-    }
-}*/
-
-/* Hide sidebars on smaller screens 
-@media (max-width: 1450px) {
-  .left-sidebar {
-    display: none;
-  }
-}*/
-
-
-
-/* === PORTRAIT MODE: hide complex UI, show only title === */
-/*@media (orientation: portrait) {
-    #drawingarea,
-    .sidenav,
-    .btn-primary,
-    h5,
-    .tooltip,
-    .tooltiptext {
-        display: none !important;
-    }
-
-    h7 {
-        font-size: 2rem;
-        color: var(--akzentfarbe2);
-    }*/
-
-    /* replace old .col-xs-6 with new Bootstrap 5 grid utility */
-   /* .col-6 {
-        padding-top: 50%;
-    }
-}*/
 
 
 h7 {
@@ -283,21 +219,6 @@ hr {
 #text {
     font-family: var(--hausschrift);
 }
-
-/* Adjusted height responsiveness */
-/*
-@media (max-height: 450px) {
-    .sidenav {
-        padding-top: 15px;
-    }
-}
-
-@media (max-width: 1199px) {
-    .sidenav {
-        width: 200px;
-        float: right;
-    }
-}*/
 
 /* === Tooltip === */
 .tooltip {
