@@ -42,7 +42,7 @@ export default function CustomNavbar() {
                 />
                 </span>
 
-                <span>CookieCaster 3.0</span>
+                <span fs-6 fs-sm-unset>CookieCaster 3.0</span>
             </Navbar.Brand>
 
             {/* Mobile Toggle */}
