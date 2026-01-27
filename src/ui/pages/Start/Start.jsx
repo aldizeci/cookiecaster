@@ -114,7 +114,7 @@ export default function Start() {
         return {linesY, linesX};
     }, [raster, size]);
 
-    const { importFromFile, exportToFile } = useCanvasInteractions({
+    const { exportToFile } = useCanvasInteractions({
         svgRef,
         analyze,
         analyzeGraph,
@@ -176,7 +176,6 @@ export default function Start() {
 
             <Drawer position="start" showDrawer={  showDrawer } setShowSidebar={setShowDrawer} onAnalyze={ analyzeGraph } 
                 onSave={saveGraph}
-                onLoadFromFile={importFromFile}
                 onExportToFile={exportToFile}
                 />
 

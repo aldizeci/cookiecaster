@@ -3,7 +3,7 @@ import {FormattedMessage} from "react-intl";
 import DrawerItem from "./DrawerItem";
 
 
-export default function Drawer( {showDrawer, setShowSidebar, position, onAnalyze, onSave, onLoadFromFile, onExportToFile }){
+export default function Drawer( {showDrawer, setShowSidebar, position, onAnalyze, onSave, onExportToFile }){
     return (
             <div>
                 <Offcanvas
