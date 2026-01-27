@@ -34,7 +34,7 @@ export default function CustomNavbar() {
                 to="/"
                 className="d-flex align-items-center gap-3 me-auto"
             >
-                <span className="fhnw-logo-safezone">
+                <span className="fhnw-logo-safezone d-none d-sm-inline">
                     <Image
                     className="fhnw-logo"
                     src={`${import.meta.env.BASE_URL}assets/FHNW.svg`}
@@ -42,7 +42,7 @@ export default function CustomNavbar() {
                 />
                 </span>
 
-                <span fs-6 fs-sm-unset>CookieCaster 3.0</span>
+                <span>CookieCaster 3.0</span>
             </Navbar.Brand>
 
             {/* Mobile Toggle */}
