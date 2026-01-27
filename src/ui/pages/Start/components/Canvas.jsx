@@ -1,7 +1,4 @@
 // components/Canvas.jsx
-import React from "react";
-import {FormattedMessage} from "react-intl";
-
 export default function Canvas({
                                    svgRef,
                                    viewBox,

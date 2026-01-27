@@ -1,5 +1,3 @@
-import React from "react";
-import {Link} from "react-router-dom";
 import {FormattedMessage} from "react-intl";
 import SidebarButtonWithTooltip from "./SidebarButtonWithTooltip";
 
@@ -96,6 +94,10 @@ export default function DrawSidebar({
 
             <SidebarButtonWithTooltip id="copy" msgId="start.copy">
                 <i className="far fa-clone"></i> <FormattedMessage id="start.copy"/>
+            </SidebarButtonWithTooltip>
+
+            <SidebarButtonWithTooltip id="loadFromFile" msgId="start.loadFromFile">
+                <i className="fas fa-folder-open"></i> <FormattedMessage id="start.loadFromFile"/>
             </SidebarButtonWithTooltip>
 
             {/* UPLOAD IMAGE */}

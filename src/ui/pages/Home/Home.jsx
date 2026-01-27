@@ -5,33 +5,6 @@ import GitHubReference from "../../components/GitHubReference.jsx";
 
 
 export default function Home() {
-   /* const [width, setWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => setWidth(window.innerWidth);
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []); */
-
-    //const isMobile = width <= 768;
-
-    // MOBILE VERSION
-    /*if (isMobile) {
-        return (
-            <Container className="mt-5">
-                <div className="p-5 bg-light rounded text-center">
-                    <h2>
-                        <FormattedMessage
-                            id="home.device"
-                            defaultMessage="Please use a tablet or desktop device."
-                        />
-                    </h2>
-                </div>
-            </Container>
-        );
-    } */
-
-    
     return (
         <Container className="mt-5">
             { /* DESKTOP/TABLET VERSION */ }
@@ -66,15 +39,6 @@ export default function Home() {
                                     defaultMessage="Start Drawing"
                                 />
                         </Button>
-
-                        {/* <Link to="/start">
-                            <Button variant="primary" size="lg">
-                                <FormattedMessage
-                                    id="home.startButton"
-                                    defaultMessage="Start Drawing"
-                                />
-                            </Button>
-                        </Link> */}
                     </Col>
 
                     {/* Right image */}

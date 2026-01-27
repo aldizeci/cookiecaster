@@ -1,5 +1,4 @@
-import { Children } from "react";
-import { Offcanvas, Button } from "react-bootstrap";
+import { Offcanvas } from "react-bootstrap";
 import {FormattedMessage} from "react-intl";
 import DrawerItem from "./DrawerItem";
 
@@ -30,9 +29,6 @@ export default function Drawer( {showDrawer, setShowSidebar, position, onAnalyze
                         </DrawerItem>
                         <DrawerItem onButtonClick={onSave}>
                             <i className="far fa-save"></i> <FormattedMessage id="start.save"/>
-                        </DrawerItem>
-                        <DrawerItem onButtonClick={onLoadFromFile}>
-                            <i className="fas fa-folder-open"></i> <FormattedMessage id="start.loadFromFile"/>
                         </DrawerItem>
                         <DrawerItem onButtonClick={onExportToFile}>
                             <i className="fas fa-file-export"></i> <FormattedMessage id="start.exportAsFile"/>

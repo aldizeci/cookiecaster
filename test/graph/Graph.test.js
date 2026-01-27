@@ -4,7 +4,6 @@ import { test, expect, jest, describe } from '@jest/globals';
 /**
  * Graph.test.js
  *
- * Adjust import paths to match your repo structure.
  * These tests are written based on Graph.js. :contentReference[oaicite:1]{index=1}
  */
 

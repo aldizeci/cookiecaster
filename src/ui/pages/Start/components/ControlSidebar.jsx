@@ -22,10 +22,6 @@ export default function ControlSidebar() {
                     <i className="fas fa-upload"></i> <FormattedMessage id="start.loadFromGallery"/>
                 </Link>
 
-                <SidebarButtonWithTooltip id="loadFromFile" msgId="start.loadFromFile">
-                    <i className="fas fa-folder-open"></i> <FormattedMessage id="start.loadFromFile"/>
-                </SidebarButtonWithTooltip>
-
                 <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportToFile">
                     <i className="fas fa-file-export"></i> <FormattedMessage id="start.exportAsFile"/>
                 </SidebarButtonWithTooltip>

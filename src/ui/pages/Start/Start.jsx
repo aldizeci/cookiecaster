@@ -1,6 +1,6 @@
 import './Start.css'
-import React, {useMemo, useRef, useState, useCallback} from "react";
-import {useIntl, FormattedMessage, defineMessages} from "react-intl";
+import {useMemo, useRef, useState, useCallback} from "react";
+import {useIntl, defineMessages} from "react-intl";
 import DrawSidebar from "./components/DrawSidebar.jsx";
 import UploadModal from "./components/UploadModal.jsx";
 import useCanvasInteractions from "./hooks/useCanvasInteractions.js";

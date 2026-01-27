@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import {useCallback} from "react";
 import {FormattedMessage} from "react-intl";
 import {Link} from "react-router-dom";
 import {Navbar, Nav, NavDropdown, Image, Container} from "react-bootstrap";
