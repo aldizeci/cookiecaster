@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback } from "react";
-import { FormattedMessage } from "react-intl";
-import { Link } from "react-router-dom";
+import {useState, useMemo, useCallback} from "react";
+import {FormattedMessage} from "react-intl";
+import {Link} from "react-router-dom";
 import createMesh from "../../../business-logic/mesh-operations/CreateMesh.js";
 import {useServices} from "../../../business-logic/services/ServicesProvider.jsx";
-import { meshToBinarySTL, downloadBinaryStl } from "../../../utils/ExportToBinarySTL.js";
+import {meshToBinarySTL, downloadBinaryStl} from "../../../utils/ExportToBinarySTL.js";
 import "./Export.css";
 
 // --------------------------------------------------------
@@ -30,8 +30,14 @@ function validateGraph(graph, svgHandler) {
     const zoom = svgHandler.getActZoomValue();
     graph.backup();
 
-    graph.forEachNode(n => { n.pos.x /= zoom; n.pos.y /= zoom; });
-    graph.forEachEdge(e => { e.q.x /= zoom; e.q.y /= zoom; });
+    graph.forEachNode(n => {
+        n.pos.x /= zoom;
+        n.pos.y /= zoom;
+    });
+    graph.forEachEdge(e => {
+        e.q.x /= zoom;
+        e.q.y /= zoom;
+    });
 
     const data = graph.validate();
     graph.restore();
@@ -83,91 +89,89 @@ export default function Export() {
     return (
         <div className="container mt-4">
 
-            <div className="card shadow-sm p-4">
-                <h2><FormattedMessage id="export.settings" /></h2>
+            <h2><FormattedMessage id="export.settings"/></h2>
 
-                <hr />
+            <hr/>
 
-                {/* --- FILENAME ROW --- */}
-                <div className="row align-items-center mb-3">
-                    <label className="col-sm-4 col-form-label">
-                        <FormattedMessage id="export.fileName" />
-                    </label>
-                    <div className="col-sm-8">
-                        <input
-                            type="text"
-                            value={filename}
-                            onChange={(e) => setFilename(e.target.value)}
-                            className="form-control"
-                        />
-                    </div>
+            {/* --- FILENAME ROW --- */}
+            <div className="row align-items-center mb-3">
+                <label className="col-sm-4 col-form-label">
+                    <FormattedMessage id="export.fileName"/>
+                </label>
+                <div className="col-sm-8">
+                    <input
+                        type="text"
+                        value={filename}
+                        onChange={(e) => setFilename(e.target.value)}
+                        className="form-control"
+                    />
                 </div>
-
-                {/* --- WALL THICKNESS ROW --- */}
-                <div className="row align-items-center mb-3">
-                    <label className="col-sm-4 col-form-label">
-                        <FormattedMessage id="export.wallThickness" />
-                    </label>
-                    <div className="col-sm-8">
-                        <select
-                            className="form-control"
-                            value={thickness}
-                            onChange={(e) => setThickness(parseFloat(e.target.value))}
-                        >
-                            <option value={1}>1 mm</option>
-                            <option value={1.5}>1.5 mm</option>
-                            <option value={2}>2 mm</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* --- HEIGHT ROW --- */}
-                <div className="row align-items-center mb-4">
-                    <label className="col-sm-4 col-form-label">
-                        <FormattedMessage id="export.height" />
-                    </label>
-                    <div className="col-sm-8">
-                        <select
-                            className="form-control"
-                            value={height}
-                            onChange={(e) => setHeight(parseFloat(e.target.value))}
-                        >
-                            <option value={12}>12 mm</option>
-                            <option value={17}>17 mm</option>
-                            <option value={23}>23 mm</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* --- BUTTONS --- */}
-                <div className="row mt-4">
-
-                    <div className="col-6 d-flex justify-content-start">
-                        <Link to="/start">
-                            <button className="btn btn-secondary btn-lg">
-                                <FormattedMessage id="export.backButton" />
-                            </button>
-                        </Link>
-                    </div>
-
-                    <div className="col-6 d-flex justify-content-end">
-                        <button
-                            className="btn btn-primary btn-lg"
-                            disabled={!data.valid || filename.length === 0}
-                            onClick={createAndDownloadMesh}
-                        >
-                            Export 3D
-                        </button>
-                    </div>
-
-                </div>
-
-                {!data.valid && (
-                    <p className="text-danger mt-3">
-                        <FormattedMessage id="alert.notAllowedExport" />
-                    </p>
-                )}
             </div>
+
+            {/* --- WALL THICKNESS ROW --- */}
+            <div className="row align-items-center mb-3">
+                <label className="col-sm-4 col-form-label">
+                    <FormattedMessage id="export.wallThickness"/>
+                </label>
+                <div className="col-sm-8">
+                    <select
+                        className="form-control"
+                        value={thickness}
+                        onChange={(e) => setThickness(parseFloat(e.target.value))}
+                    >
+                        <option value={1}>1 mm</option>
+                        <option value={1.5}>1.5 mm</option>
+                        <option value={2}>2 mm</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* --- HEIGHT ROW --- */}
+            <div className="row align-items-center mb-4">
+                <label className="col-sm-4 col-form-label">
+                    <FormattedMessage id="export.height"/>
+                </label>
+                <div className="col-sm-8">
+                    <select
+                        className="form-control"
+                        value={height}
+                        onChange={(e) => setHeight(parseFloat(e.target.value))}
+                    >
+                        <option value={12}>12 mm</option>
+                        <option value={17}>17 mm</option>
+                        <option value={23}>23 mm</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* --- BUTTONS --- */}
+            <div className="row mt-4">
+
+                <div className="col-6 d-flex justify-content-start">
+                    <Link to="/start">
+                        <button className="btn btn-secondary btn-lg">
+                            <FormattedMessage id="export.backButton"/>
+                        </button>
+                    </Link>
+                </div>
+
+                <div className="col-6 d-flex justify-content-end">
+                    <button
+                        className="btn btn-primary btn-lg"
+                        disabled={!data.valid || filename.length === 0}
+                        onClick={createAndDownloadMesh}
+                    >
+                        Export 3D
+                    </button>
+                </div>
+
+            </div>
+
+            {!data.valid && (
+                <p className="text-danger mt-3">
+                    <FormattedMessage id="alert.notAllowedExport"/>
+                </p>
+            )}
         </div>
     );
 }

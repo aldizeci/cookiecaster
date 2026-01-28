@@ -18,6 +18,8 @@
     --akzentfarbe2: #8c5a37;
     --akzentfarbe3: #aba491;
     --akzentfarbe4: #ed1a1f;
+    --bs-primary: #8c5a37;
+    --bs-primary-rgb: 140, 90, 55;
 }
 
 /* ------------------------------------------------------------
@@ -213,8 +215,14 @@ input[type="file"].form-control:hover::file-selector-button {
 }
 
 .btn-primary {
-    background-color: var(--akzentfarbe2);
-    border-color: var(--akzentfarbe2);
+    --bs-btn-bg: var(--akzentfarbe2);
+    --bs-btn-border-color: var(--akzentfarbe2);
+    --bs-btn-hover-bg: var(--hintergrundfarbe);
+    --bs-btn-hover-border-color: var(--akzentfarbe2);
+    --bs-btn-active-bg: var(--hintergrundfarbe);
+    --bs-btn-active-border-color: var(--akzentfarbe2);
+    --bs-btn-disabled-bg: var(--akzentfarbe2);
+    --bs-btn-disabled-border-color: var(--akzentfarbe2);
 }
 
 .btn-primary:hover,
@@ -222,4 +230,9 @@ input[type="file"].form-control:hover::file-selector-button {
 .btn-primary:active {
     background-color: var(--hintergrundfarbe);
     border-color: var(--akzentfarbe2);
+}
+
+.modal-footer {
+    background-color: var(--hintergrundfarbe);
+    border-top: none;
 }
