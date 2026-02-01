@@ -35,7 +35,7 @@ const About = () => {
                                 controls
                             >
                                 <source
-                                    src="/cookiecaster/assets/Cookiecaster_Tutorial_2.1.mp4"
+                                    src="/cookiecaster/assets/Tutorial_Cookiecaster3.mp4"
                                     type="video/mp4"
                                 />
                                 Your browser does not support the video tag.
