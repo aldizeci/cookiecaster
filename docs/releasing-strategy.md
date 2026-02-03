@@ -23,7 +23,7 @@ Manual releases are intended for **major changes, important fixes, or new featur
 
 ### Triggering a Manual Release
 
-To create a manual release, open the GitHub Action responsible for manual releases.
+To create a manual release, open the [GitHub Action](https://github.com/fhnw-makerverse/cookiecaster/actions/workflows/release_manual.yml) responsible for manual releases.
 
 In the GitHub Action:
 
@@ -52,13 +52,13 @@ Once triggered, GitHub Actions will automatically:
 ---
 > **Note for Maintainers**
 >
-> At the moment this doesn't run, because there are restrictions for scheduled actions in the GitHub Organization
+> This is deactivated. The release should be controlled. But if the wish is there to automate it, you can enable the action again.
 
 ## Automatic Releasing
 
 Automatic releases are designed for **regular, incremental updates**.
 
-A scheduled GitHub Action runs **daily at 19:00** and performs the following steps:
+A scheduled GitHub Action runs **daily at 19:00 UTC** and performs the following steps:
 
 1. Checks whether new commits have been added since the latest Git tag.
 2. If changes are detected:

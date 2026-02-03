@@ -6,8 +6,9 @@ This document highlights the most important resources for maintaining this repos
 The following documents describe the release strategy, workflow, and merge procedures:
 - **a.** [Releasing Strategy](./releasing-strategy.md)
 - **b.** [Releasing Process](../CONTRIBUTING.md#releasing)
-- **c.** [Merging to Main](#merging-to-main)
-- **d.** [Merging Releases](#merging-releases)
+- **c.** [Merging to Main](../CONTRIBUTING.md#merging-to-main)
+- **d.** [Merging Releases](../CONTRIBUTING.md#merging-releases)
+- **e.** [Creating Release](./releasing-strategy.md#manual-releasing)
 
 ## 2. Handling Pull Requests
 Guidelines and best practices for reviewing and managing pull requests:
