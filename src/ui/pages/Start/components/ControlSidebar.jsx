@@ -22,7 +22,7 @@ export default function ControlSidebar() {
                     <i className="fas fa-upload"></i> <FormattedMessage id="start.loadFromGallery"/>
                 </Link>
 
-                <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportToFile">
+                <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportAsFile">
                     <i className="fas fa-file-export"></i> <FormattedMessage id="start.exportAsFile"/>
                 </SidebarButtonWithTooltip>
 
