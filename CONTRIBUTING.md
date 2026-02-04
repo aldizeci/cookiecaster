@@ -371,7 +371,9 @@ The following diagram illustrates how components inside the `ui` folder are orga
 - Page-specific hooks are stored in a `hooks` subfolder
 - Reusable components shared across multiple pages belong in `ui/components`
 - Application routing is defined in `App.jsx`
+- When adding a new page, the corresponding route must be registered in `App.jsx`
 - Hash-based routing is used to ensure compatibility with GitHub Pages
+- Optionally, the new page may be linked from the navigation bar
 
 ---
 
