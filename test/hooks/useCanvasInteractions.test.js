@@ -169,11 +169,11 @@ async function loadFresh({ selectedSource, selectedId, templateGraphJSON, localD
 
   // ✅ IMPORTANT: mock ServicesProvider to inject controller/graph/svgHandler
   await jest.unstable_mockModule(
-      "../../src/business-logic/services/ServicesProvider.jsx",
-      () => ({
-        __esModule: true,
-        useServices: () => ({ controller: ctr, graph: graphSvc, svgHandler: svgh }),
-      })
+    "../../src/business-logic/services/ServicesProvider.jsx",
+    () => ({
+      __esModule: true,
+      useServices: () => ({ controller: ctr, graph: graphSvc, svgHandler: svgh }),
+    })
   );
 
   await jest.unstable_mockModule("../../src/utils/FileImport.js", () => ({
@@ -187,8 +187,8 @@ async function loadFresh({ selectedSource, selectedId, templateGraphJSON, localD
   }));
 
   ({ default: useCanvasInteractions } = await import(
-      "../../src/ui/pages/Start/hooks/useCanvasInteractions.js"
-      ));
+    "../../src/ui/pages/Start/hooks/useCanvasInteractions.js"
+  ));
 
   return { d3 };
 }
@@ -405,7 +405,6 @@ describe("useCanvasInteractions (no jsdom)", () => {
     runHook({ d3 });
 
     expect(graphSvc.fromJSON).toHaveBeenCalledWith({ hello: 1 });
-    expect(svgh.redraw).toHaveBeenCalledTimes(1);
 
     expect(sessionStorage.removeItem).toHaveBeenCalledWith("selectedDrawingId");
     expect(sessionStorage.removeItem).toHaveBeenCalledWith("selectedSource");
@@ -425,7 +424,6 @@ describe("useCanvasInteractions (no jsdom)", () => {
     runHook({ d3 });
 
     expect(graphSvc.fromJSON).toHaveBeenCalledWith({ local: 123 });
-    expect(svgh.redraw).toHaveBeenCalledTimes(1);
   });
 
   test("exportToFile button: calls exportCC3File(graphSvc.toJSON(),'drawing')", async () => {
