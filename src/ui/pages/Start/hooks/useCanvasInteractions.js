@@ -17,6 +17,15 @@ function clearUnsavedDrawings() {
     saveAllDrawings(drawings);
 }
 
+function hasGraphContent(graphJSON) {
+    try {
+        const obj = typeof graphJSON === "string" ? JSON.parse(graphJSON) : graphJSON;
+        return obj?.nodes?.length > 0 || obj?.edges?.length > 0;
+    } catch {
+        return false;
+    }
+}
+
 export default function useCanvasInteractions({
                                                   svgRef,
                                                   analyze,
@@ -40,8 +49,7 @@ export default function useCanvasInteractions({
 
             svgh.updateMessage();
 
-            ctr.mode = new ctr.modi.MODE_SELECT();
-            ctr.mode.enable();
+            ctr.mode = ctr.modi.MODE_SELECT;
 
             alert("Vorlage erfolgreich geladen!");
         } catch {
@@ -66,6 +74,7 @@ export default function useCanvasInteractions({
             };
 
             // --- Load template / saved drawing ---
+            let figureLoaded = getAllDrawings().some(d => !d.saved && hasGraphContent(d.graphJSON));
             const selectedId = sessionStorage.getItem("selectedDrawingId");
             const selectedSource = sessionStorage.getItem("selectedSource");
 
@@ -84,6 +93,8 @@ export default function useCanvasInteractions({
                     if (graphData) {
                         graphSvc.fromJSON(graphData);
                         svgh.redraw();
+                        d3.select("#layer").remove();
+                        figureLoaded = hasGraphContent(graphData);
                     }
                 } catch { /* empty */
                 } finally {
@@ -91,6 +102,10 @@ export default function useCanvasInteractions({
                     sessionStorage.removeItem("selectedSource");
                     sessionStorage.removeItem("templateGraphJSON");
                 }
+            }
+
+            if (figureLoaded) {
+                d3.select("#layer").remove();
             }
 
             // --- Pointer events ---
@@ -175,7 +190,6 @@ export default function useCanvasInteractions({
 
                     svgh.updateMessage();
                     ctr.mode = ctr.modi.MODE_SELECT;
-                    ctr.mode.enable();
                     alert("Vorlage erfolgreich geladen!");
                 } catch { /* empty */
                 }
@@ -187,8 +201,10 @@ export default function useCanvasInteractions({
             });
 
             // Init mode
-            if (!ctr.mode) {
-                ctr.mode = new ctr.modi.MODE_DRAW();
+            if (figureLoaded) {
+                ctr.mode = ctr.modi.MODE_SELECT;
+            } else if (!ctr.mode) {
+                ctr.mode = ctr.modi.MODE_DRAW;
             }
             ctr.mode.enable();
 
