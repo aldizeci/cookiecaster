@@ -129,24 +129,12 @@ async function loadFresh({ selectedSource, selectedId, templateGraphJSON, localD
 
   ctr = {
     modi: {
-      MODE_DRAW: class MODE_DRAW {
-        enable() {}
-        disable() {}
-      },
-      MODE_SELECT: class MODE_SELECT {
-        enable() {}
-        disable() {}
-      },
-      MODE_MOVE: class MODE_MOVE {
-        enable() {}
-        disable() {}
-      },
-      MODE_ROTATE: class MODE_ROTATE {
-        enable() {}
-        disable() {}
-      },
+      MODE_DRAW: { enable: jest.fn(), disable: jest.fn() },
+      MODE_SELECT: { enable: jest.fn(), disable: jest.fn() },
+      MODE_MOVE: { enable: jest.fn(), disable: jest.fn() },
+      MODE_ROTATE: { enable: jest.fn(), disable: jest.fn() },
     },
-    mode: undefined,
+    _mode: undefined,
     reset: jest.fn(),
     mouseDown: jest.fn(),
     mouseMove: jest.fn(),
@@ -156,6 +144,17 @@ async function loadFresh({ selectedSource, selectedId, templateGraphJSON, localD
     copy: jest.fn(),
     mirror: jest.fn(),
   };
+  Object.defineProperty(ctr, "mode", {
+    get() { return this._mode; },
+    set(newMode) {
+      if (newMode === this._mode) return;
+      if (this._mode && typeof this._mode.disable === "function") this._mode.disable();
+      this._mode = newMode;
+      if (this._mode && typeof this._mode.enable === "function") this._mode.enable();
+    },
+    configurable: true,
+    enumerable: true,
+  });
 
   importCC3FileMock = jest.fn();
   exportCC3FileMock = jest.fn();
@@ -249,11 +248,7 @@ describe("useCanvasInteractions (no jsdom)", () => {
     importCC3FileMock.mockResolvedValue({ graphJSON: { foo: 1 } });
 
     const enableSpy = jest.fn();
-    ctr.modi.MODE_SELECT = class MODE_SELECT {
-      enable() {
-        enableSpy();
-      }
-    };
+    ctr.modi.MODE_SELECT = { enable: enableSpy, disable: jest.fn() };
 
     await api.importFromFile();
 
@@ -286,7 +281,7 @@ describe("useCanvasInteractions (no jsdom)", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith("keydown", expect.any(Function));
 
-    expect(ctr.mode).toBeInstanceOf(ctr.modi.MODE_DRAW);
+    expect(ctr.mode).toBe(ctr.modi.MODE_DRAW);
   });
 
   test("pointerdown: clears warnings when analyze.status true, removes #layer, calls ctr.mouseDown(pointerPos)", async () => {
