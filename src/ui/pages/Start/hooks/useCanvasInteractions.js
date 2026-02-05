@@ -75,13 +75,26 @@ export default function useCanvasInteractions({
 
         const updateSaveButtonEnabled = () => {
             const hasContent = hasGraphContent(graphSvc.toJSON());
+            const disabled = !hasContent;
 
-            // "grey" + non clickable
-            d3.select("#save")
-                .classed("disable-mode", !hasContent)
-                .property("disabled", !hasContent)
-                .attr("aria-disabled", (!hasContent).toString());
+            const sel = d3.selectAll(".js-save")
+                .classed("disable-mode", disabled)
+                .property("disabled", disabled)
+                .attr("aria-disabled", String(disabled));
+
+            if (disabled) {
+                sel.attr("disabled", "disabled");
+            } else {
+                sel.attr("disabled", null);
+            }
         };
+
+        const domObserver = new MutationObserver(() => {
+            updateSaveButtonEnabled();
+        });
+        domObserver.observe(document.body, {childList: true, subtree: true});
+
+        updateSaveButtonEnabled();
 
         // --- Load template / saved drawing ---
         let figureLoaded = getAllDrawings().some(d => !d.saved && hasGraphContent(d.graphJSON));
@@ -187,7 +200,7 @@ export default function useCanvasInteractions({
         d3.select("#copy").on("click", () => ctr.copy());
         d3.select("#erase").on("click", () => ctr.erase());
         d3.select("#analyze").on("click", analyzeGraph);
-        d3.select("#save").on("click", () => {
+        d3.selectAll(".js-save").on("click", () => {
             if (!hasGraphContent(graphSvc.toJSON())) return;
             saveGraph();
             updateSaveButtonEnabled();
@@ -231,6 +244,7 @@ export default function useCanvasInteractions({
         ctr.mode.enable();
 
         return () => {
+            domObserver.disconnect();
             window.removeEventListener("keydown", onKeyDown);
             svgSel.on(".pointerdown", null)
                 .on(".pointermove", null)

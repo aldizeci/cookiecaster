@@ -1,33 +1,38 @@
-import { Button } from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
+export default function DrawerItem({children, onButtonClick, to, closeDrawer, id, className, disabled}) {
+    const mergedClassName = ["drawer-item", className].filter(Boolean).join(" ");
 
-
-export default function DrawerItem( {children, onButtonClick, to, closeDrawer }){
     if (to) {
         return (
             <div>
                 <Button
-                        as={ Link }
-                        to={ to }
-                        variant="primary"
-                        className="drawer-item"
-                        onClick={() => closeDrawer(false)}
-                    >
-                        { children }
+                    as={Link}
+                    to={to}
+                    variant="primary"
+                    className={mergedClassName}
+                    onClick={() => closeDrawer(false)}
+                    id={id}
+                    disabled={disabled}
+                >
+                    {children}
                 </Button>
-            </div>)
+            </div>
+        );
     }
 
     return (
-            <div>
-                <Button
-                    className="drawer-item"
-                    variant="primary"
-                    onClick={() => onButtonClick()}
-                    >
-                        { children }
-                </Button>
-            </div>)
-
+        <div>
+            <Button
+                className={mergedClassName}
+                variant="primary"
+                onClick={() => onButtonClick()}
+                id={id}
+                disabled={disabled}
+            >
+                {children}
+            </Button>
+        </div>
+    );
 }
