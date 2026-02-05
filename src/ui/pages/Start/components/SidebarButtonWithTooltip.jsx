@@ -11,7 +11,7 @@ export default function SidebarButtonWithTooltip({id, msgId, children, placement
                 </Tooltip>
             }
         >
-            <button id={id} {...props}> {children} </button>
+            <button className="ps-0" id={id} {...props}> {children} </button>
         </OverlayTrigger>
     );
 }

@@ -105,7 +105,6 @@ export default function DrawSidebar({
                 id="upload"
                 msgId="start.uploadTooltip"
                 type="button"
-                className="btn btn-sm"
                 onClick={handleUploadClick}
             >
                 <i className="fas fa-camera"></i> <FormattedMessage id="start.upload"/>
