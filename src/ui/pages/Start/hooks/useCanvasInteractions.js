@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import {useEffect} from "react";
 import * as d3 from "d3";
-import { importCC3File } from "../../../../utils/FileImport.js";
-import { exportCC3File } from "../../../../utils/FileExport.js";
-import { useServices } from "../../../../business-logic/services/ServicesProvider.jsx";
+import {importCC3File} from "../../../../utils/FileImport.js";
+import {exportCC3File} from "../../../../utils/FileExport.js";
+import {useServices} from "../../../../business-logic/services/ServicesProvider.jsx";
 
 function getAllDrawings() {
     return JSON.parse(localStorage.getItem("drawings")) || [];
@@ -27,12 +27,12 @@ function hasGraphContent(graphJSON) {
 }
 
 export default function useCanvasInteractions({
-    svgRef,
-    analyze,
-    analyzeGraph,
-    saveGraph
-}) {
-    const { controller: ctr, graph: graphSvc, svgHandler: svgh } = useServices();
+                                                  svgRef,
+                                                  analyze,
+                                                  analyzeGraph,
+                                                  saveGraph
+                                              }) {
+    const {controller: ctr, graph: graphSvc, svgHandler: svgh} = useServices();
 
     const importFromFile = async () => {
         try {
@@ -70,7 +70,17 @@ export default function useCanvasInteractions({
 
         const pointerPos = (evt) => {
             const [x, y] = d3.pointer(evt, svgNode);
-            return { x: Math.round(x), y: Math.round(y) };
+            return {x: Math.round(x), y: Math.round(y)};
+        };
+
+        const updateSaveButtonEnabled = () => {
+            const hasContent = hasGraphContent(graphSvc.toJSON());
+
+            // "grey" + non clickable
+            d3.select("#save")
+                .classed("disable-mode", !hasContent)
+                .property("disabled", !hasContent)
+                .attr("aria-disabled", (!hasContent).toString());
         };
 
         // --- Load template / saved drawing ---
@@ -107,6 +117,9 @@ export default function useCanvasInteractions({
             d3.select("#layer").remove();
         }
 
+        // set initial enabled/disabled state for Save
+        updateSaveButtonEnabled();
+
         // --- Pointer events ---
         const onDown = (evt) => {
             if (analyze.status) svgh.clearWarnings();
@@ -130,6 +143,9 @@ export default function useCanvasInteractions({
                 saveAllDrawings(list);
             } catch { /* empty */
             }
+
+            // after any interaction, re-check if we have something to save
+            updateSaveButtonEnabled();
         };
 
         svgSel.on("pointerdown", onDown);
@@ -160,6 +176,7 @@ export default function useCanvasInteractions({
         d3.select("#reset").on("click", () => {
             ctr.reset();
             clearUnsavedDrawings();
+            updateSaveButtonEnabled();
         });
 
         d3.select("#draw").on("click", () => ctr.mode = ctr.modi.MODE_DRAW);
@@ -170,7 +187,11 @@ export default function useCanvasInteractions({
         d3.select("#copy").on("click", () => ctr.copy());
         d3.select("#erase").on("click", () => ctr.erase());
         d3.select("#analyze").on("click", analyzeGraph);
-        d3.select("#save").on("click", saveGraph);
+        d3.select("#save").on("click", () => {
+            if (!hasGraphContent(graphSvc.toJSON())) return;
+            saveGraph();
+            updateSaveButtonEnabled();
+        });
 
         // --- Import/Export ---
         d3.select("#loadFromFile").on("click", async () => {
@@ -191,6 +212,8 @@ export default function useCanvasInteractions({
                 ctr.mode = ctr.modi.MODE_SELECT;
                 alert("Vorlage erfolgreich geladen!");
             } catch { /* empty */
+            } finally {
+                updateSaveButtonEnabled();
             }
         });
 
@@ -215,5 +238,5 @@ export default function useCanvasInteractions({
         };
     }, [svgRef, analyze.status, analyzeGraph, saveGraph, ctr, graphSvc, svgh]);
 
-    return { importFromFile, exportToFile };
+    return {importFromFile, exportToFile};
 }
