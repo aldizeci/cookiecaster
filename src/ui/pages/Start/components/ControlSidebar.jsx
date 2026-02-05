@@ -17,9 +17,9 @@ export default function ControlSidebar() {
                 <i className="far fa-save"></i> <FormattedMessage id="start.save" />
             </SidebarButtonWithTooltip>
 
-            <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportAsFile">
-                <i className="fas fa-file-export"></i> <FormattedMessage id="start.exportAsFile" />
-            </SidebarButtonWithTooltip>
+            <Link id="load" className="nav-link" to="/gallery">
+                <i className="fas fa-upload"></i> <FormattedMessage id="start.loadFromGallery"/>
+            </Link>
 
             <SidebarButtonWithTooltip id="exportToFile" msgId="start.exportAsFile">
                 <i className="fas fa-file-export"></i> <FormattedMessage id="start.exportAsFile" />
